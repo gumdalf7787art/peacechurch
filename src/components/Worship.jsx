@@ -1,0 +1,409 @@
+import React from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight, Home } from 'lucide-react';
+
+/* ─────────────────────────── Sub-page Components ─────────────────────────── */
+
+function Word() {
+  // 샘플 유튜브 영상 데이터 (추후 API 연동으로 교체 가능)
+  const featuredVideo = {
+    id: '1',
+    title: '[주일예배] 하나님의 은혜를 기억하라 (시편 103:1-5)',
+    date: '2026.08.23',
+    thumbnail: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=1200&q=80'
+  };
+
+  // 과거 영상 더미 데이터 (총 12개)
+  const recentVideos = Array.from({ length: 12 }).map((_, i) => ({
+    id: `v${i}`,
+    title: `[주일예배] 믿음으로 승리하는 삶 - 제 ${12 - i}편`,
+    date: `2026.08.${String(20 - i).padStart(2, '0')}`,
+    thumbnail: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=500&q=80',
+  }));
+
+  return (
+    <div>
+      {/* ── 가장 최근 영상 (Featured Video, 65% width) ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '48px' }}>
+        <div style={{ width: '65%' }}>
+          {/* 16:9 비율 컨테이너 */}
+          <div style={{ 
+            position: 'relative', 
+            width: '100%', 
+            paddingBottom: '56.25%', 
+            backgroundColor: '#000', 
+            borderRadius: '16px', 
+            overflow: 'hidden', 
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.15)',
+            cursor: 'pointer',
+          }}
+          className="group"
+          >
+            <img 
+              src={featuredVideo.thumbnail} 
+              alt={featuredVideo.title} 
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85, transition: 'transform 0.5s ease' }} 
+              className="group-hover:scale-105"
+            />
+            {/* Play 아이콘 */}
+            <div style={{ 
+              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
+              width: '64px', height: '64px', backgroundColor: '#cc0000', borderRadius: '50%', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(204,0,0,0.4)',
+              transition: 'transform 0.2s'
+            }}
+            className="group-hover:scale-110"
+            >
+              <div style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: '16px solid #fff', marginLeft: '4px' }}></div>
+            </div>
+          </div>
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: '#111', marginBottom: '6px' }}>{featuredVideo.title}</h3>
+            <span style={{ fontSize: '14px', color: '#666' }}>{featuredVideo.date}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 구분선 */}
+      <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '48px 0' }} />
+
+      {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '48px' }}>
+        {recentVideos.map((video) => (
+          <div key={video.id} style={{ cursor: 'pointer' }} className="group">
+            <div style={{ 
+              position: 'relative', width: '100%', paddingBottom: '56.25%', 
+              backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '12px' 
+            }}>
+              <img 
+                src={video.thumbnail} 
+                alt={video.title} 
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} 
+                className="group-hover:scale-105"
+              />
+              {/* 작은 Play 아이콘 오버레이 (호버 시 표시) */}
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: '12px solid #fff', marginLeft: '4px' }}></div>
+              </div>
+            </div>
+            <h4 style={{ 
+              fontSize: '15px', fontWeight: '600', color: '#222', lineHeight: '1.4', 
+              marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
+            }} className="group-hover:text-[#cc0000] transition-colors">
+              {video.title}
+            </h4>
+            <div style={{ fontSize: '13px', color: '#888' }}>{video.date}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── 페이지네이션 (번호표) ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&lt;</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', borderRadius: '6px', cursor: 'pointer', color: '#fff', fontWeight: 'bold', fontSize: '14px', transition: 'all 0.2s' }}>1</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>2</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>3</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&gt;</button>
+      </div>
+
+    </div>
+  );
+}
+
+function Choir() {
+  // 샘플 유튜브 영상 데이터 (추후 API 연동으로 교체 가능)
+  const featuredVideo = {
+    id: '1',
+    title: '[특별찬양] 여호와는 나의 목자시니 - 할렐루야 찬양대',
+    date: '2026.08.23',
+    thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80'
+  };
+
+  // 과거 영상 더미 데이터 (총 12개)
+  const recentVideos = Array.from({ length: 12 }).map((_, i) => ({
+    id: `v${i}`,
+    title: `[주일찬양] 하나님의 은혜 - 할렐루야 찬양대`,
+    date: `2026.08.${String(20 - i).padStart(2, '0')}`,
+    thumbnail: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80',
+  }));
+
+  return (
+    <div>
+      {/* ── 가장 최근 영상 (Featured Video, 65% width) ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '48px' }}>
+        <div style={{ width: '65%' }}>
+          {/* 16:9 비율 컨테이너 */}
+          <div style={{ 
+            position: 'relative', 
+            width: '100%', 
+            paddingBottom: '56.25%', 
+            backgroundColor: '#000', 
+            borderRadius: '16px', 
+            overflow: 'hidden', 
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.15)',
+            cursor: 'pointer',
+          }}
+          className="group"
+          >
+            <img 
+              src={featuredVideo.thumbnail} 
+              alt={featuredVideo.title} 
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85, transition: 'transform 0.5s ease' }} 
+              className="group-hover:scale-105"
+            />
+            {/* Play 아이콘 */}
+            <div style={{ 
+              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
+              width: '64px', height: '64px', backgroundColor: '#cc0000', borderRadius: '50%', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(204,0,0,0.4)',
+              transition: 'transform 0.2s'
+            }}
+            className="group-hover:scale-110"
+            >
+              <div style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: '16px solid #fff', marginLeft: '4px' }}></div>
+            </div>
+          </div>
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: '#111', marginBottom: '6px' }}>{featuredVideo.title}</h3>
+            <span style={{ fontSize: '14px', color: '#666' }}>{featuredVideo.date}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 구분선 */}
+      <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '48px 0' }} />
+
+      {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '48px' }}>
+        {recentVideos.map((video) => (
+          <div key={video.id} style={{ cursor: 'pointer' }} className="group">
+            <div style={{ 
+              position: 'relative', width: '100%', paddingBottom: '56.25%', 
+              backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '12px' 
+            }}>
+              <img 
+                src={video.thumbnail} 
+                alt={video.title} 
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} 
+                className="group-hover:scale-105"
+              />
+              {/* 작은 Play 아이콘 오버레이 (호버 시 표시) */}
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: '12px solid #fff', marginLeft: '4px' }}></div>
+              </div>
+            </div>
+            <h4 style={{ 
+              fontSize: '15px', fontWeight: '600', color: '#222', lineHeight: '1.4', 
+              marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
+            }} className="group-hover:text-[#cc0000] transition-colors">
+              {video.title}
+            </h4>
+            <div style={{ fontSize: '13px', color: '#888' }}>{video.date}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── 페이지네이션 (번호표) ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&lt;</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', borderRadius: '6px', cursor: 'pointer', color: '#fff', fontWeight: 'bold', fontSize: '14px', transition: 'all 0.2s' }}>1</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>2</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>3</button>
+        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&gt;</button>
+      </div>
+
+    </div>
+  );
+}
+
+/* ─────────────────────────── Main Worship Layout ─────────────────────────── */
+
+const MENU_ITEMS = [
+  { path: '/worship/word', label: '예배와말씀' },
+  { path: '/worship/choir', label: '찬양단' },
+];
+
+export default function Worship() {
+  const location = useLocation();
+  const currentPath = location.pathname === '/worship' ? '/worship/word' : location.pathname;
+  const currentMenu = MENU_ITEMS.find(item => item.path === currentPath) || MENU_ITEMS[0];
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#fff' }}>
+      
+      {/* ── Full Width Top Banner ── */}
+      <div style={{
+        width: '100%',
+        height: '200px',
+        backgroundImage: 'url("https://images.unsplash.com/photo-1438032005730-c779502df39b?q=80&w=2000&auto=format&fit=crop")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative'
+      }}>
+        {/* Semi-transparent overlay for better text readability */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <h1 style={{ color: '#fff', fontSize: '38px', fontWeight: 700, letterSpacing: '2px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+            예배와찬양
+          </h1>
+        </div>
+      </div>
+
+      {/* ── Body: Sidebar + Content ── */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '60px 20px',
+        display: 'flex',
+        gap: '60px',
+        alignItems: 'flex-start'
+      }}>
+        
+        {/* ── Sidebar (LNB) ── */}
+        <nav style={{
+          width: '240px',
+          flexShrink: 0
+        }}>
+          {/* LNB Header */}
+          <div style={{
+            background: '#2a4358',
+            color: '#fff',
+            textAlign: 'center',
+            padding: '18px 0',
+            fontSize: '20px',
+            fontWeight: 500
+          }}>
+            예배와찬양
+          </div>
+          
+          {/* LNB Menu */}
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, borderTop: '1px solid #eee' }}>
+            {MENU_ITEMS.map((item) => {
+              const isActive = currentPath === item.path;
+              return (
+                <li key={item.path} style={{ borderBottom: '1px solid #eee' }}>
+                  <Link 
+                    to={item.path}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 20px',
+                      fontSize: '15px',
+                      fontWeight: isActive ? 'bold' : 'normal',
+                      color: isActive ? '#e64835' : '#444',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) e.currentTarget.style.color = '#e64835';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) e.currentTarget.style.color = '#444';
+                    }}
+                  >
+                    <span>{item.label}</span>
+                    {isActive && <ChevronRight size={16} color="#e64835" />}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* ── Main Content ── */}
+        <div style={{
+          flex: 1,
+          minWidth: 0
+        }}>
+          
+          {/* Breadcrumb */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '16px' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', color: '#888', textDecoration: 'none' }} title="홈으로 이동" onMouseEnter={(e) => e.currentTarget.style.color = '#333'} onMouseLeave={(e) => e.currentTarget.style.color = '#888'}>
+              <Home size={12} />
+            </Link>
+            <ChevronRight size={12} color="#ccc" />
+            <Link to="/worship/word" style={{ color: '#888', textDecoration: 'none' }} title="예배와찬양으로 이동" onMouseEnter={(e) => e.currentTarget.style.color = '#333'} onMouseLeave={(e) => e.currentTarget.style.color = '#888'}>
+              예배와찬양
+            </Link>
+            <ChevronRight size={12} color="#ccc" />
+            <span style={{ color: '#333' }}>{currentMenu.label}</span>
+          </div>
+
+          {/* Page Title & YouTube Button */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-end', 
+            paddingBottom: '20px', 
+            borderBottom: '1px solid #999',
+            marginBottom: '40px'
+          }}>
+            <h2 style={{ fontSize: '32px', fontWeight: 'normal', color: '#333', margin: 0 }}>
+              {currentMenu.label}
+            </h2>
+            <a 
+              href="https://youtube.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                backgroundColor: '#ff0000',
+                color: '#fff',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 6px rgba(255,0,0,0.2)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#cc0000';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#ff0000';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+              </svg>
+              유튜브 채널 바로가기
+            </a>
+          </div>
+
+          {/* Dynamic Content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Routes>
+                <Route path="/" element={<Word />} />
+                <Route path="word" element={<Word />} />
+                <Route path="choir" element={<Choir />} />
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
+
+        </div>
+      </div>
+    </div>
+  );
+}
