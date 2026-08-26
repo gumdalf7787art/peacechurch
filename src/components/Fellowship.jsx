@@ -595,11 +595,18 @@ function BusinessList() {
   return (
     <div>
       <div style={{ backgroundColor: '#f8fafc', padding: '24px 32px', borderRadius: '12px', marginBottom: '40px', borderLeft: '4px solid #cc0000' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px', margin: 0 }}>교우 사업장 안내</h3>
-        <p style={{ margin: 0, marginTop: '8px', fontSize: '14px', color: '#64748b', lineHeight: '1.6' }}>
-          우리 교회 성도님들이 운영하시는 사업장을 소개합니다.<br/>
-          많은 이용과 기도를 부탁드리며, 사업장 등록을 원하시는 성도님은 사무실로 문의해 주시기 바랍니다.
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px', margin: 0 }}>교우 사업장 안내</h3>
+            <p style={{ margin: 0, marginTop: '8px', fontSize: '14px', color: '#64748b', lineHeight: '1.6' }}>
+              우리 교회 성도님들이 운영하시는 사업장을 소개합니다.<br/>
+              많은 이용과 기도를 부탁드리며, 사업장 등록을 원하시는 성도님은 우측 버튼을 통해 등록해 주시기 바랍니다.
+            </p>
+          </div>
+          <Link to="/fellowship/business/write" style={{ padding: '12px 24px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s', whiteSpace: 'nowrap' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>
+            사업장 등록하기
+          </Link>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
@@ -626,10 +633,81 @@ function BusinessList() {
   );
 }
 
+function BusinessWrite() {
+  return (
+    <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', padding: '48px', border: '1px solid #f8fafc' }}>
+      <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#0f172a', marginBottom: '32px', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px' }}>사업장 등록하기</h2>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>사업장 이름</label>
+          <input type="text" placeholder="예: 평화 베이커리" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>대표 성도명 (직분)</label>
+          <input type="text" placeholder="예: 김평화 집사" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '24px', marginBottom: '24px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>업종 (카테고리)</label>
+          <select style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', appearance: 'none', backgroundColor: '#fff', cursor: 'pointer', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}>
+            <option value="">카테고리 선택</option>
+            <option value="음식점">음식점</option>
+            <option value="카페/베이커리">카페/베이커리</option>
+            <option value="꽃/식물">꽃/식물</option>
+            <option value="인테리어/건축">인테리어/건축</option>
+            <option value="의료/건강">의료/건강</option>
+            <option value="교육/학원">교육/학원</option>
+            <option value="안경/렌즈">안경/렌즈</option>
+            <option value="서비스/기타">서비스/기타</option>
+          </select>
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>전화번호</label>
+          <input type="text" placeholder="예: 02-123-4567" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '24px' }}>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>사업장 주소</label>
+        <input type="text" placeholder="예: 서울시 구로구 평화로 1길 10" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+      </div>
+
+      <div style={{ marginBottom: '32px' }}>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>간략 소개 및 영업 안내</label>
+        <textarea placeholder="사업장에 대한 간단한 소개, 특장점, 영업시간 등을 자유롭게 적어주세요." style={{ width: '100%', minHeight: '120px', padding: '16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', lineHeight: '1.6', color: '#334155', boxSizing: 'border-box', outline: 'none', resize: 'vertical', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+      </div>
+
+      <div style={{ marginBottom: '40px' }}>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>매장 사진 등록</label>
+        <div style={{ width: '100%', height: '200px', border: '2px dashed #cbd5e1', borderRadius: '16px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}>
+          <UploadCloud size={40} color="#94a3b8" />
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold', color: '#334155' }}>첫 번째 사진이 대표 이미지로 설정됩니다</p>
+            <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>이곳을 클릭하거나 사진을 드래그하여 업로드하세요</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
+        <Link to="/fellowship/business" style={{ padding: '16px 48px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '12px', fontSize: '16px', fontWeight: '600', textDecoration: 'none', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}>
+          취소
+        </Link>
+        <Link to="/fellowship/business" style={{ padding: '16px 64px', background: 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 10px 20px -5px rgba(204,0,0,0.4)' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; }}>
+          등록 신청하기
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function Business() {
   return (
     <Routes>
       <Route path="/" element={<BusinessList />} />
+      <Route path="write" element={<BusinessWrite />} />
       <Route path=":id" element={<BusinessDetail />} />
     </Routes>
   );
@@ -655,7 +733,7 @@ export default function Fellowship() {
       <div style={{
         width: '100%',
         height: '200px',
-        backgroundImage: 'url("https://images.unsplash.com/photo-1529070538774-1843cb1665eb?q=80&w=2000&auto=format&fit=crop")',
+        backgroundImage: 'url("/sub-header-bg.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative'
@@ -670,7 +748,7 @@ export default function Fellowship() {
           justifyContent: 'center'
         }}>
           <h1 style={{ color: '#fff', fontSize: '38px', fontWeight: 700, letterSpacing: '2px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-            나눔과교제
+            {/* 나눔과교제 */}
           </h1>
         </div>
       </div>

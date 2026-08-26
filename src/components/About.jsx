@@ -20,12 +20,104 @@ function Vision() {
 
 function Pastor() {
   return (
-    <div>
-      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
-        <div style={{ width: '320px', height: '420px', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '16px' }}>사진</div>
-        <div style={{ paddingTop: '10px' }}>
-          <h4 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px', color: '#222' }}>홍길동 담임목사</h4>
-          <p style={{ fontSize: '16px', color: '#444', lineHeight: 1.8 }}>환영합니다.<br />평화교회 담임목사입니다.</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+      
+      {/* Title */}
+      <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <h3 style={{ fontSize: '28px', fontWeight: 800, color: '#111', marginBottom: '16px', lineHeight: 1.4 }}>
+          "그리스도의 평화가 머무는 교회,<br/>세상에 그 평화를 전하는 교회"
+        </h3>
+      </div>
+
+      <div style={{ display: 'flex', gap: '50px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        {/* Left Side: Photo & Profile */}
+        <div style={{ flex: '0 0 320px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{ 
+            width: '100%', 
+            borderRadius: '12px', 
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)'
+          }}>
+            <img 
+              src="/pastor-profile.jpg" 
+              alt="장성진 담임목사" 
+              style={{ width: '100%', height: 'auto', display: 'block' }} 
+            />
+          </div>
+          
+          <div style={{ backgroundColor: '#f8f9fa', padding: '24px', borderRadius: '12px', border: '1px solid #eee' }}>
+            <h4 style={{ fontSize: '18px', fontWeight: 'bold', color: '#222', borderBottom: '2px solid #cc0000', paddingBottom: '12px', marginBottom: '16px' }}>PROFILE</h4>
+            <div style={{ fontSize: '15px', color: '#444', lineHeight: 1.8 }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', color: '#111', marginBottom: '12px' }}>장성진 담임목사</div>
+              <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', color: '#555' }}>
+                <li>감리교신학교 신학과 졸업</li>
+                <li>감리교신학교 대학원 졸업 (조직신학 전공)</li>
+                <li>Wesley University of Washington D.C.<br/><span style={{ fontSize: '13px', color: '#888' }}>D.Min. Asian Track (2011–2013)</span></li>
+                <li>필리핀 이주 노동자 목회 (2004–현재)</li>
+                <li>평화감리교회 담임 (2016–현재)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Greeting Text */}
+        <div style={{ flex: '1', minWidth: '300px', fontSize: '16px', color: '#333', lineHeight: 1.9, wordBreak: 'keep-all' }}>
+          <p style={{ marginBottom: '20px' }}>
+            평화교회 홈페이지를 찾아주신 여러분을 주님의 이름으로 환영합니다.<br/>
+            평화교회를 섬기고 있는 담임목사 <strong style={{ color: '#111' }}>장성진</strong>입니다.
+          </p>
+          
+          <p style={{ marginBottom: '20px' }}>
+            교회는 단순히 사람들이 모여 예배드리는 장소가 아니라, 하나님의 사랑을 배우고 그 사랑을 삶으로 살아내는 공동체라고 믿습니다.
+          </p>
+          
+          <p style={{ marginBottom: '20px' }}>
+            저는 목회의 길을 걸어오면서 다양한 삶의 자리에서 사람들을 만나왔습니다. 특히 2004년부터 필리핀 이주 노동자들을 섬기며, 낯선 땅에서 살아가는 이들의 기쁨과 아픔, 외로움과 소망을 가까이에서 함께해 왔습니다.
+          </p>
+
+          <p style={{ marginBottom: '20px' }}>
+            그 시간을 통해 한 가지를 더욱 깊이 깨닫게 되었습니다.
+          </p>
+
+          <div style={{ 
+            padding: '24px', 
+            backgroundColor: '#fff', 
+            borderLeft: '4px solid #cc0000',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+            marginBottom: '24px',
+            fontSize: '17px',
+            fontWeight: '600',
+            color: '#111'
+          }}>
+            복음은 말에만 머무는 것이 아니라 한 사람의 삶 곁으로 다가가 함께 울고, 함께 기뻐하며, 함께 걸어가는 사랑이어야 한다는 것입니다.
+          </div>
+
+          <p style={{ marginBottom: '20px' }}>
+            2016년부터 평화교회를 섬기면서도 이 마음을 잊지 않으려고 노력해 왔습니다.
+          </p>
+          
+          <p style={{ marginBottom: '20px' }}>
+            우리 교회가 예배의 기쁨이 살아 있는 교회, 말씀을 통해 삶의 방향을 발견하는 교회, 다음 세대가 믿음 안에서 꿈을 키우는 교회가 되기를 소망합니다. 또한 교회 안에만 머무르지 않고 이웃의 아픔을 돌아보며, 지역사회와 세상을 향해 예수 그리스도의 사랑과 평화를 나누는 교회가 되기를 기도합니다.
+          </p>
+
+          <p style={{ marginBottom: '20px' }}>
+            신앙생활을 처음 시작하시는 분도, 오랫동안 교회를 떠나 계셨던 분도, 삶의 어려움 가운데 위로와 새로운 길을 찾고 계신 분도 평화교회에서는 모두 소중한 한 사람입니다.
+          </p>
+
+          <p style={{ marginBottom: '20px' }}>
+            누구든 편안한 마음으로 찾아오십시오.<br/>
+            함께 예배하고, 함께 말씀을 배우며, 서로의 삶을 나누면서 하나님께서 우리에게 허락하신 믿음의 길을 함께 걸어가고 싶습니다.
+          </p>
+
+          <p style={{ marginBottom: '32px' }}>
+            평화교회가 여러분의 삶에 따뜻한 쉼이 되고, 다시 일어설 수 있는 소망이 되며, 하나님의 평화를 세상으로 전하는 믿음의 공동체가 되기를 소망합니다.<br/><br/>
+            여러분과 평화교회에서 만나 뵙기를 기다리겠습니다.<br/>
+            하나님의 은혜와 평화가 여러분의 가정과 삶 가운데 늘 함께하시기를 기도합니다.
+          </p>
+
+          <div style={{ textAlign: 'right', fontSize: '18px', fontWeight: 'bold', color: '#111' }}>
+            평화교회 담임목사 장 성 진 드림
+          </div>
         </div>
       </div>
     </div>
@@ -538,7 +630,7 @@ export default function About() {
       <div style={{
         width: '100%',
         height: '200px',
-        backgroundImage: 'url("https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2000&auto=format&fit=crop")',
+        backgroundImage: 'url("/sub-header-bg.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative'
@@ -553,7 +645,7 @@ export default function About() {
           justifyContent: 'center'
         }}>
           <h1 style={{ color: '#fff', fontSize: '38px', fontWeight: 700, letterSpacing: '2px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-            교회소개
+            {/* 교회소개 */}
           </h1>
         </div>
       </div>

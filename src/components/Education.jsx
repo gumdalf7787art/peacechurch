@@ -153,7 +153,7 @@ export default function Education() {
       <div style={{
         width: '100%',
         height: '200px',
-        backgroundImage: 'url("https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2000&auto=format&fit=crop")',
+        backgroundImage: 'url("/sub-header-bg.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative'
@@ -168,7 +168,7 @@ export default function Education() {
           justifyContent: 'center'
         }}>
           <h1 style={{ color: '#fff', fontSize: '38px', fontWeight: 700, letterSpacing: '2px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-            교육과선교
+            {/* 교육과선교 */}
           </h1>
         </div>
       </div>
