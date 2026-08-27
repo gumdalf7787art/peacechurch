@@ -367,10 +367,13 @@ function Hero() {
         >
           {/* Background Image */}
           <div className="absolute inset-0 bg-black/40 z-10" />
-          <img 
+          <motion.img 
             src={HERO_SLIDES[currentSlide].image} 
             alt="Hero Background" 
-            className="absolute inset-0 w-full h-full object-cover z-0" 
+            initial={{ scale: 1 }}
+            animate={{ scale: 1.1 }}
+            transition={{ duration: 6, ease: "linear" }}
+            className="absolute inset-0 w-full h-full object-cover z-0 origin-center" 
           />
           
           {/* Text Content */}
