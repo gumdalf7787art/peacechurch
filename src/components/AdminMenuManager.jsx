@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, GripVertical, Eye, EyeOff, Save, FolderTree } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Eye, EyeOff, Save, FolderTree, X } from 'lucide-react';
 
 export default function AdminMenuManager() {
   const [menus, setMenus] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ parentId: null, name: '', slug: '', error: '' });
 
   useEffect(() => {
     fetchMenus();
@@ -124,24 +128,42 @@ export default function AdminMenuManager() {
     }
   };
 
-  const handleAddMenu = async (parentId = null) => {
-    const name = window.prompt('새 메뉴 이름을 입력하세요:');
-    if (!name) return;
+  const handleAddMenuClick = (parentId = null) => {
+    setModalData({ parentId, name: '', slug: '', error: '' });
+    setIsModalOpen(true);
+  };
 
-    let slug = window.prompt('URL 경로(영어)를 입력하세요 (예: sample). 빈칸으로 두면 임의 생성됩니다:');
-    if (!slug) slug = 'page-' + Math.random().toString(36).substr(2, 6);
+  const handleSubmitMenu = async (e) => {
+    e.preventDefault();
+    const { parentId, name, slug } = modalData;
+    
+    if (!name) {
+      setModalData(prev => ({ ...prev, error: '메뉴 이름을 입력해주세요.' }));
+      return;
+    }
+
+    // Validation: English letters, numbers, and dashes only
+    const slugRegex = /^[a-zA-Z0-9-]+$/;
+    if (slug && !slugRegex.test(slug)) {
+      setModalData(prev => ({ ...prev, error: 'URL 경로는 영문, 숫자, 하이픈(-)만 사용할 수 있습니다.' }));
+      return;
+    }
+
+    // Auto-generate if empty
+    let finalSlug = slug;
+    if (!finalSlug) finalSlug = 'page-' + Math.random().toString(36).substr(2, 6);
     
     let sort_order = 1;
     let finalPath = '';
 
     if (parentId === null) {
       sort_order = menus.length + 1;
-      finalPath = `/${slug}`;
+      finalPath = `/${finalSlug}`;
     } else {
       const parent = menus.find(m => m.id === parentId);
       if (parent) {
         sort_order = parent.children.length + 1;
-        finalPath = `${parent.path}/${slug}`;
+        finalPath = `${parent.path}/${finalSlug}`;
       }
     }
 
@@ -151,9 +173,11 @@ export default function AdminMenuManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, path: finalPath, parent_id: parentId, sort_order })
       });
+      setIsModalOpen(false);
       fetchMenus();
     } catch(e) {
       console.error(e);
+      setModalData(prev => ({ ...prev, error: '서버 오류가 발생했습니다.' }));
     }
   };
 
@@ -202,7 +226,7 @@ export default function AdminMenuManager() {
                   <button onClick={() => handleToggleVisibility(menu.id)} className={`p-2 rounded-lg ${menu.is_active ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
                     {menu.is_active ? <Eye size={18}/> : <EyeOff size={18}/>}
                   </button>
-                  <button onClick={() => handleAddMenu(menu.id)} className="p-2 text-[#5227FF] bg-[#5227FF]/10 rounded-lg hover:bg-[#5227FF]/20"><Plus size={18}/></button>
+                  <button onClick={() => handleAddMenuClick(menu.id)} className="p-2 text-[#5227FF] bg-[#5227FF]/10 rounded-lg hover:bg-[#5227FF]/20"><Plus size={18}/></button>
                   <button onClick={() => handleDelete(menu.id)} className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100"><Trash2 size={18}/></button>
                 </div>
               </div>
@@ -236,11 +260,72 @@ export default function AdminMenuManager() {
             </div>
           ))}
 
-          <button onClick={() => handleAddMenu(null)} className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-black hover:text-black transition-colors flex items-center justify-center">
+          <button onClick={() => handleAddMenuClick(null)} className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-black hover:text-black transition-colors flex items-center justify-center">
             <Plus size={20} className="mr-2" /> 새 최상위 카테고리 추가
           </button>
         </div>
       </div>
+
+      {/* Menu Creation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-[400px] shadow-2xl relative"
+          >
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-[20px] font-bold text-gray-900 mb-6">
+              {modalData.parentId ? '새 하위 메뉴 추가' : '새 최상위 카테고리 추가'}
+            </h3>
+            
+            <form onSubmit={handleSubmitMenu} className="space-y-4">
+              <div>
+                <label className="block text-[14px] font-bold text-gray-700 mb-2">메뉴 이름 (한글/영문 모두 가능)</label>
+                <input 
+                  type="text" 
+                  value={modalData.name}
+                  onChange={(e) => setModalData({...modalData, name: e.target.value, error: ''})}
+                  placeholder="예: 샘플 메뉴"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-black outline-none transition-all text-[15px]"
+                  autoFocus
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[14px] font-bold text-gray-700 mb-2">URL 경로 (영문/숫자만 가능)</label>
+                <input 
+                  type="text" 
+                  value={modalData.slug}
+                  onChange={(e) => setModalData({...modalData, slug: e.target.value, error: ''})}
+                  placeholder="예: sample (선택사항)"
+                  className={\`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:outline-none transition-all text-[15px] \${modalData.error.includes('영문') ? 'border-red-500 focus:border-red-500 text-red-600 bg-red-50' : 'border-gray-200 focus:border-black'}\`}
+                />
+                <p className="text-[12px] text-gray-500 mt-2 ml-1">입력하지 않으면 임의의 주소가 자동 생성됩니다.</p>
+              </div>
+
+              {modalData.error && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[13px] font-medium flex items-center">
+                  <span className="mr-2">⚠️</span>
+                  {modalData.error}
+                </div>
+              )}
+
+              <button 
+                type="submit"
+                className="w-full bg-black text-white font-bold rounded-xl py-3.5 mt-2 hover:bg-gray-800 transition-colors text-[15px]"
+              >
+                메뉴 생성하기
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 }
