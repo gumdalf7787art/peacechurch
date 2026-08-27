@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Image as ImageIcon, Link as LinkIcon, Type, Plus, Trash2, Edit3, MoveUp, MoveDown, Save, MonitorPlay, MessageSquare, Megaphone, ToggleLeft, ToggleRight, Info, MapPin, Layout, AlignLeft, AlignCenter, AlignRight, ZoomIn, ZoomOut, MousePointer2 } from 'lucide-react';
+import { Image as ImageIcon, Link as LinkIcon, Type, Plus, Trash2, Edit3, MoveUp, MoveDown, Save, MonitorPlay, MessageSquare, Megaphone, ToggleLeft, ToggleRight, Info, MapPin, Layout, AlignLeft, AlignCenter, AlignRight, ZoomIn, ZoomOut, MousePointer2, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function AdminHomeManager() {
   const [activeTab, setActiveTab] = useState('hero');
   const [isSaving, setIsSaving] = useState(false);
+  const saveTimeoutRef = useRef(null);
+
+  const triggerAutoSave = () => {
+    setIsSaving(true);
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      setIsSaving(false);
+    }, 800);
+  };
 
   // Section Toggles
   const [sections, setSections] = useState({
@@ -15,7 +24,10 @@ export default function AdminHomeManager() {
     footer: true
   });
 
-  const toggleSection = (key) => setSections(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleSection = (key) => {
+    setSections(prev => ({ ...prev, [key]: !prev[key] }));
+    triggerAutoSave();
+  };
 
   const tabs = [
     { id: 'hero', label: '메인 슬라이드', icon: <MonitorPlay size={18} /> },
@@ -81,6 +93,7 @@ export default function AdminHomeManager() {
 
   const handleAddLocationGroup = () => {
     setLocationGroups([...locationGroups, { id: Date.now().toString(), title: '새 항목 그룹', items: [{ id: Date.now().toString() + '-1', label: '', value: '' }] }]);
+    triggerAutoSave();
   };
 
   const handleAddLocationItem = (groupId) => {
@@ -90,14 +103,7 @@ export default function AdminHomeManager() {
       }
       return group;
     }));
-  };
-
-  const handleFakeSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      alert('저장되었습니다. (현재는 프론트엔드 UI 프리뷰 모드입니다)');
-    }, 1000);
+    triggerAutoSave();
   };
 
   return (
@@ -105,6 +111,7 @@ export default function AdminHomeManager() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-5xl space-y-6 pb-20"
+      onChange={triggerAutoSave}
     >
       {/* Header */}
       <div className="flex justify-between items-end mb-8 border-b border-gray-200 pb-6">
@@ -118,14 +125,16 @@ export default function AdminHomeManager() {
             각 섹션의 내용과 보이기/숨기기 상태를 관리할 수 있습니다.
           </p>
         </div>
-        <button 
-          onClick={handleFakeSave}
-          disabled={isSaving}
-          className="bg-black text-white px-8 py-3 rounded-xl font-bold flex items-center hover:bg-gray-800 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] disabled:opacity-50"
-        >
-          <Save size={20} className="mr-2" />
-          {isSaving ? '저장 중...' : '모든 변경사항 적용'}
-        </button>
+        
+        <div className="flex items-center">
+          <div className="flex items-center text-[14px] font-bold text-gray-500 bg-gray-100 px-5 py-2.5 rounded-xl border border-gray-200">
+            {isSaving ? (
+              <><Loader2 size={16} className="animate-spin text-blue-500 mr-2" /> <span className="text-blue-600">자동 저장 중...</span></>
+            ) : (
+              <><CheckCircle2 size={16} className="text-green-500 mr-2" /> 모든 변경사항 저장됨</>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
