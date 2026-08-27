@@ -24,7 +24,8 @@ export async function onRequestPost(context) {
       `INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)`
     ).bind(email, passwordHash, name || '회원').run();
 
-    const token = await signJWT({ email: email, role: 'user' }, env.JWT_SECRET);
+    const secretKey = env.JWT_SECRET || 'peacechurch-default-secret-key-2026';
+    const token = await signJWT({ email: email, role: 'user' }, secretKey);
 
     return new Response(JSON.stringify({ 
       success: true, 

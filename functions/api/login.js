@@ -46,7 +46,8 @@ export async function onRequestPost(context) {
       role: result.role || 'user'
     };
 
-    const token = await signJWT({ email: result.email, role: result.role || 'user' }, env.JWT_SECRET);
+    const secretKey = env.JWT_SECRET || 'peacechurch-default-secret-key-2026';
+    const token = await signJWT({ email: result.email, role: result.role || 'user' }, secretKey);
 
     return new Response(JSON.stringify({ 
       success: true, 
