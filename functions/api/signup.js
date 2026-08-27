@@ -19,13 +19,15 @@ export async function onRequestPost(context) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
+    const role = (email === 'goodduck2@naver.com') ? 'admin' : 'user';
+
     // D1 데이터베이스에 유저 저장
     const result = await env.DB.prepare(
-      `INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)`
-    ).bind(email, passwordHash, name || '회원').run();
+      `INSERT INTO users (email, password_hash, name, role) VALUES (?, ?, ?, ?)`
+    ).bind(email, passwordHash, name || '회원', role).run();
 
     const secretKey = env.JWT_SECRET || 'peacechurch-default-secret-key-2026';
-    const token = await signJWT({ email: email, role: 'user' }, secretKey);
+    const token = await signJWT({ email: email, role: role }, secretKey);
 
     return new Response(JSON.stringify({ 
       success: true, 
