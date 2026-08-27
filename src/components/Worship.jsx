@@ -144,13 +144,13 @@ function Word() {
           {/* 구분선 */}
           {featuredVideo && <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '32px 0 md:margin-48px 0' }} className="my-8 md:my-12" />}
 
-          {/* ── 썸네일 카드 갤러리 (3열 구조) ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+          {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
+          <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8 md:mb-12">
             {recentVideos.map((video) => (
               <div key={video.id} style={{ cursor: 'pointer' }} className="group" onClick={() => setSelectedVideo(video)}>
                 <div style={{ 
                   position: 'relative', width: '100%', paddingBottom: '56.25%', 
-                  backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '12px' 
+                  backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '8px' 
                 }}>
                   <img 
                     src={video.thumbnail} 
@@ -160,16 +160,16 @@ function Word() {
                   />
                   {/* 작은 Play 아이콘 오버레이 (호버 시 표시) */}
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: '12px solid #fff', marginLeft: '4px' }}></div>
+                    <div style={{ width: 0, height: 0, borderTop: '6px solid transparent', borderBottom: '6px solid transparent', borderLeft: '10px solid #fff', marginLeft: '4px' }}></div>
                   </div>
                 </div>
                 <h4 style={{ 
-                  fontSize: '15px', fontWeight: '600', color: '#222', lineHeight: '1.4', 
-                  marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
-                }} className="group-hover:text-[#cc0000] transition-colors">
+                  fontWeight: '600', color: '#222', lineHeight: '1.4', 
+                  marginBottom: '4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
+                }} className="text-[12px] md:text-[15px] group-hover:text-[#cc0000] transition-colors tracking-tight">
                   {video.title}
                 </h4>
-                <div style={{ fontSize: '13px', color: '#888' }}>{video.date}</div>
+                <div className="text-[10px] md:text-[13px] text-[#888]">{video.date}</div>
               </div>
             ))}
           </div>
@@ -273,13 +273,13 @@ function Choir() {
       {/* 구분선 */}
       <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb' }} className="my-8 md:my-12" />
 
-      {/* ── 썸네일 카드 갤러리 (3열 구조) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+      {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
+      <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 mb-8 md:mb-12">
         {recentVideos.map((video) => (
           <div key={video.id} style={{ cursor: 'pointer' }} className="group" onClick={() => setSelectedVideo(video)}>
             <div style={{ 
               position: 'relative', width: '100%', paddingBottom: '56.25%', 
-              backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '12px' 
+              backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginBottom: '8px' 
             }}>
               <img 
                 src={video.thumbnail} 
@@ -289,16 +289,16 @@ function Choir() {
               />
               {/* 작은 Play 아이콘 오버레이 (호버 시 표시) */}
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: '12px solid #fff', marginLeft: '4px' }}></div>
+                <div style={{ width: 0, height: 0, borderTop: '6px solid transparent', borderBottom: '6px solid transparent', borderLeft: '10px solid #fff', marginLeft: '4px' }}></div>
               </div>
             </div>
             <h4 style={{ 
-              fontSize: '15px', fontWeight: '600', color: '#222', lineHeight: '1.4', 
-              marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
-            }} className="group-hover:text-[#cc0000] transition-colors">
+              fontWeight: '600', color: '#222', lineHeight: '1.4', 
+              marginBottom: '4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
+            }} className="text-[12px] md:text-[15px] group-hover:text-[#cc0000] transition-colors tracking-tight">
               {video.title}
             </h4>
-            <div style={{ fontSize: '13px', color: '#888' }}>{video.date}</div>
+            <div className="text-[10px] md:text-[13px] text-[#888]">{video.date}</div>
           </div>
         ))}
       </div>
