@@ -502,7 +502,7 @@ function Bulletin() {
         <span style={{ fontSize: '14px', color: '#666' }}>주보 썸네일을 클릭하면 원본 이미지를 볼 수 있습니다.</span>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {dummyBulletins.map((date, idx) => (
           <BulletinCard key={idx} date={date} />
         ))}
