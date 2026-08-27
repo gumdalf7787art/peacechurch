@@ -498,7 +498,7 @@ function QuickMenu() {
           <Link 
             key={idx} 
             to={menu.path} 
-            className="group relative w-full aspect-[3/5] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer block"
+            className="group relative w-full aspect-square sm:aspect-[3/5] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer block"
           >
             {/* Background Image */}
             <div className="absolute inset-0 bg-black/20 z-10 group-hover:bg-black/10 transition-colors duration-500" />
