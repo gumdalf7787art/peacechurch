@@ -457,7 +457,14 @@ export default function AdminHomeManager() {
                     </div>
 
                     <div className="w-full md:w-1/3 shrink-0">
-                      <h4 className="text-[15px] font-bold text-gray-900 mb-4">표어 배경 이미지</h4>
+                      <div className="flex justify-between items-end mb-4">
+                        <h4 className="text-[15px] font-bold text-gray-900">표어 배경 이미지</h4>
+                        {quickSection.bgImage && (
+                          <button onClick={() => updateQuickSection('bgImage', '')} className="text-[12px] font-bold text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
+                            배경 이미지 삭제
+                          </button>
+                        )}
+                      </div>
                       <label className="aspect-video bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors block">
                         {quickSection.bgImage ? (
                           <div className="w-full h-full bg-blue-900 flex items-center justify-center text-white/50 text-[12px]">
