@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Image as ImageIcon, Link as LinkIcon, Type, Plus, Trash2, Edit3, MoveUp, MoveDown, Save, MonitorPlay, MessageSquare, Megaphone, ToggleLeft, ToggleRight, Info, MapPin, Layout, AlignLeft, AlignCenter, AlignRight, ZoomIn, ZoomOut, MousePointer2, CheckCircle2, Loader2 } from 'lucide-react';
+import { Image as ImageIcon, Link as LinkIcon, Type, Plus, Trash2, Edit3, MoveUp, MoveDown, Save, MonitorPlay, MessageSquare, Megaphone, ToggleLeft, ToggleRight, Info, MapPin, Layout, AlignLeft, AlignCenter, AlignRight, ZoomIn, ZoomOut, MousePointer2, CheckCircle2, Loader2, Clock, FileText, PlayCircle } from 'lucide-react';
 
 export default function AdminHomeManager() {
   const [activeTab, setActiveTab] = useState('hero');
@@ -565,7 +565,12 @@ export default function AdminHomeManager() {
                               {link.customIcon ? (
                                 <img src={link.customIcon} className="w-10 h-10 object-contain z-10" />
                               ) : (
-                                <span className="text-[24px] relative z-10">{link.icon === 'Clock' ? '⏱️' : (link.icon === 'FileText' ? '📄' : (link.icon === 'PlayCircle' ? '▶️' : '📍'))}</span>
+                                <div className="z-10 text-gray-700">
+                                  {link.icon === 'Clock' && <Clock size={28} />}
+                                  {link.icon === 'FileText' && <FileText size={28} />}
+                                  {link.icon === 'PlayCircle' && <PlayCircle size={28} />}
+                                  {link.icon === 'MapPin' && <MapPin size={28} />}
+                                </div>
                               )}
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/icon:opacity-100 transition-opacity flex flex-col items-center justify-center z-20">
                                 <span className="text-white text-[11px] font-bold">아이콘 변경</span>
