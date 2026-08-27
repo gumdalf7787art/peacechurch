@@ -16,7 +16,8 @@ export async function onRequestGet(context) {
       return new Response(JSON.stringify({ success: false, message: "유효한 토큰이 없습니다." }), { status: 401 });
     }
 
-    const payload = await verifyJWT(token, env.JWT_SECRET);
+    const secretKey = env.JWT_SECRET || 'peacechurch-default-secret-key-2026';
+    const payload = await verifyJWT(token, secretKey);
     if (!payload) {
       return new Response(JSON.stringify({ success: false, message: "토큰이 만료되었거나 변조되었습니다." }), { status: 401 });
     }

@@ -83,7 +83,8 @@ export async function onRequestPost(context) {
     };
 
     // 4. JWT 발급
-    const token = await signJWT({ email: user.email, role: user.role }, env.JWT_SECRET);
+    const secretKey = env.JWT_SECRET || 'peacechurch-default-secret-key-2026';
+    const token = await signJWT({ email: user.email, role: user.role }, secretKey);
 
     return new Response(JSON.stringify({ 
       success: true, 
