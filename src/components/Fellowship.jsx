@@ -725,16 +725,15 @@ function Business() {
 
 /* ─────────────────────────── Main Fellowship Layout ─────────────────────────── */
 
-const MENU_ITEMS = [
-  { path: '/fellowship/grace', label: '은혜의글' },
-  { path: '/fellowship/gallery', label: '갤러리' },
-  { path: '/fellowship/business', label: '교우사업장소개' },
-];
+
 
 export default function Fellowship() {
+  const MENU_ITEMS = useSubMenus('/fellowship');
+  const currentMenuItems = MENU_ITEMS.length > 0 ? MENU_ITEMS : [{ path: '/fellowship/grace', label: '은혜의글' }];
+
   const location = useLocation();
   const currentPath = location.pathname === '/fellowship' ? '/fellowship/grace' : location.pathname;
-  const currentMenu = MENU_ITEMS.find(item => item.path === currentPath) || MENU_ITEMS[0];
+  const currentMenu = currentMenuItems.find(item => item.path === currentPath) || currentMenuItems[0];
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff' }}>
@@ -772,7 +771,7 @@ export default function Fellowship() {
             나눔과교제
           </div>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, borderTop: '1px solid #eee' }}>
-            {MENU_ITEMS.map((item) => {
+            {currentMenuItems.map((item) => {
               const isActive = currentPath === item.path;
               return (
                 <li key={item.path} style={{ borderBottom: '1px solid #eee' }}>

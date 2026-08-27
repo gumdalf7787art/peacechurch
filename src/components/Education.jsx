@@ -100,18 +100,15 @@ function Mens() {
 
 /* ─────────────────────────── Main Education Layout ─────────────────────────── */
 
-const MENU_ITEMS = [
-  { path: '/education/kids', label: '유초등부' },
-  { path: '/education/youth', label: '중고등부' },
-  { path: '/education/young-adult', label: '청년부' },
-  { path: '/education/womens', label: '여선교회' },
-  { path: '/education/mens', label: '남선교회' },
-];
+
 
 export default function Education() {
+  const MENU_ITEMS = useSubMenus('/education');
+  const currentMenuItems = MENU_ITEMS.length > 0 ? MENU_ITEMS : [{ path: '/education/kids', label: '유초등부' }];
+
   const location = useLocation();
   const currentPath = location.pathname === '/education' ? '/education/kids' : location.pathname;
-  const currentMenu = MENU_ITEMS.find(item => item.path === currentPath) || MENU_ITEMS[0];
+  const currentMenu = currentMenuItems.find(item => item.path === currentPath) || currentMenuItems[0];
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff' }}>
@@ -159,7 +156,7 @@ export default function Education() {
           
           {/* LNB Menu */}
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, borderTop: '1px solid #eee' }}>
-            {MENU_ITEMS.map((item) => {
+            {currentMenuItems.map((item) => {
               const isActive = currentPath === item.path;
               return (
                 <li key={item.path} style={{ borderBottom: '1px solid #eee' }}>

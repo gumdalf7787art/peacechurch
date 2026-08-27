@@ -778,21 +778,15 @@ function LocationPage() {
 
 /* ─────────────────────────── Main About Layout ─────────────────────────── */
 
-const MENU_ITEMS = [
-  { path: '/about/vision', label: '교회비전과 목표' },
-  { path: '/about/pastor', label: '담임목사 소개' },
-  { path: '/about/staff', label: '섬기는 분' },
-  { path: '/about/worship', label: '예배안내' },
-  { path: '/about/bulletin', label: '교회주보' },
-  { path: '/about/offering', label: '온라인헌금' },
-  { path: '/about/facility', label: '시설안내' },
-  { path: '/about/location', label: '찾아오시는 길' },
-];
+
 
 export default function About() {
+  const MENU_ITEMS = useSubMenus('/about');
+  const currentMenuItems = MENU_ITEMS.length > 0 ? MENU_ITEMS : [{ path: '/about/vision', label: '교회비전과 목표' }];
+
   const location = useLocation();
   const currentPath = location.pathname === '/about' ? '/about/vision' : location.pathname;
-  const currentMenu = MENU_ITEMS.find(item => item.path === currentPath) || MENU_ITEMS[0];
+  const currentMenu = currentMenuItems.find(item => item.path === currentPath) || currentMenuItems[0];
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff' }}>
@@ -840,7 +834,7 @@ export default function About() {
           
           {/* LNB Menu */}
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, borderTop: '1px solid #eee' }}>
-            {MENU_ITEMS.map((item) => {
+            {currentMenuItems.map((item) => {
               const isActive = currentPath === item.path;
               return (
                 <li key={item.path} style={{ borderBottom: '1px solid #eee' }}>
