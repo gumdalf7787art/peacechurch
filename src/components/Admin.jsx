@@ -8,6 +8,10 @@ const Admin = () => {
   const [currentView, setCurrentView] = useState('list'); // 'list', 'edit'
   const [editingPage, setEditingPage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    return sessionStorage.getItem('adminAuth') === 'true';
+  });
+  const [adminPassword, setAdminPassword] = useState('');
 
   // Form states
   const [formData, setFormData] = useState({ slug: '', title: '', content: '' });
@@ -123,6 +127,51 @@ const Admin = () => {
       alert("이미지 업로드 중 오류가 발생했습니다.");
     }
   };
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    // 제작자 전용 마스터 비밀번호 (필요시 변경 가능)
+    if (adminPassword === 'peace1234!') {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem('adminAuth', 'true');
+    } else {
+      alert('비밀번호가 일치하지 않습니다.');
+    }
+  };
+
+  if (!isAdminAuthenticated) {
+    return (
+      <div className="w-full min-h-screen bg-[#fafafc] flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 w-full max-w-sm text-center">
+          <div className="flex justify-center mb-6">
+            <img src="/logo.jpg" alt="로고" className="w-16 h-16 object-contain rounded-xl shadow-sm border border-black/5" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">관리자 로그인</h2>
+          <p className="text-sm text-gray-500 mb-8">제작자 전용 마스터 비밀번호를 입력해주세요.</p>
+          
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <input 
+              type="password" 
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder="마스터 비밀번호"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-black outline-none transition-all text-sm text-center"
+              autoFocus
+            />
+            <button 
+              type="submit"
+              className="w-full bg-black text-white font-bold rounded-lg py-3 hover:bg-gray-800 transition-colors"
+            >
+              접속하기
+            </button>
+          </form>
+          <button onClick={() => navigate('/')} className="mt-6 text-sm text-gray-400 hover:text-black underline underline-offset-4">
+            홈페이지로 돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-screen bg-[#f5f5f7] flex text-left overflow-hidden">
