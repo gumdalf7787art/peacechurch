@@ -27,79 +27,11 @@ export default function AdminMenuManager() {
     }
   };
 
-  const handleToggleVisibility = (menuId, parentId = null) => {
-    setMenus(prev => {
-      const newMenus = [...prev];
-      if (parentId === null) {
-        const idx = newMenus.findIndex(m => m.id === menuId);
-        newMenus[idx].is_active = newMenus[idx].is_active ? 0 : 1;
-      } else {
-        const parentIdx = newMenus.findIndex(m => m.id === parentId);
-        const childIdx = newMenus[parentIdx].children.findIndex(m => m.id === menuId);
-        newMenus[parentIdx].children[childIdx].is_active = newMenus[parentIdx].children[childIdx].is_active ? 0 : 1;
-      }
-      return newMenus;
-    });
-  };
-
-  const handleMoveUp = (menuId, parentId = null) => {
-    setMenus(prev => {
-      const newMenus = JSON.parse(JSON.stringify(prev));
-      if (parentId === null) {
-        const idx = newMenus.findIndex(m => m.id === menuId);
-        if (idx > 0) {
-          const temp = newMenus[idx];
-          newMenus[idx] = newMenus[idx - 1];
-          newMenus[idx - 1] = temp;
-          // update sort_order
-          newMenus.forEach((m, i) => m.sort_order = i + 1);
-        }
-      } else {
-        const parentIdx = newMenus.findIndex(m => m.id === parentId);
-        const children = newMenus[parentIdx].children;
-        const idx = children.findIndex(m => m.id === menuId);
-        if (idx > 0) {
-          const temp = children[idx];
-          children[idx] = children[idx - 1];
-          children[idx - 1] = temp;
-          children.forEach((m, i) => m.sort_order = i + 1);
-        }
-      }
-      return newMenus;
-    });
-  };
-
-  const handleMoveDown = (menuId, parentId = null) => {
-    setMenus(prev => {
-      const newMenus = JSON.parse(JSON.stringify(prev));
-      if (parentId === null) {
-        const idx = newMenus.findIndex(m => m.id === menuId);
-        if (idx < newMenus.length - 1) {
-          const temp = newMenus[idx];
-          newMenus[idx] = newMenus[idx + 1];
-          newMenus[idx + 1] = temp;
-          newMenus.forEach((m, i) => m.sort_order = i + 1);
-        }
-      } else {
-        const parentIdx = newMenus.findIndex(m => m.id === parentId);
-        const children = newMenus[parentIdx].children;
-        const idx = children.findIndex(m => m.id === menuId);
-        if (idx < children.length - 1) {
-          const temp = children[idx];
-          children[idx] = children[idx + 1];
-          children[idx + 1] = temp;
-          children.forEach((m, i) => m.sort_order = i + 1);
-        }
-      }
-      return newMenus;
-    });
-  };
-
-  const handleSave = async () => {
+  const saveMenusToDB = async (menusArray) => {
     setIsSaving(true);
     try {
       const flattened = [];
-      menus.forEach(m => {
+      menusArray.forEach(m => {
         flattened.push({ id: m.id, parent_id: null, sort_order: m.sort_order, is_active: m.is_active });
         m.children.forEach(c => {
           flattened.push({ id: c.id, parent_id: m.id, sort_order: c.sort_order, is_active: c.is_active });
@@ -111,12 +43,77 @@ export default function AdminMenuManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(flattened)
       });
-      alert('메뉴 구조가 성공적으로 저장되었습니다.');
     } catch (e) {
-      alert('저장 중 오류가 발생했습니다.');
+      console.error('자동 저장 중 오류:', e);
     }
     setIsSaving(false);
   };
+
+  const handleToggleVisibility = async (menuId, parentId = null) => {
+    const newMenus = JSON.parse(JSON.stringify(menus));
+    if (parentId === null) {
+      const idx = newMenus.findIndex(m => m.id === menuId);
+      newMenus[idx].is_active = newMenus[idx].is_active ? 0 : 1;
+    } else {
+      const parentIdx = newMenus.findIndex(m => m.id === parentId);
+      const childIdx = newMenus[parentIdx].children.findIndex(m => m.id === menuId);
+      newMenus[parentIdx].children[childIdx].is_active = newMenus[parentIdx].children[childIdx].is_active ? 0 : 1;
+    }
+    setMenus(newMenus);
+    await saveMenusToDB(newMenus);
+  };
+
+  const handleMoveUp = async (menuId, parentId = null) => {
+    const newMenus = JSON.parse(JSON.stringify(menus));
+    if (parentId === null) {
+      const idx = newMenus.findIndex(m => m.id === menuId);
+      if (idx > 0) {
+        const temp = newMenus[idx];
+        newMenus[idx] = newMenus[idx - 1];
+        newMenus[idx - 1] = temp;
+        newMenus.forEach((m, i) => m.sort_order = i + 1);
+      }
+    } else {
+      const parentIdx = newMenus.findIndex(m => m.id === parentId);
+      const children = newMenus[parentIdx].children;
+      const idx = children.findIndex(m => m.id === menuId);
+      if (idx > 0) {
+        const temp = children[idx];
+        children[idx] = children[idx - 1];
+        children[idx - 1] = temp;
+        children.forEach((m, i) => m.sort_order = i + 1);
+      }
+    }
+    setMenus(newMenus);
+    await saveMenusToDB(newMenus);
+  };
+
+  const handleMoveDown = async (menuId, parentId = null) => {
+    const newMenus = JSON.parse(JSON.stringify(menus));
+    if (parentId === null) {
+      const idx = newMenus.findIndex(m => m.id === menuId);
+      if (idx < newMenus.length - 1) {
+        const temp = newMenus[idx];
+        newMenus[idx] = newMenus[idx + 1];
+        newMenus[idx + 1] = temp;
+        newMenus.forEach((m, i) => m.sort_order = i + 1);
+      }
+    } else {
+      const parentIdx = newMenus.findIndex(m => m.id === parentId);
+      const children = newMenus[parentIdx].children;
+      const idx = children.findIndex(m => m.id === menuId);
+      if (idx < children.length - 1) {
+        const temp = children[idx];
+        children[idx] = children[idx + 1];
+        children[idx + 1] = temp;
+        children.forEach((m, i) => m.sort_order = i + 1);
+      }
+    }
+    setMenus(newMenus);
+    await saveMenusToDB(newMenus);
+  };
+
+
 
   const handleDelete = async (id) => {
     if(!window.confirm('정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)')) return;
@@ -195,16 +192,11 @@ export default function AdminMenuManager() {
             <FolderTree className="mr-2" size={24} /> 
             사이트 메뉴 (GNB) 구조 관리
           </h2>
-          <p className="text-gray-500 text-[14px] mt-1">웹사이트 상단 네비게이션 메뉴의 순서를 바꾸거나 켜고 끌 수 있습니다.</p>
+          <div className="flex items-center space-x-2 mt-1">
+            <p className="text-gray-500 text-[14px]">웹사이트 상단 네비게이션 메뉴의 순서를 바꾸거나 켜고 끌 수 있습니다.</p>
+            {isSaving && <span className="text-[12px] bg-green-50 text-green-600 px-2 py-0.5 rounded font-medium animate-pulse">자동 저장 중...</span>}
+          </div>
         </div>
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className="bg-black text-white px-6 py-2.5 rounded-xl font-bold flex items-center hover:bg-gray-800 transition-colors disabled:opacity-50"
-        >
-          <Save size={18} className="mr-2" />
-          {isSaving ? '저장 중...' : '변경사항 저장'}
-        </button>
       </div>
 
       <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
