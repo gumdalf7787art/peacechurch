@@ -95,15 +95,51 @@ export default function AdminHomeManager() {
     triggerAutoSave();
   };
 
-  const handleHeroImageUpload = (id, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateHeroSlide(id, 'image', reader.result);
+  const processAndUploadImage = (file, callback) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        const MAX_WIDTH = 1920;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const optimizedDataUrl = canvas.toDataURL('image/webp', 0.8);
+        callback(optimizedDataUrl);
       };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleHeroImageUpload = (id, e) => {
+    processAndUploadImage(e.target.files[0], (optimizedDataUrl) => {
+      updateHeroSlide(id, 'image', optimizedDataUrl);
+    });
+  };
+
+  const handleQuickBgUpload = (e) => {
+    processAndUploadImage(e.target.files[0], (optimizedDataUrl) => {
+      updateQuickSection('bgImage', optimizedDataUrl);
+    });
+  };
+
+  const handleQuickLinkImageUpload = (id, e) => {
+    processAndUploadImage(e.target.files[0], (optimizedDataUrl) => {
+      updateQuickLink(id, 'bgImage', optimizedDataUrl);
+    });
   };
 
   const DEFAULT_QUICK_SECTION = {
@@ -411,9 +447,11 @@ export default function AdminHomeManager() {
 
                     <div className="w-full md:w-1/3 shrink-0">
                       <h4 className="text-[15px] font-bold text-gray-900 mb-4">표어 배경 이미지</h4>
-                      <div className="aspect-video bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors">
+                      <label className="aspect-video bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors block">
                         {quickSection.bgImage ? (
-                          <div className="w-full h-full bg-blue-900 flex items-center justify-center text-white/50 text-[12px]">(배경 이미지)</div>
+                          <div className="w-full h-full bg-blue-900 flex items-center justify-center text-white/50 text-[12px]">
+                            <img src={quickSection.bgImage} className="w-full h-full object-cover opacity-50" />
+                          </div>
                         ) : (
                           <ImageIcon color="gray" size={32} className="opacity-50" />
                         )}
@@ -421,7 +459,8 @@ export default function AdminHomeManager() {
                           <ImageIcon color="white" size={32} className="mb-2" />
                           <span className="text-white font-bold text-[13px]">사진 변경</span>
                         </div>
-                      </div>
+                        <input type="file" accept="image/*" className="hidden" onChange={handleQuickBgUpload} />
+                      </label>
                     </div>
                   </div>
 
@@ -430,11 +469,12 @@ export default function AdminHomeManager() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {quickLinks.map((link, idx) => (
                         <div key={link.id} className="border border-gray-200 p-5 rounded-xl flex gap-4 bg-white relative group hover:border-black transition-colors shadow-sm">
-                          <div className="w-20 h-20 bg-gray-50 rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 relative overflow-hidden">
+                          <label className="w-20 h-20 bg-gray-50 rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 relative overflow-hidden block">
                             {link.bgImage && <img src={link.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-30" />}
                             <span className="text-[20px] relative z-10">{link.icon === 'Clock' ? '⏱️' : (link.icon === 'FileText' ? '📄' : (link.icon === 'PlayCircle' ? '▶️' : '📍'))}</span>
-                            <span className="text-[10px] text-gray-700 font-bold mt-1 relative z-10 bg-white/80 px-1 rounded">아이콘/배경</span>
-                          </div>
+                            <span className="text-[10px] text-gray-700 font-bold mt-1 relative z-10 bg-white/80 px-1 rounded">배경 변경</span>
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleQuickLinkImageUpload(link.id, e)} />
+                          </label>
                           <div className="flex-1 space-y-3">
                             <div>
                               <label className="block text-[11px] font-bold text-gray-500 mb-1">메뉴명 (타이틀)</label>
