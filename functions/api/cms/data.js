@@ -1,0 +1,50 @@
+export async function onRequestGet(context) {
+  const { env } = context;
+  try {
+    const { results } = await env.DB.prepare('SELECT id, value FROM cms_settings').all();
+    const data = {};
+    for (const row of results) {
+      try {
+        data[row.id] = JSON.parse(row.value);
+      } catch (e) {
+        data[row.id] = row.value; // fallback
+      }
+    }
+    return new Response(JSON.stringify({ success: true, data }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  try {
+    const body = await request.json();
+    // body is expected to be { id: "cms_...", value: <any> } or an array of such objects
+    
+    let items = Array.isArray(body) ? body : [body];
+    
+    const statements = items.map(item => {
+      const val = typeof item.value === 'object' ? JSON.stringify(item.value) : item.value;
+      return env.DB.prepare(
+        'INSERT INTO cms_settings (id, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP'
+      ).bind(item.id, val);
+    });
+    
+    await env.DB.batch(statements);
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
