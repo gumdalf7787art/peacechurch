@@ -822,20 +822,10 @@ export default function About() {
       </div>
 
       {/* ── Body: Sidebar + Content ── */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '60px 20px',
-        display: 'flex',
-        gap: '60px',
-        alignItems: 'flex-start'
-      }}>
+      <div className="max-w-[1200px] mx-auto px-4 md:px-5 py-8 md:py-[60px] flex flex-col md:flex-row gap-8 md:gap-[60px] items-start w-full">
         
         {/* ── Sidebar (LNB) ── */}
-        <nav style={{
-          width: '240px',
-          flexShrink: 0
-        }}>
+        <nav className="hidden md:block w-[240px] shrink-0">
           {/* LNB Header */}
           <div style={{
             background: '#2a4358',
@@ -884,10 +874,7 @@ export default function About() {
         </nav>
 
         {/* ── Main Content ── */}
-        <div style={{
-          flex: 1,
-          minWidth: 0
-        }}>
+        <div className="flex-1 w-full min-w-0">
           
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '16px' }}>
@@ -903,14 +890,7 @@ export default function About() {
           </div>
 
           {/* Page Title */}
-          <h2 style={{ 
-            fontSize: '32px', 
-            fontWeight: 'normal', 
-            color: '#333', 
-            paddingBottom: '20px', 
-            borderBottom: '1px solid #999',
-            marginBottom: '40px'
-          }}>
+          <h2 className="text-[26px] md:text-[32px] font-normal text-[#333] pb-4 md:pb-5 border-b border-[#999] mb-6 md:mb-10">
             {currentMenu.label}
           </h2>
 
