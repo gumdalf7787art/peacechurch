@@ -16,22 +16,34 @@ export default function AdminHomeManager() {
   };
 
   // Section Toggles
-  const [sections, setSections] = useState({
-    hero: true,
-    quick: true,
-    pastor: true,
-    location: true,
-    footer: true
+  const [sections, setSections] = useState(() => {
+    const saved = localStorage.getItem('cms_sections');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return {
+      hero: true,
+      quick: true,
+      worship: true,
+      pastor: true,
+      gallery: true,
+      location: true,
+      footer: true
+    };
   });
 
   const toggleSection = (key) => {
-    setSections(prev => ({ ...prev, [key]: !prev[key] }));
+    const newSections = { ...sections, [key]: !sections[key] };
+    setSections(newSections);
+    localStorage.setItem('cms_sections', JSON.stringify(newSections));
+    window.dispatchEvent(new Event('cms_sections_updated'));
     triggerAutoSave();
   };
 
   const tabs = [
     { id: 'hero', label: '메인 슬라이드', icon: <MonitorPlay size={18} /> },
     { id: 'quick', label: '표어 및 바로가기', icon: <LinkIcon size={18} /> },
+    { id: 'worship', label: '예배시간 안내', icon: <Clock size={18} /> },
     { id: 'pastor', label: '담임목사 인사말', icon: <MessageSquare size={18} /> },
     { id: 'location', label: '오시는길', icon: <MapPin size={18} /> },
     { id: 'footer', label: '풋터 설정', icon: <Layout size={18} /> },
@@ -620,6 +632,45 @@ export default function AdminHomeManager() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* WORSHIP SECTION SETTINGS */}
+          {activeTab === 'worship' && (
+            <div className={`bg-white rounded-[24px] p-8 border ${sections.worship ? 'border-gray-200 shadow-sm' : 'border-gray-100 bg-gray-50'}`}>
+              <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 pb-6 border-b border-gray-100 gap-4">
+                <div>
+                  <h3 className="text-[20px] font-bold text-gray-900 flex items-center">
+                    예배시간 안내 카드
+                    <span className={`ml-3 text-[12px] px-2 py-0.5 rounded-full ${sections.worship ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
+                      {sections.worship ? 'ON' : 'OFF'}
+                    </span>
+                  </h3>
+                </div>
+                <button 
+                  onClick={() => toggleSection('worship')}
+                  className={`flex items-center font-bold ${sections.worship ? 'text-[#5227FF]' : 'text-gray-400'}`}
+                >
+                  <span className="mr-2 text-[14px]">{sections.worship ? '섹션 노출됨' : '섹션 숨김'}</span>
+                  {sections.worship ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
+                </button>
+              </div>
+
+              <div className={`transition-opacity ${!sections.worship ? 'opacity-40 pointer-events-none' : ''}`}>
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-blue-100 p-3 rounded-full text-blue-600 shrink-0">
+                      <Info size={24} />
+                    </div>
+                    <div>
+                      <h4 className="text-[16px] font-bold text-gray-900 mb-2">예배시간 안내 연동</h4>
+                      <p className="text-[14px] text-gray-600 leading-relaxed break-keep">
+                        예배시간 안내의 내용은 <strong className="text-black">교회소개 {'>'} 예배안내</strong> 페이지의 내용을 가져와서 표기됩니다. 내용 수정이 필요하신 경우 해당 페이지 설정에서 변경해 주세요.
+                      </p>
                     </div>
                   </div>
                 </div>

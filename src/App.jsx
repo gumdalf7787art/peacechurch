@@ -735,6 +735,33 @@ function WorshipVideos() {
 }
 
 function WorshipSchedule() {
+  const [isVisible, setIsVisible] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('cms_sections');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.worship !== undefined) return parsed.worship;
+      }
+    } catch(e) {}
+    return true;
+  });
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        const saved = localStorage.getItem('cms_sections');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.worship !== undefined) setIsVisible(parsed.worship);
+        }
+      } catch(e) {}
+    };
+    window.addEventListener('cms_sections_updated', handleUpdate);
+    return () => window.removeEventListener('cms_sections_updated', handleUpdate);
+  }, []);
+
+  if (!isVisible) return null;
+
   return (
     <section id="worship-schedule" className="bg-white text-[#111] relative min-h-[350px] flex items-center border-t border-black/5 px-4 py-12 md:py-16 overflow-hidden">
       <div className="max-w-[1200px] w-full mx-auto flex flex-col md:flex-row items-center md:items-start h-full">
