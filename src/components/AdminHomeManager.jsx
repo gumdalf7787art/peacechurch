@@ -627,7 +627,7 @@ export default function AdminHomeManager() {
               <div className={`flex flex-col md:flex-row gap-8 transition-opacity ${!sections.pastor ? 'opacity-40 pointer-events-none' : ''}`}>
                 <div className="w-full md:w-1/3">
                   <label className="block text-[14px] font-bold text-gray-700 mb-2">프로필 (배경) 이미지</label>
-                  <label className="aspect-[3/4] bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 block">
+                  <label className="aspect-video bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 block">
                     <img src={pastorSection.image || "/pastor-bg.png"} alt="목사님" className="w-full h-full object-cover opacity-80" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity z-10">
                       <ImageIcon color="white" size={32} className="mb-2" />
