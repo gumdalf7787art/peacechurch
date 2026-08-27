@@ -9,63 +9,30 @@ function DepartmentInfo({ title, subtitle, imageSrc, description }) {
   return (
     <div>
       {/* Title Box */}
-      <div style={{ 
-        backgroundColor: '#f8fafc', 
-        borderLeft: '4px solid #cc0000', 
-        padding: '24px 32px', 
-        borderRadius: '0 8px 8px 0',
-        marginBottom: '40px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-      }}>
-        <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', marginBottom: '8px', margin: 0 }}>{title}</h3>
-        <p style={{ fontSize: '15px', color: '#555', margin: 0 }}>{subtitle}</p>
+      <div className="bg-[#f8fafc] border-l-[4px] border-[#cc0000] p-4 md:py-6 md:px-8 rounded-r-lg mb-8 md:mb-10 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+        <h3 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1 md:mb-2 m-0">{title}</h3>
+        <p className="text-[13px] md:text-[15px] text-[#555] m-0">{subtitle}</p>
       </div>
 
       {/* Card News (Horizontal) */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'row', 
-        backgroundColor: '#fff', 
-        border: '1px solid #eee', 
-        borderRadius: '16px', 
-        overflow: 'hidden', 
-        boxShadow: '0 10px 20px -5px rgba(0,0,0,0.05)',
-        marginBottom: '48px',
-        gap: '32px'
-      }}>
-        <div style={{ width: '45%', flexShrink: 0 }}>
-          <div style={{ 
-            width: '100%', 
-            height: '100%', 
-            minHeight: '260px',
-            backgroundImage: `url(${imageSrc})`, 
-            backgroundSize: 'cover', 
-            backgroundPosition: 'center' 
-          }} />
+      <div className="flex flex-col md:flex-row bg-white border border-[#eee] rounded-[16px] overflow-hidden shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] mb-8 md:mb-12 gap-0 md:gap-8">
+        <div className="w-full md:w-[45%] shrink-0">
+          <div 
+            className="w-full h-[200px] md:h-full md:min-h-[260px] bg-cover bg-center"
+            style={{ backgroundImage: `url(${imageSrc})` }} 
+          />
         </div>
-        <div style={{ padding: '32px 32px 32px 0', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <h4 style={{ fontSize: '20px', fontWeight: 'bold', color: '#cc0000', marginBottom: '16px', margin: 0 }}>사역 소개</h4>
-          <div style={{ fontSize: '15px', color: '#444', lineHeight: 1.8, wordBreak: 'keep-all' }}>
+        <div className="flex-1 flex flex-col justify-center p-6 md:py-8 md:pr-8 md:pl-0">
+          <h4 className="text-[18px] md:text-[20px] font-bold text-[#cc0000] mb-3 md:mb-4 m-0">사역 소개</h4>
+          <div className="text-[14px] md:text-[15px] text-[#444] leading-[1.8] break-keep">
             {description}
           </div>
         </div>
       </div>
 
       {/* Custom Content Section (빈 공간) */}
-      <div style={{
-        backgroundColor: '#fafafa',
-        border: '2px dashed #ddd',
-        borderRadius: '16px',
-        padding: '60px',
-        textAlign: 'center',
-        minHeight: '200px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#888',
-        fontSize: '15px'
-      }}>
-        자유롭게 추가하실 수 있는 빈 공간입니다. <br/>(사진 갤러리, 표, 조직도, 게시판 등을 넣을 수 있습니다)
+      <div className="bg-[#fafafa] border-2 border-dashed border-[#ddd] rounded-[16px] p-6 md:p-14 text-center min-h-[150px] md:min-h-[200px] flex items-center justify-center text-[#888] text-[13px] md:text-[15px]">
+        자유롭게 추가하실 수 있는 빈 공간입니다. <br className="hidden md:block" />(사진 갤러리, 표, 조직도, 게시판 등을 넣을 수 있습니다)
       </div>
     </div>
   );
@@ -174,20 +141,10 @@ export default function Education() {
       </div>
 
       {/* ── Body: Sidebar + Content ── */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '60px 20px',
-        display: 'flex',
-        gap: '60px',
-        alignItems: 'flex-start'
-      }}>
+      <div className="max-w-[1200px] mx-auto px-4 md:px-5 py-8 md:py-[60px] flex flex-col md:flex-row gap-8 md:gap-[60px] items-start w-full">
         
         {/* ── Sidebar (LNB) ── */}
-        <nav style={{
-          width: '240px',
-          flexShrink: 0
-        }}>
+        <nav className="hidden md:block w-[240px] shrink-0">
           {/* LNB Header */}
           <div style={{
             background: '#2a4358',
@@ -236,10 +193,7 @@ export default function Education() {
         </nav>
 
         {/* ── Main Content ── */}
-        <div style={{
-          flex: 1,
-          minWidth: 0
-        }}>
+        <div className="flex-1 w-full min-w-0">
           
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '16px' }}>
@@ -255,14 +209,7 @@ export default function Education() {
           </div>
 
           {/* Page Title */}
-          <h2 style={{ 
-            fontSize: '32px', 
-            fontWeight: 'normal', 
-            color: '#333', 
-            paddingBottom: '20px', 
-            borderBottom: '1px solid #999',
-            marginBottom: '40px'
-          }}>
+          <h2 className="text-[26px] md:text-[32px] font-normal text-[#333] pb-4 md:pb-5 border-b border-[#999] mb-6 md:mb-10 m-0">
             {currentMenu.label}
           </h2>
 
