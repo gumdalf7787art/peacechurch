@@ -68,13 +68,13 @@ export default function AdminHomeManager() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={\`flex-1 py-3 px-4 rounded-xl flex items-center justify-center font-bold text-[15px] transition-all duration-300 \${
+            className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center font-bold text-[15px] transition-all duration-300 ${
               activeTab === tab.id 
                 ? 'bg-white text-black shadow-sm' 
                 : 'text-gray-500 hover:text-black hover:bg-gray-200/50'
-            }\`}
+            }`}
           >
-            <span className={\`mr-2 \${activeTab === tab.id ? 'text-[#5227FF]' : ''}\`}>{tab.icon}</span>
+            <span className={`mr-2 ${activeTab === tab.id ? 'text-[#5227FF]' : ''}`}>{tab.icon}</span>
             {tab.label}
           </button>
         ))}

@@ -296,7 +296,7 @@ export default function AdminMenuManager() {
                   value={modalData.slug}
                   onChange={(e) => setModalData({...modalData, slug: e.target.value, error: ''})}
                   placeholder="예: sample (선택사항)"
-                  className={\`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:outline-none transition-all text-[15px] \${modalData.error.includes('영문') ? 'border-red-500 focus:border-red-500 text-red-600 bg-red-50' : 'border-gray-200 focus:border-black'}\`}
+                  className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:bg-white focus:outline-none transition-all text-[15px] ${modalData.error.includes('영문') ? 'border-red-500 focus:border-red-500 text-red-600 bg-red-50' : 'border-gray-200 focus:border-black'}`}
                 />
                 <p className="text-[12px] text-gray-500 mt-2 ml-1">입력하지 않으면 임의의 주소가 자동 생성됩니다.</p>
               </div>
