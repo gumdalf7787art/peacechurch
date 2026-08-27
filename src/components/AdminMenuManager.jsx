@@ -127,20 +127,29 @@ export default function AdminMenuManager() {
   const handleAddMenu = async (parentId = null) => {
     const name = window.prompt('새 메뉴 이름을 입력하세요:');
     if (!name) return;
+
+    let slug = window.prompt('URL 경로(영어)를 입력하세요 (예: sample). 빈칸으로 두면 임의 생성됩니다:');
+    if (!slug) slug = 'page-' + Math.random().toString(36).substr(2, 6);
     
     let sort_order = 1;
+    let finalPath = '';
+
     if (parentId === null) {
       sort_order = menus.length + 1;
+      finalPath = `/${slug}`;
     } else {
       const parent = menus.find(m => m.id === parentId);
-      if (parent) sort_order = parent.children.length + 1;
+      if (parent) {
+        sort_order = parent.children.length + 1;
+        finalPath = `${parent.path}/${slug}`;
+      }
     }
 
     try {
       await fetch('/api/menus', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, path: '#', parent_id: parentId, sort_order })
+        body: JSON.stringify({ name, path: finalPath, parent_id: parentId, sort_order })
       });
       fetchMenus();
     } catch(e) {
