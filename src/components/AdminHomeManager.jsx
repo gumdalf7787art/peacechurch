@@ -574,11 +574,23 @@ export default function AdminHomeManager() {
                               <input type="file" accept="image/*" className="hidden" onChange={(e) => handleQuickLinkIconUpload(link.id, e)} />
                             </label>
                             
-                            {link.customIcon && (
-                              <button onClick={(e) => handleQuickLinkIconReset(link.id, e)} className="text-[11px] text-red-500 font-bold hover:underline text-center w-full mt-1">
-                                기본 아이콘 복구
-                              </button>
-                            )}
+                            <div className="w-full flex justify-between mt-1 px-1">
+                              {link.bgImage !== DEFAULT_QUICK_LINKS.find(l => l.id === link.id).bgImage ? (
+                                <button onClick={(e) => { e.preventDefault(); updateQuickLink(link.id, 'bgImage', DEFAULT_QUICK_LINKS.find(l => l.id === link.id).bgImage); }} className="text-[10px] text-red-500 font-bold hover:underline">
+                                  배경 복구
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-gray-300 font-bold">배경 복구</span>
+                              )}
+                              
+                              {link.customIcon ? (
+                                <button onClick={(e) => handleQuickLinkIconReset(link.id, e)} className="text-[10px] text-red-500 font-bold hover:underline">
+                                  아이콘 복구
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-gray-300 font-bold">아이콘 복구</span>
+                              )}
+                            </div>
                           </div>
                           <div className="flex-1 space-y-3">
                             <div>
