@@ -1,3 +1,4 @@
+import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -907,6 +908,7 @@ export default function About() {
                 <Route path="offering" element={<Offering />} />
                 <Route path="facility" element={<Facility />} />
                 <Route path="location" element={<LocationPage />} />
+                <Route path="*" element={<DynamicSubPage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

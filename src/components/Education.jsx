@@ -1,3 +1,4 @@
+import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -226,6 +227,7 @@ export default function Education() {
                 <Route path="young-adult" element={<YoungAdult />} />
                 <Route path="womens" element={<Womens />} />
                 <Route path="mens" element={<Mens />} />
+                <Route path="*" element={<DynamicSubPage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

@@ -1,3 +1,4 @@
+import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
 import { Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -254,7 +255,8 @@ function Grace() {
       <Route path="/" element={<GraceList />} />
       <Route path="write" element={<GraceWrite />} />
       <Route path=":id" element={<GraceDetail />} />
-    </Routes>
+      <Route path="*" element={<DynamicSubPage />} />
+              </Routes>
   );
 }
 

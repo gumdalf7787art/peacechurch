@@ -1,3 +1,4 @@
+import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -455,6 +456,7 @@ export default function Worship() {
                 <Route path="/" element={<Word />} />
                 <Route path="word" element={<Word />} />
                 <Route path="choir" element={<Choir />} />
+                <Route path="*" element={<DynamicSubPage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>
