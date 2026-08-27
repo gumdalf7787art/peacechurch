@@ -71,9 +71,8 @@ export default function Login({ setIsLoggedIn }) {
       </button>
 
       {/* Logo */}
-      <div className="flex items-center cursor-pointer mb-10 z-20" onClick={() => navigate('/')}>
-        <img src="/assets/images/logo.png" alt="Platform Maker Logo" className="w-10 h-10 object-cover rounded-xl mr-3 shadow-sm border border-black/5" />
-        <span className="font-display font-bold text-[24px] text-black tracking-tight">Platform Maker</span>
+      <div className="flex justify-center cursor-pointer mb-10 z-20" onClick={() => navigate('/')}>
+        <img src="/logo.jpg" alt="평화교회 로고" className="h-12 w-auto object-contain" />
       </div>
 
       <motion.div 
@@ -83,8 +82,7 @@ export default function Login({ setIsLoggedIn }) {
         className="bg-white w-full max-w-[480px] rounded-[32px] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-black/[0.03] relative z-10"
       >
         <div className="text-center mb-10">
-          <h2 className="text-[28px] font-bold text-black tracking-tight mb-2">다시 오신 것을 환영합니다</h2>
-          <p className="text-[15px] text-[#888]">Platform Maker와 함께 혁신을 이어가세요.</p>
+          <h2 className="text-[28px] font-bold text-black tracking-tight mb-2">로그인</h2>
         </div>
 
         {/* SNS Login */}
