@@ -33,6 +33,21 @@ function Navbar({ isLoggedIn }) {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState({ name: '고객' });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [dynamicMenus, setDynamicMenus] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/menus')
+      .then(res => res.json())
+      .then(data => {
+        // Only active menus
+        const filterActive = (list) => list.filter(m => m.is_active !== 0).map(m => ({
+          ...m,
+          children: m.children ? filterActive(m.children) : []
+        }));
+        setDynamicMenus(filterActive(data));
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -58,127 +73,29 @@ function Navbar({ isLoggedIn }) {
         {/* Links */}
         <div className="hidden md:flex items-center h-full space-x-10 text-[16px] font-semibold text-ink-muted-80 relative">
           
-          {/* 교회소개 */}
-          <div className="relative group h-full flex items-center">
-            <Link to="/about" className="hover:text-ink transition-colors py-4 px-2">교회소개</Link>
-            <div className="absolute top-[56px] left-1/2 -translate-x-1/2 w-[170px] pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-lg rounded-[8px] p-1.5 relative">
-                {/* Pointer */}
-                <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-[2px] z-0"></div>
-                
-                <div className="flex flex-col space-y-0.5 relative z-10">
-                  <Link to="/about/vision" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>교회비전과 목표</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/pastor" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>담임목사 소개</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/staff" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>섬기는 분</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/worship" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>예배안내</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/bulletin" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>교회주보</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/offering" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>온라인헌금</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/facility" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>시설안내</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/about/location" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>찾아오시는 길</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 예배와찬양 */}
-          <div className="relative group h-full flex items-center">
-            <Link to="/worship" className="hover:text-ink transition-colors py-4 px-2">예배와찬양</Link>
-            <div className="absolute top-[56px] left-1/2 -translate-x-1/2 w-[170px] pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-lg rounded-[8px] p-1.5 relative">
-                <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-[2px] z-0"></div>
-                <div className="flex flex-col space-y-0.5 relative z-10">
-                  <Link to="/worship/word" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>예배와말씀</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/worship/choir" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>찬양단</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 교육과선교 */}
-          <div className="relative group h-full flex items-center">
-            <Link to="/education" className="hover:text-ink transition-colors py-4 px-2">교육과선교</Link>
-            <div className="absolute top-[56px] left-1/2 -translate-x-1/2 w-[170px] pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-lg rounded-[8px] p-1.5 relative">
-                <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-[2px] z-0"></div>
-                <div className="flex flex-col space-y-0.5 relative z-10">
-                  <Link to="/education/kids" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>유초등부</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/education/youth" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>중고등부</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/education/young-adult" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>청년부</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/education/womens" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>여선교회</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/education/mens" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>남선교회</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* 나눔과교제 */}
-          <div className="relative group h-full flex items-center">
-            <Link to="/fellowship" className="hover:text-ink transition-colors py-4 px-2">나눔과교제</Link>
-            <div className="absolute top-[56px] left-1/2 -translate-x-1/2 w-[170px] pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-lg rounded-[8px] p-1.5 relative">
-                <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-[2px] z-0"></div>
-                <div className="flex flex-col space-y-0.5 relative z-10">
-                  <Link to="/fellowship/grace" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>은혜의글</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/fellowship/gallery" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>갤러리</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
-                  <Link to="/fellowship/business" className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
-                    <span>교우사업장소개</span>
-                    <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
-                  </Link>
+          {dynamicMenus.length > 0 ? dynamicMenus.map((menu) => (
+            <div key={menu.id} className="relative group h-full flex items-center">
+              <Link to={menu.path || '#'} className="hover:text-ink transition-colors py-4 px-2">{menu.name}</Link>
+              {menu.children && menu.children.length > 0 && (
+                <div className="absolute top-[56px] left-1/2 -translate-x-1/2 w-[170px] pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-lg rounded-[8px] p-1.5 relative">
+                    <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-t border-l border-gray-100 rotate-45 rounded-tl-[2px] z-0"></div>
+                    <div className="flex flex-col space-y-0.5 relative z-10">
+                      {menu.children.map(child => (
+                        <Link key={child.id} to={child.path || '#'} className="flex items-center justify-between px-3 py-1.5 text-[13.5px] text-gray-700 hover:text-[#cc0000] hover:bg-[#cc0000]/5 rounded-md transition-all duration-200 font-medium group/item">
+                          <span>{child.name}</span>
+                          <ChevronRight size={13} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
+          )) : (
+            <div className="animate-pulse w-48 h-6 bg-gray-100 rounded-md"></div>
+          )}
         </div>
 
         {/* Buttons */}
