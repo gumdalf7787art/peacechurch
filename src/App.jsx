@@ -753,25 +753,20 @@ function Location() {
   const mapRef = React.useRef(null);
 
   React.useEffect(() => {
-    if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
-      const geocoder = new window.kakao.maps.services.Geocoder();
-      // Search for the address
-      geocoder.addressSearch('서울 중랑구 봉화산로 120', function(result, status) {
-        if (status === window.kakao.maps.services.Status.OK) {
-          const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
-          
-          const options = {
-            center: coords,
-            level: 3 // Zoom level
-          };
-          
+    const initMap = () => {
+      if (!window.kakao || !window.kakao.maps) {
+        console.error("Kakao map SDK is not loaded.");
+        return;
+      }
+      
+      window.kakao.maps.load(() => {
+        // Fallback coordinates (서울 중랑구 봉화산로 120)
+        const fallbackCoords = new window.kakao.maps.LatLng(37.60533, 127.0924); 
+        
+        const renderMap = (coords) => {
+          const options = { center: coords, level: 3 };
           const map = new window.kakao.maps.Map(mapRef.current, options);
-          
-          const marker = new window.kakao.maps.Marker({
-            map: map,
-            position: coords
-          });
-          
+          const marker = new window.kakao.maps.Marker({ map: map, position: coords });
           const content = `<div style="padding:5px 10px; border-radius:8px; background:white; font-size:14px; font-weight:bold; color:#cc0000; border:1px solid #ddd; box-shadow:0 2px 4px rgba(0,0,0,0.1);">평화교회</div>`;
           const customOverlay = new window.kakao.maps.CustomOverlay({
               position: coords,
@@ -779,9 +774,31 @@ function Location() {
               yAnchor: 2.3
           });
           customOverlay.setMap(map);
+        };
+
+        if (window.kakao.maps.services) {
+          const geocoder = new window.kakao.maps.services.Geocoder();
+          geocoder.addressSearch('서울 중랑구 봉화산로 120', function(result, status) {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+              renderMap(coords);
+            } else {
+              console.warn("Geocoding failed, using fallback coordinates.");
+              renderMap(fallbackCoords);
+            }
+          });
+        } else {
+          renderMap(fallbackCoords);
         }
       });
-    }
+    };
+
+    // React가 너무 빨리 렌더링될 경우를 대비해 약간의 지연 후 실행
+    const timer = setTimeout(() => {
+      initMap();
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
