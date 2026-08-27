@@ -646,34 +646,71 @@ function Facility() {
   );
 }
 function LocationPage() {
+  const mapRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const initMap = () => {
+      if (!window.kakao || !window.kakao.maps) {
+        console.error("Kakao map SDK is not loaded.");
+        return;
+      }
+      
+      window.kakao.maps.load(() => {
+        const fallbackCoords = new window.kakao.maps.LatLng(37.60533, 127.0924); 
+        
+        const renderMap = (coords) => {
+          const options = { center: coords, level: 3 };
+          const map = new window.kakao.maps.Map(mapRef.current, options);
+          const marker = new window.kakao.maps.Marker({ map: map, position: coords });
+          const content = `<div style="padding:5px 10px; border-radius:8px; background:white; font-size:14px; font-weight:bold; color:#cc0000; border:1px solid #ddd; box-shadow:0 2px 4px rgba(0,0,0,0.1);">평화교회</div>`;
+          const customOverlay = new window.kakao.maps.CustomOverlay({
+              position: coords,
+              content: content,
+              yAnchor: 2.3
+          });
+          customOverlay.setMap(map);
+        };
+
+        if (window.kakao.maps.services) {
+          const geocoder = new window.kakao.maps.services.Geocoder();
+          geocoder.addressSearch('서울 중랑구 봉화산로 120', function(result, status) {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+              renderMap(coords);
+            } else {
+              renderMap(fallbackCoords);
+            }
+          });
+        } else {
+          renderMap(fallbackCoords);
+        }
+      });
+    };
+
+    const timer = setTimeout(() => {
+      initMap();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#222', borderLeft: '4px solid #cc0000', paddingLeft: '12px' }}>오시는 길</h3>
       </div>
       
-      {/* ── Top: Map Placeholder ── */}
+      {/* ── Top: Map Area ── */}
       <div style={{ 
         width: '100%', 
         height: '400px', 
         backgroundColor: '#eef1f5', 
         borderRadius: '12px',
-        display: 'flex', 
-        flexDirection: 'column',
-        alignItems: 'center', 
-        justifyContent: 'center',
         marginBottom: '40px',
-        border: '1px solid #e2e8f0'
+        border: '1px solid #e2e8f0',
+        overflow: 'hidden'
       }}>
-        <div style={{ 
-          width: '64px', height: '64px', backgroundColor: '#fbbf24', borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        }}>
-          <MapPin size={32} color="#111" />
-        </div>
-        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>카카오맵 API 연동 영역</div>
-        <div style={{ fontSize: '14px', color: '#666' }}>실제 서비스 시 카카오맵 스크립트를 삽입하여 동적 지도가 표시됩니다.</div>
+        <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
       </div>
 
       {/* ── Bottom: Location Info ── */}
@@ -702,8 +739,8 @@ function LocationPage() {
         <div style={{ display: 'flex', padding: '32px 0', borderBottom: '1px solid #e5e7eb' }}>
           <div style={{ width: '140px', fontSize: '16px', fontWeight: 'bold', color: '#111', flexShrink: 0 }}>주소</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '16px', color: '#333', marginBottom: '6px' }}>서울특별시 중구 평화로 1004</div>
-            <div style={{ fontSize: '14px', color: '#666' }}>(지번: 서울특별시 중구 평화동 1-1)</div>
+            <div style={{ fontSize: '16px', color: '#333', marginBottom: '6px' }}>서울 중랑구 봉화산로 120</div>
+            <div style={{ fontSize: '14px', color: '#666' }}>(지번: 서울 중랑구 신내동 613)</div>
           </div>
         </div>
         
