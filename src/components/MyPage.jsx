@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, FolderKanban, Receipt, MessageSquare, 
   Wrench, Bookmark, Settings, LogOut, ArrowLeft,
-  Bell, ChevronRight, Download, FileText, Camera, Check
+  Bell, ChevronRight, Download, FileText, Camera, Check,
+  FolderTree
 } from 'lucide-react';
+import AdminMenuManager from './AdminMenuManager';
 
 export default function MyPage({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -95,6 +97,12 @@ export default function MyPage({ setIsLoggedIn }) {
     { id: 'support', label: '1:1 소통', icon: <MessageSquare size={18} /> },
     { id: 'maintenance', label: '유지보수 관리', icon: <Wrench size={18} /> },
     { id: 'settings', label: '내 정보 설정', icon: <Settings size={18} /> },
+    ...(userProfile.role === 'admin' ? [
+      { id: 'admin-menu', label: '메뉴 및 구조 관리', icon: <FolderTree size={18} /> },
+      { id: 'admin-home', label: '메인 페이지 설정', icon: <LayoutDashboard size={18} /> },
+      { id: 'admin-pages', label: '서브 페이지 편집', icon: <FileText size={18} /> },
+      { id: 'admin-media', label: '미디어 라이브러리', icon: <Camera size={18} /> },
+    ] : [])
   ];
 
   return (
@@ -317,6 +325,22 @@ export default function MyPage({ setIsLoggedIn }) {
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Admin Views */}
+        {activeMenu === 'admin-menu' && <AdminMenuManager />}
+        {['admin-home', 'admin-pages', 'admin-media'].includes(activeMenu) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center h-[50vh] text-center bg-white rounded-[24px] border border-gray-100 shadow-sm"
+          >
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+              <Wrench size={32} className="text-gray-400" />
+            </div>
+            <h2 className="text-[20px] font-bold text-gray-800 mb-2">개발 진행 중인 기능입니다</h2>
+            <p className="text-[15px] text-gray-500">기획안의 다음 단계에 따라 곧 업데이트될 예정입니다.</p>
           </motion.div>
         )}
 

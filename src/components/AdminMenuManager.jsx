@@ -1,0 +1,237 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Plus, Trash2, GripVertical, Eye, EyeOff, Save, FolderTree } from 'lucide-react';
+
+export default function AdminMenuManager() {
+  const [menus, setMenus] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetchMenus();
+  }, []);
+
+  const fetchMenus = async () => {
+    try {
+      const res = await fetch('/api/menus');
+      const data = await res.json();
+      setMenus(data);
+      setIsLoading(false);
+    } catch (e) {
+      console.error(e);
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleVisibility = (menuId, parentId = null) => {
+    setMenus(prev => {
+      const newMenus = [...prev];
+      if (parentId === null) {
+        const idx = newMenus.findIndex(m => m.id === menuId);
+        newMenus[idx].is_active = newMenus[idx].is_active ? 0 : 1;
+      } else {
+        const parentIdx = newMenus.findIndex(m => m.id === parentId);
+        const childIdx = newMenus[parentIdx].children.findIndex(m => m.id === menuId);
+        newMenus[parentIdx].children[childIdx].is_active = newMenus[parentIdx].children[childIdx].is_active ? 0 : 1;
+      }
+      return newMenus;
+    });
+  };
+
+  const handleMoveUp = (menuId, parentId = null) => {
+    setMenus(prev => {
+      const newMenus = JSON.parse(JSON.stringify(prev));
+      if (parentId === null) {
+        const idx = newMenus.findIndex(m => m.id === menuId);
+        if (idx > 0) {
+          const temp = newMenus[idx];
+          newMenus[idx] = newMenus[idx - 1];
+          newMenus[idx - 1] = temp;
+          // update sort_order
+          newMenus.forEach((m, i) => m.sort_order = i + 1);
+        }
+      } else {
+        const parentIdx = newMenus.findIndex(m => m.id === parentId);
+        const children = newMenus[parentIdx].children;
+        const idx = children.findIndex(m => m.id === menuId);
+        if (idx > 0) {
+          const temp = children[idx];
+          children[idx] = children[idx - 1];
+          children[idx - 1] = temp;
+          children.forEach((m, i) => m.sort_order = i + 1);
+        }
+      }
+      return newMenus;
+    });
+  };
+
+  const handleMoveDown = (menuId, parentId = null) => {
+    setMenus(prev => {
+      const newMenus = JSON.parse(JSON.stringify(prev));
+      if (parentId === null) {
+        const idx = newMenus.findIndex(m => m.id === menuId);
+        if (idx < newMenus.length - 1) {
+          const temp = newMenus[idx];
+          newMenus[idx] = newMenus[idx + 1];
+          newMenus[idx + 1] = temp;
+          newMenus.forEach((m, i) => m.sort_order = i + 1);
+        }
+      } else {
+        const parentIdx = newMenus.findIndex(m => m.id === parentId);
+        const children = newMenus[parentIdx].children;
+        const idx = children.findIndex(m => m.id === menuId);
+        if (idx < children.length - 1) {
+          const temp = children[idx];
+          children[idx] = children[idx + 1];
+          children[idx + 1] = temp;
+          children.forEach((m, i) => m.sort_order = i + 1);
+        }
+      }
+      return newMenus;
+    });
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const flattened = [];
+      menus.forEach(m => {
+        flattened.push({ id: m.id, parent_id: null, sort_order: m.sort_order, is_active: m.is_active });
+        m.children.forEach(c => {
+          flattened.push({ id: c.id, parent_id: m.id, sort_order: c.sort_order, is_active: c.is_active });
+        });
+      });
+
+      await fetch('/api/menus', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(flattened)
+      });
+      alert('메뉴 구조가 성공적으로 저장되었습니다.');
+    } catch (e) {
+      alert('저장 중 오류가 발생했습니다.');
+    }
+    setIsSaving(false);
+  };
+
+  const handleDelete = async (id) => {
+    if(!window.confirm('정말 삭제하시겠습니까? (하위 메뉴도 모두 삭제됩니다)')) return;
+    try {
+      await fetch(`/api/menus?id=${id}`, { method: 'DELETE' });
+      fetchMenus();
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
+  const handleAddMenu = async (parentId = null) => {
+    const name = window.prompt('새 메뉴 이름을 입력하세요:');
+    if (!name) return;
+    
+    let sort_order = 1;
+    if (parentId === null) {
+      sort_order = menus.length + 1;
+    } else {
+      const parent = menus.find(m => m.id === parentId);
+      if (parent) sort_order = parent.children.length + 1;
+    }
+
+    try {
+      await fetch('/api/menus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, path: '#', parent_id: parentId, sort_order })
+      });
+      fetchMenus();
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
+  if (isLoading) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6 max-w-4xl"
+    >
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-[20px] font-bold text-black flex items-center">
+            <FolderTree className="mr-2" size={24} /> 
+            사이트 메뉴 (GNB) 구조 관리
+          </h2>
+          <p className="text-gray-500 text-[14px] mt-1">웹사이트 상단 네비게이션 메뉴의 순서를 바꾸거나 켜고 끌 수 있습니다.</p>
+        </div>
+        <button 
+          onClick={handleSave}
+          disabled={isSaving}
+          className="bg-black text-white px-6 py-2.5 rounded-xl font-bold flex items-center hover:bg-gray-800 transition-colors disabled:opacity-50"
+        >
+          <Save size={18} className="mr-2" />
+          {isSaving ? '저장 중...' : '변경사항 저장'}
+        </button>
+      </div>
+
+      <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+        <div className="space-y-4">
+          {menus.map((menu, idx) => (
+            <div key={menu.id} className="border border-gray-200 rounded-xl overflow-hidden">
+              {/* 1Depth Menu */}
+              <div className={`flex items-center justify-between p-4 bg-gray-50 border-b border-gray-200 ${menu.is_active ? '' : 'opacity-50'}`}>
+                <div className="flex items-center">
+                  <div className="flex flex-col mr-4">
+                    <button onClick={() => handleMoveUp(menu.id)} disabled={idx === 0} className="text-gray-400 hover:text-black disabled:opacity-30">▲</button>
+                    <button onClick={() => handleMoveDown(menu.id)} disabled={idx === menus.length - 1} className="text-gray-400 hover:text-black disabled:opacity-30">▼</button>
+                  </div>
+                  <GripVertical className="text-gray-400 mr-2 cursor-move hidden" />
+                  <span className="font-bold text-[16px] text-black">{menu.name}</span>
+                  <span className="text-[12px] text-gray-400 ml-3">{menu.path}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <button onClick={() => handleToggleVisibility(menu.id)} className={`p-2 rounded-lg ${menu.is_active ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
+                    {menu.is_active ? <Eye size={18}/> : <EyeOff size={18}/>}
+                  </button>
+                  <button onClick={() => handleAddMenu(menu.id)} className="p-2 text-[#5227FF] bg-[#5227FF]/10 rounded-lg hover:bg-[#5227FF]/20"><Plus size={18}/></button>
+                  <button onClick={() => handleDelete(menu.id)} className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100"><Trash2 size={18}/></button>
+                </div>
+              </div>
+
+              {/* 2Depth Menus */}
+              <div className="p-4 bg-white space-y-2">
+                {menu.children && menu.children.length > 0 ? (
+                  menu.children.map((child, cIdx) => (
+                    <div key={child.id} className={`flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50/50 ml-12 ${child.is_active ? '' : 'opacity-50'}`}>
+                      <div className="flex items-center">
+                        <div className="flex mr-3 space-x-1">
+                          <button onClick={() => handleMoveUp(child.id, menu.id)} disabled={cIdx === 0} className="text-gray-400 hover:text-black disabled:opacity-30 text-[12px]">▲</button>
+                          <button onClick={() => handleMoveDown(child.id, menu.id)} disabled={cIdx === menu.children.length - 1} className="text-gray-400 hover:text-black disabled:opacity-30 text-[12px]">▼</button>
+                        </div>
+                        <span className="text-gray-400 mr-2">└</span>
+                        <span className="font-medium text-[14px] text-gray-700">{child.name}</span>
+                        <span className="text-[12px] text-gray-400 ml-3">{child.path}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button onClick={() => handleToggleVisibility(child.id, menu.id)} className={`p-1.5 rounded-md ${child.is_active ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
+                          {child.is_active ? <Eye size={16}/> : <EyeOff size={16}/>}
+                        </button>
+                        <button onClick={() => handleDelete(child.id)} className="p-1.5 text-red-500 bg-red-50 rounded-md hover:bg-red-100"><Trash2 size={16}/></button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-[13px] text-gray-400 ml-12 py-2">하위 메뉴가 없습니다.</p>
+                )}
+              </div>
+            </div>
+          ))}
+
+          <button onClick={() => handleAddMenu(null)} className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-black hover:text-black transition-colors flex items-center justify-center">
+            <Plus size={20} className="mr-2" /> 새 최상위 카테고리 추가
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
