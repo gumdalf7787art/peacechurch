@@ -201,6 +201,36 @@ export default function AdminHomeManager() {
     triggerAutoSave();
   };
 
+  const DEFAULT_PASTOR_SECTION = {
+    image: '/pastor-bg.png',
+    title: '평화 교회에 오신것을 환영합니다.',
+    subTitle: '하나님의 사랑과 은혜가 충만한 곳',
+    content: '어떠한 어려움 속에서도 믿음의 자리를 지키며 주님의 길을 걷는 교회\n점점 혼탁해져가는 이 시대에 진리를 전하며 거룩함을 세워가는 교회\n주님의 소유된 백성들을 거룩한 제사장으로 세워 이땅에 하나님의 나라를 이루어가는 교회',
+    name: '장 성 진'
+  };
+
+  const [pastorSection, setPastorSection] = useState(() => {
+    const saved = localStorage.getItem('cms_pastorSection');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return DEFAULT_PASTOR_SECTION;
+  });
+
+  const updatePastorSection = (field, value) => {
+    const newSec = { ...pastorSection, [field]: value };
+    setPastorSection(newSec);
+    localStorage.setItem('cms_pastorSection', JSON.stringify(newSec));
+    window.dispatchEvent(new Event('cms_pastor_updated'));
+    triggerAutoSave();
+  };
+
+  const handlePastorImageUpload = (e) => {
+    processAndUploadImage(e.target.files[0], (optimizedDataUrl) => {
+      updatePastorSection('image', optimizedDataUrl);
+    });
+  };
+
   const [locationGroups, setLocationGroups] = useState([
     {
       id: 'contact',
@@ -562,29 +592,31 @@ export default function AdminHomeManager() {
 
               <div className={`flex flex-col md:flex-row gap-8 transition-opacity ${!sections.pastor ? 'opacity-40 pointer-events-none' : ''}`}>
                 <div className="w-full md:w-1/3">
-                  <label className="block text-[14px] font-bold text-gray-700 mb-2">프로필 이미지</label>
-                  <div className="aspect-[3/4] bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50">
-                    <img src="/pastor.png" alt="목사님" className="w-full h-full object-cover opacity-80" />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                  <label className="block text-[14px] font-bold text-gray-700 mb-2">프로필 (배경) 이미지</label>
+                  <label className="aspect-[3/4] bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 block">
+                    <img src={pastorSection.image || "/pastor-bg.png"} alt="목사님" className="w-full h-full object-cover opacity-80" />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity z-10">
                       <ImageIcon color="white" size={32} className="mb-2" />
-                      <span className="text-white font-bold text-[13px]">사진 업로드</span>
+                      <span className="text-white font-bold text-[13px]">사진 변경</span>
                     </div>
-                  </div>
+                    <input type="file" accept="image/*" className="hidden" onChange={handlePastorImageUpload} />
+                  </label>
                 </div>
 
                 <div className="flex-1 space-y-5">
                   <div>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">이름</label>
+                    <input type="text" value={pastorSection.name} onChange={(e) => updatePastorSection('name', e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-[18px] focus:bg-white focus:border-black outline-none" />
+                  </div>
+                  <div>
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">인사말 큰 제목</label>
-                    <input type="text" defaultValue="환영합니다. 평화교회에 오신 것을 환영합니다." className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-[18px] focus:bg-white focus:border-black outline-none" />
+                    <input type="text" value={pastorSection.title} onChange={(e) => updatePastorSection('title', e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-[18px] focus:bg-white focus:border-black outline-none" />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 mb-2">인사말 소제목</label>
-                    <input type="text" defaultValue="하나님의 사랑과 은혜가 충만한 곳" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[15px] focus:bg-white focus:border-black outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-[13px] font-bold text-gray-700 mb-2">인사말 본문 내용</label>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">인사말 본문 내용 (엔터로 줄바꿈)</label>
                     <textarea 
-                      defaultValue="평화교회는 이웃과 함께하며 그리스도의 사랑을 실천하는 공동체입니다. 여러분을 주님의 이름으로 축복하고 환영합니다. 홈페이지를 통해 교회의 다양한 소식과 은혜를 나누시길 바랍니다."
+                      value={pastorSection.content}
+                      onChange={(e) => updatePastorSection('content', e.target.value)}
                       className="w-full h-[200px] px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[14px] leading-relaxed focus:bg-white focus:border-black outline-none resize-none"
                     />
                   </div>

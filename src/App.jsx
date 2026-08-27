@@ -840,11 +840,36 @@ function WorshipSchedule() {
 }
 
 function PastorGreeting() {
+  const [section, setSection] = React.useState(() => {
+    const saved = localStorage.getItem('cms_pastorSection');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return {
+      image: '/pastor-bg.png',
+      title: '평화 교회에 오신것을 환영합니다.',
+      subTitle: '하나님의 사랑과 은혜가 충만한 곳',
+      content: '어떠한 어려움 속에서도 믿음의 자리를 지키며 주님의 길을 걷는 교회\n점점 혼탁해져가는 이 시대에 진리를 전하며 거룩함을 세워가는 교회\n주님의 소유된 백성들을 거룩한 제사장으로 세워 이땅에 하나님의 나라를 이루어가는 교회',
+      name: '장 성 진'
+    };
+  });
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      const saved = localStorage.getItem('cms_pastorSection');
+      if (saved) {
+        try { setSection(JSON.parse(saved)); } catch(e) {}
+      }
+    };
+    window.addEventListener('cms_pastor_updated', handleUpdate);
+    return () => window.removeEventListener('cms_pastor_updated', handleUpdate);
+  }, []);
+
   return (
     <section 
       id="pastor-greeting" 
       className="relative flex items-center justify-center min-h-[85vh] pt-32 pb-[378px] px-4 bg-fixed bg-[85%_center] md:bg-center bg-cover bg-no-repeat"
-      style={{ backgroundImage: 'url("/pastor-bg.png")' }}
+      style={{ backgroundImage: `url("${section.image || '/pastor-bg.png'}")` }}
     >
       {/* Gradient Overlay for text readability on left, visibility on right */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/10 z-0"></div>
@@ -857,7 +882,7 @@ function PastorGreeting() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-[32px] md:text-[48px] font-bold text-white tracking-tight"
         >
-          평화 교회에 오신것을 환영합니다.
+          {section.title}
         </motion.h2>
 
         <motion.div 
@@ -875,9 +900,9 @@ function PastorGreeting() {
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
           className="flex flex-col space-y-1.5 md:space-y-2 text-[15px] md:text-[18px] font-medium text-white/90 leading-relaxed tracking-tight break-keep"
         >
-          <p>어떠한 어려움 속에서도 믿음의 자리를 지키며 주님의 길을 걷는 교회</p>
-          <p>점점 혼탁해져가는 이 시대에 진리를 전하며 거룩함을 세워가는 교회</p>
-          <p>주님의 소유된 백성들을 거룩한 제사장으로 세워 이땅에 하나님의 나라를 이루어가는 교회</p>
+          {section.content?.split('\n').map((line, idx) => (
+            <p key={idx}>{line}</p>
+          ))}
         </motion.div>
 
         <motion.div
@@ -888,7 +913,7 @@ function PastorGreeting() {
           className="mt-8 md:mt-10 flex flex-col items-start"
         >
           <p className="text-[17px] md:text-[19px] text-white/80 font-medium mb-1">담임목사</p>
-          <p className="text-[28px] md:text-[40px] font-bold text-white tracking-wider mb-5 md:mb-6">장 성 진</p>
+          <p className="text-[28px] md:text-[40px] font-bold text-white tracking-wider mb-5 md:mb-6">{section.name}</p>
           
           <button className="bg-black text-[#F6BE00] px-8 md:px-10 py-2.5 md:py-3 rounded-[10px] text-[15px] md:text-[16px] font-bold hover:bg-gray-800 transition-colors duration-300 shadow-lg border border-white/10">
             목사님 인사말 바로가기
