@@ -113,8 +113,8 @@ function Word() {
         <>
           {/* ── 가장 최근 영상 (Featured Video, 65% width) ── */}
           {featuredVideo && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '48px' }}>
-              <div style={{ width: '65%' }}>
+            <div className="flex justify-center mb-8 md:mb-12">
+              <div className="w-full md:w-[65%]">
                 {/* 16:9 비율 컨테이너 */}
                 <div style={{ 
                   position: 'relative', 
@@ -133,19 +133,19 @@ function Word() {
                     allowFullScreen
                   ></iframe>
                 </div>
-                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: '#111', marginBottom: '6px' }}>{featuredVideo.title}</h3>
-                  <span style={{ fontSize: '14px', color: '#666' }}>{featuredVideo.date}</span>
+                <div className="mt-4 md:mt-5 text-center px-2 md:px-0">
+                  <h3 className="text-[18px] md:text-[22px] font-bold text-[#111] mb-1 md:mb-1.5">{featuredVideo.title}</h3>
+                  <span className="text-[13px] md:text-[14px] text-[#666]">{featuredVideo.date}</span>
                 </div>
               </div>
             </div>
           )}
 
           {/* 구분선 */}
-          {featuredVideo && <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '48px 0' }} />}
+          {featuredVideo && <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '32px 0 md:margin-48px 0' }} className="my-8 md:my-12" />}
 
           {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '48px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
             {recentVideos.map((video) => (
               <div key={video.id} style={{ cursor: 'pointer' }} className="group" onClick={() => setSelectedVideo(video)}>
                 <div style={{ 
@@ -242,8 +242,8 @@ function Choir() {
   return (
     <div>
       {/* ── 가장 최근 영상 (Featured Video, 65% width) ── */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '48px' }}>
-        <div style={{ width: '65%' }}>
+      <div className="flex justify-center mb-8 md:mb-12">
+        <div className="w-full md:w-[65%]">
           {/* 16:9 비율 컨테이너 */}
           <div style={{ 
             position: 'relative', 
@@ -263,18 +263,18 @@ function Choir() {
               allowFullScreen
             ></iframe>
           </div>
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: '#111', marginBottom: '6px' }}>{featuredVideo.title}</h3>
-            <span style={{ fontSize: '14px', color: '#666' }}>{featuredVideo.date}</span>
+          <div className="mt-4 md:mt-5 text-center px-2 md:px-0">
+            <h3 className="text-[18px] md:text-[22px] font-bold text-[#111] mb-1 md:mb-1.5">{featuredVideo.title}</h3>
+            <span className="text-[13px] md:text-[14px] text-[#666]">{featuredVideo.date}</span>
           </div>
         </div>
       </div>
 
       {/* 구분선 */}
-      <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '48px 0' }} />
+      <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb' }} className="my-8 md:my-12" />
 
       {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '48px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
         {recentVideos.map((video) => (
           <div key={video.id} style={{ cursor: 'pointer' }} className="group" onClick={() => setSelectedVideo(video)}>
             <div style={{ 
@@ -357,20 +357,10 @@ export default function Worship() {
       </div>
 
       {/* ── Body: Sidebar + Content ── */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '60px 20px',
-        display: 'flex',
-        gap: '60px',
-        alignItems: 'flex-start'
-      }}>
+      <div className="max-w-[1200px] mx-auto px-4 md:px-5 py-8 md:py-[60px] flex flex-col md:flex-row gap-8 md:gap-[60px] items-start w-full">
         
         {/* ── Sidebar (LNB) ── */}
-        <nav style={{
-          width: '240px',
-          flexShrink: 0
-        }}>
+        <nav className="hidden md:block w-[240px] shrink-0">
           {/* LNB Header */}
           <div style={{
             background: '#2a4358',
@@ -419,10 +409,7 @@ export default function Worship() {
         </nav>
 
         {/* ── Main Content ── */}
-        <div style={{
-          flex: 1,
-          minWidth: 0
-        }}>
+        <div className="flex-1 w-full min-w-0">
           
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '16px' }}>
@@ -438,43 +425,15 @@ export default function Worship() {
           </div>
 
           {/* Page Title & YouTube Button */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'flex-end', 
-            paddingBottom: '20px', 
-            borderBottom: '1px solid #999',
-            marginBottom: '40px'
-          }}>
-            <h2 style={{ fontSize: '32px', fontWeight: 'normal', color: '#333', margin: 0 }}>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-4 md:pb-5 border-b border-[#999] mb-6 md:mb-10 gap-4 md:gap-0">
+            <h2 className="text-[26px] md:text-[32px] font-normal text-[#333] m-0">
               {currentMenu.label}
             </h2>
             <a 
               href="https://youtube.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                backgroundColor: '#ff0000',
-                color: '#fff',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                transition: 'all 0.2s',
-                boxShadow: '0 4px 6px rgba(255,0,0,0.2)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#cc0000';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#ff0000';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+              className="flex items-center gap-2 px-4 py-2 bg-[#ff0000] hover:bg-[#cc0000] text-white rounded-lg text-sm font-bold shadow-[0_4px_6px_rgba(255,0,0,0.2)] hover:-translate-y-0.5 transition-all duration-200"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
