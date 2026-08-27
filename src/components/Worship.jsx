@@ -144,8 +144,8 @@ function Word() {
           {/* 구분선 */}
           {featuredVideo && <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '32px 0 md:margin-48px 0' }} className="my-8 md:my-12" />}
 
-          {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
+          {/* ── 썸네일 카드 갤러리 (3열 구조) ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
             {recentVideos.map((video) => (
               <div key={video.id} style={{ cursor: 'pointer' }} className="group" onClick={() => setSelectedVideo(video)}>
                 <div style={{ 
@@ -273,8 +273,8 @@ function Choir() {
       {/* 구분선 */}
       <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb' }} className="my-8 md:my-12" />
 
-      {/* ── 썸네일 카드 갤러리 (4열 3줄) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
+      {/* ── 썸네일 카드 갤러리 (3열 구조) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
         {recentVideos.map((video) => (
           <div key={video.id} style={{ cursor: 'pointer' }} className="group" onClick={() => setSelectedVideo(video)}>
             <div style={{ 
