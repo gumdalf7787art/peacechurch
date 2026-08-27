@@ -218,9 +218,11 @@ function Navbar({ isLoggedIn }) {
 const HERO_SLIDES = [
   {
     image: "/hero-1-bg.webp",
-    main: "평화교회에 오신 것을 환영합니다",
-    sub: "하나님의 사랑과 은혜가 넘치는 진정한 쉼터",
-    align: "center"
+    topText: "기독교대한감리회",
+    main: "평화교회",
+    engText: "PEACE METHODIST CHURCH",
+    sub: "예수님의 사랑으로 사람을 세우고,\n세상을 섬기는 교회",
+    align: "left"
   },
   {
     image: "/hero-2-bg.webp",
@@ -267,6 +269,18 @@ function Hero() {
           
           {/* Text Content */}
           <div className={`relative z-20 flex flex-col justify-center h-full max-w-7xl mx-auto px-8 md:px-12 ${HERO_SLIDES[currentSlide].align === 'left' ? 'items-start text-left md:pl-24 lg:pl-32' : 'items-center text-center'}`}>
+            
+            {HERO_SLIDES[currentSlide].topText && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.1 }}
+                className="text-[20px] md:text-[24px] lg:text-[28px] font-bold text-white/95 mb-2 drop-shadow-md tracking-tight"
+              >
+                {HERO_SLIDES[currentSlide].topText}
+              </motion.div>
+            )}
+
             <SplitText
               tag="h1"
               textAlign={HERO_SLIDES[currentSlide].align}
@@ -276,7 +290,7 @@ function Hero() {
               from={{ opacity: 0, y: 80, rotationX: -30 }}
               to={{ opacity: 1, y: 0, rotationX: 0 }}
               ease="back.out(1.2)"
-              className="text-[40px] md:text-[56px] lg:text-[64px] font-bold text-white mb-4 tracking-tight drop-shadow-lg leading-tight"
+              className="text-[50px] md:text-[70px] lg:text-[90px] font-black text-white mb-2 tracking-tight drop-shadow-lg leading-none"
             >
               {HERO_SLIDES[currentSlide].main.split('\n').map((line, i, arr) => (
                 <React.Fragment key={i}>
@@ -285,6 +299,18 @@ function Hero() {
                 </React.Fragment>
               ))}
             </SplitText>
+
+            {HERO_SLIDES[currentSlide].engText && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                className="text-[16px] md:text-[20px] font-medium text-white/80 mb-6 drop-shadow-md tracking-[0.35em] uppercase"
+              >
+                {HERO_SLIDES[currentSlide].engText}
+              </motion.div>
+            )}
+
             <SplitText
               tag="p"
               textAlign={HERO_SLIDES[currentSlide].align}
