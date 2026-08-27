@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCMSData } from './hooks/useCMS';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Apple, Search, ShoppingBag, Menu, ArrowRight, Sun, Clock, FileText, PlayCircle, MapPin, Users, ChevronRight, X } from 'lucide-react';
@@ -279,39 +280,13 @@ const DEFAULT_HERO_SLIDES = [
 
 function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState(DEFAULT_HERO_SLIDES);
+  const slides = useCMSData('cms_heroSlides', DEFAULT_HERO_SLIDES);
 
   useEffect(() => {
-    const saved = localStorage.getItem('cms_heroSlides');
-    if (saved) {
-      try {
-        setSlides(JSON.parse(saved));
-      } catch (e) {
-        setSlides(DEFAULT_HERO_SLIDES);
-      }
-    }
-    
-    const handleStorage = () => {
-      const updated = localStorage.getItem('cms_heroSlides');
-      if (updated) {
-        try {
-          setSlides(JSON.parse(updated));
-        } catch (e) {}
-      }
-    };
-    
-    window.addEventListener('storage', handleStorage);
-    window.addEventListener('cms_hero_updated', handleStorage);
-
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-    
-    return () => {
-      clearInterval(timer);
-      window.removeEventListener('storage', handleStorage);
-      window.removeEventListener('cms_hero_updated', handleStorage);
-    };
+    return () => clearInterval(timer);
   }, [slides.length]);
 
   return (
@@ -463,29 +438,8 @@ const ICONS = {
 };
 
 function QuickMenu() {
-  const [section, setSection] = useState(DEFAULT_QUICK_SECTION);
-  const [menus, setMenus] = useState(DEFAULT_QUICK_LINKS);
-
-  useEffect(() => {
-    const handleStorage = () => {
-      try {
-        const savedSec = localStorage.getItem('cms_quickSection');
-        if (savedSec) setSection(JSON.parse(savedSec));
-        
-        const savedLinks = localStorage.getItem('cms_quickLinks');
-        if (savedLinks) setMenus(JSON.parse(savedLinks));
-      } catch (e) {}
-    };
-
-    handleStorage();
-    window.addEventListener('storage', handleStorage);
-    window.addEventListener('cms_quick_updated', handleStorage);
-
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-      window.removeEventListener('cms_quick_updated', handleStorage);
-    };
-  }, []);
+  const section = useCMSData('cms_quickSection', DEFAULT_QUICK_SECTION);
+  const menus = useCMSData('cms_quickLinks', DEFAULT_QUICK_LINKS);
 
   return (
     <section className="relative bg-[#f5f5f7] py-16 md:py-24 px-4 flex flex-col items-center overflow-hidden">
@@ -735,30 +689,8 @@ function WorshipVideos() {
 }
 
 function WorshipSchedule() {
-  const [isVisible, setIsVisible] = React.useState(() => {
-    try {
-      const saved = localStorage.getItem('cms_sections');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.worship !== undefined) return parsed.worship;
-      }
-    } catch(e) {}
-    return true;
-  });
-
-  React.useEffect(() => {
-    const handleUpdate = () => {
-      try {
-        const saved = localStorage.getItem('cms_sections');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.worship !== undefined) setIsVisible(parsed.worship);
-        }
-      } catch(e) {}
-    };
-    window.addEventListener('cms_sections_updated', handleUpdate);
-    return () => window.removeEventListener('cms_sections_updated', handleUpdate);
-  }, []);
+  const sections = useCMSData('cms_sections', { worship: true });
+  const isVisible = sections.worship !== false;
 
   if (!isVisible) return null;
 
@@ -1169,34 +1101,17 @@ function Location() {
 function Footer() {
   const navigate = useNavigate();
   
-  const [footer, setFooter] = React.useState(() => {
-    const saved = localStorage.getItem('cms_footerSection');
-    if (saved) {
-      try { return JSON.parse(saved); } catch(e) {}
-    }
-    return {
-      logo: '/logo.jpg',
-      description: '하나님의 사랑과 은혜가 넘치는 진정한 쉼터\n세상의 빛과 소금이 되는 평화교회입니다.',
-      churchName: '기독교대한감리회 평화교회',
-      repName: '',
-      address: '서울 중랑구 봉화산로 120',
-      phone: '02-000-0000',
-      fax: '',
-      email: 'peace@peacechurch.com',
-      copyright: 'Copyright © 2026 Peace Church. All rights reserved.'
-    };
+  const footer = useCMSData('cms_footerSection', {
+    logo: '/logo.jpg',
+    description: '하나님의 사랑과 은혜가 넘치는 진정한 쉼터\n세상의 빛과 소금이 되는 평화교회입니다.',
+    churchName: '기독교대한감리회 평화교회',
+    repName: '',
+    address: '서울 중랑구 봉화산로 120',
+    phone: '02-000-0000',
+    fax: '',
+    email: 'peace@peacechurch.com',
+    copyright: 'Copyright © 2026 Peace Church. All rights reserved.'
   });
-
-  React.useEffect(() => {
-    const handleUpdate = () => {
-      const saved = localStorage.getItem('cms_footerSection');
-      if (saved) {
-        try { setFooter(JSON.parse(saved)); } catch(e) {}
-      }
-    };
-    window.addEventListener('cms_footer_updated', handleUpdate);
-    return () => window.removeEventListener('cms_footer_updated', handleUpdate);
-  }, []);
 
   return (
     <footer className="bg-[#0a0a0a] text-[#888] pt-20 pb-12 px-6 border-t border-white/5 text-[14px] font-body">

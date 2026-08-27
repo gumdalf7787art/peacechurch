@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchCMSData, saveToServer } from '../hooks/useCMS';
 import { Image as ImageIcon, Link as LinkIcon, Type, Plus, Trash2, Edit3, MoveUp, MoveDown, Save, MonitorPlay, MessageSquare, Megaphone, ToggleLeft, ToggleRight, Info, MapPin, Layout, AlignLeft, AlignCenter, AlignRight, ZoomIn, ZoomOut, MousePointer2, CheckCircle2, Loader2, Clock, FileText, PlayCircle } from 'lucide-react';
 
 export default function AdminHomeManager() {
@@ -7,13 +8,36 @@ export default function AdminHomeManager() {
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef(null);
 
-  const triggerAutoSave = () => {
+  const pendingSaves = useRef({});
+  const triggerAutoSave = (key, value) => {
+    if (key) pendingSaves.current[key] = value;
     setIsSaving(true);
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      setIsSaving(false);
-    }, 800);
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        if (Object.keys(pendingSaves.current).length > 0) {
+          const payload = Object.keys(pendingSaves.current).map(k => ({ id: k, value: pendingSaves.current[k] }));
+          pendingSaves.current = {};
+          await saveToServer(payload);
+        }
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1000);
   };
+
+  React.useEffect(() => {
+    fetchCMSData().then(serverData => {
+      if (serverData) {
+        if (serverData.cms_sections) setSections(serverData.cms_sections);
+        if (serverData.cms_heroSlides) setHeroSlides(serverData.cms_heroSlides);
+        if (serverData.cms_quickSection) setQuickSection(serverData.cms_quickSection);
+        if (serverData.cms_quickLinks) setQuickLinks(serverData.cms_quickLinks);
+        if (serverData.cms_pastorSection) setPastorSection(serverData.cms_pastorSection);
+        if (serverData.cms_footerSection) setFooterSection(serverData.cms_footerSection);
+      }
+    });
+  }, []);
 
   // Section Toggles
   const [sections, setSections] = useState(() => {
@@ -37,7 +61,7 @@ export default function AdminHomeManager() {
     setSections(newSections);
     localStorage.setItem('cms_sections', JSON.stringify(newSections));
     window.dispatchEvent(new Event('cms_sections_updated'));
-    triggerAutoSave();
+    triggerAutoSave('cms_sections', newSections);
   };
 
   const tabs = [
@@ -104,7 +128,7 @@ export default function AdminHomeManager() {
     setHeroSlides(newSlides);
     localStorage.setItem('cms_heroSlides', JSON.stringify(newSlides));
     window.dispatchEvent(new Event('cms_hero_updated'));
-    triggerAutoSave();
+    triggerAutoSave('cms_heroSlides', newSlides);
   };
 
   const processAndUploadImage = (file, callback) => {
@@ -130,7 +154,17 @@ export default function AdminHomeManager() {
         ctx.drawImage(img, 0, 0, width, height);
         
         const optimizedDataUrl = canvas.toDataURL('image/webp', 0.8);
-        callback(optimizedDataUrl);
+        fetch('/api/cms/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ base64Data: optimizedDataUrl, extension: 'webp' })
+        }).then(res => res.json()).then(data => {
+          if (data.success) {
+            callback(data.url);
+          } else {
+            callback(optimizedDataUrl);
+          }
+        }).catch(() => callback(optimizedDataUrl));
       };
     };
     reader.readAsDataURL(file);
@@ -201,7 +235,7 @@ export default function AdminHomeManager() {
     setQuickSection(newSec);
     localStorage.setItem('cms_quickSection', JSON.stringify(newSec));
     window.dispatchEvent(new Event('cms_quick_updated'));
-    triggerAutoSave();
+    triggerAutoSave('cms_quickSection', newSec);
   };
 
   const updateQuickLink = (id, field, value) => {
@@ -211,7 +245,7 @@ export default function AdminHomeManager() {
     setQuickLinks(newLinks);
     localStorage.setItem('cms_quickLinks', JSON.stringify(newLinks));
     window.dispatchEvent(new Event('cms_quick_updated'));
-    triggerAutoSave();
+    triggerAutoSave('cms_quickLinks', newLinks);
   };
 
   const DEFAULT_PASTOR_SECTION = {
@@ -235,7 +269,7 @@ export default function AdminHomeManager() {
     setPastorSection(newSec);
     localStorage.setItem('cms_pastorSection', JSON.stringify(newSec));
     window.dispatchEvent(new Event('cms_pastor_updated'));
-    triggerAutoSave();
+    triggerAutoSave('cms_pastorSection', newSec);
   };
 
   const handlePastorImageUpload = (e) => {
@@ -269,7 +303,7 @@ export default function AdminHomeManager() {
     setFooterSection(newSec);
     localStorage.setItem('cms_footerSection', JSON.stringify(newSec));
     window.dispatchEvent(new Event('cms_footer_updated'));
-    triggerAutoSave();
+    triggerAutoSave('cms_footerSection', newSec);
   };
 
   const handleFooterLogoUpload = (e) => {
