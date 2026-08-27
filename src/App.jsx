@@ -181,7 +181,7 @@ function Navbar({ isLoggedIn }) {
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-6">
           {isLoggedIn ? (
             <button 
               onClick={() => navigate('/mypage')}
@@ -247,6 +247,33 @@ function Navbar({ isLoggedIn }) {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto py-6 px-6 space-y-8">
+                {/* Mobile Auth Buttons */}
+                <div className="flex flex-col space-y-3 border-b border-gray-100 pb-6">
+                  {isLoggedIn ? (
+                    <button 
+                      onClick={() => { setIsMobileMenuOpen(false); navigate('/mypage'); }}
+                      className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-center font-bold text-gray-700 transition-colors"
+                    >
+                      내 정보 ({userProfile.name})
+                    </button>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
+                        className="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg text-center font-bold text-gray-700 transition-colors"
+                      >
+                        로그인
+                      </button>
+                      <button 
+                        onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
+                        className="w-full py-2.5 bg-black hover:bg-gray-900 text-[#F6BE00] rounded-lg text-center font-bold transition-colors"
+                      >
+                        회원가입
+                      </button>
+                    </>
+                  )}
+                </div>
+                
                 <div>
                   <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">교회소개</h3>
                   <div className="flex flex-col space-y-4 pl-2">
@@ -319,7 +346,7 @@ function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full h-[600px] overflow-hidden bg-black">
+    <section className="relative w-full h-[480px] lg:h-[600px] overflow-hidden bg-black">
       <AnimatePresence initial={false}>
         <motion.div
           key={currentSlide}
@@ -429,7 +456,7 @@ function QuickMenu() {
   ];
 
   return (
-    <section className="bg-[#f5f5f7] py-20 px-4 flex flex-col items-center overflow-hidden">
+    <section className="bg-[#f5f5f7] py-12 md:py-20 px-4 flex flex-col items-center overflow-hidden">
       {/* Motto */}
       <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -594,7 +621,7 @@ function WorshipVideos() {
             )}
 
             {/* Recent Videos - Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               {recentVideos.map((video, idx) => (
                 <motion.div
                   onClick={() => setSelectedVideo(video)}
@@ -636,8 +663,8 @@ function WorshipVideos() {
 
 function WorshipSchedule() {
   return (
-    <section id="worship-schedule" className="bg-white text-[#111] relative min-h-[350px] flex items-center border-t border-black/5 px-4 py-16 md:py-0 overflow-hidden">
-      <div className="max-w-[1200px] w-full mx-auto flex flex-col md:flex-row items-center md:items-center h-full py-10 md:py-0">
+    <section id="worship-schedule" className="bg-white text-[#111] relative min-h-[350px] flex items-center border-t border-black/5 px-4 py-12 md:py-16 overflow-hidden">
+      <div className="max-w-[1200px] w-full mx-auto flex flex-col md:flex-row items-center md:items-start h-full">
         
         {/* Left 1/5: Title */}
         <motion.div
@@ -645,13 +672,13 @@ function WorshipSchedule() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-1/5 flex flex-col justify-start shrink-0 mb-12 md:mb-0 md:pr-8 text-center md:text-left"
+          className="w-full md:w-1/5 flex flex-col justify-start shrink-0 mb-8 md:mb-0 md:pr-8 text-center md:text-left mt-0 md:mt-2"
         >
-          <div className="text-[13px] md:text-[14px] font-bold tracking-widest text-[#8DC63F] mb-2">예배안내</div>
-          <h2 className="text-[32px] md:text-[40px] font-bold tracking-tight text-black leading-tight">
+          <div className="text-[13px] md:text-[14px] font-bold tracking-widest text-[#8DC63F] mb-1 md:mb-2">예배안내</div>
+          <h2 className="text-[28px] md:text-[40px] font-bold tracking-tight text-black leading-tight">
             예배시간
           </h2>
-          <div className="w-12 h-1 bg-black mt-5 mx-auto md:mx-0"></div>
+          <div className="w-10 md:w-12 h-1 bg-black mt-3 md:mt-5 mx-auto md:mx-0"></div>
         </motion.div>
 
         {/* Right 4/5: Content Grid */}
@@ -660,40 +687,40 @@ function WorshipSchedule() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="w-full md:w-4/5 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10 md:pl-10 border-l-0 md:border-l border-gray-200"
+          className="w-full md:w-4/5 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 md:gap-y-10 md:pl-10 border-l-0 md:border-l border-gray-200"
         >
           {/* Group 1: 주일예배 */}
           <div>
-            <h3 className="font-bold text-[18px] text-black mb-5 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-[#8DC63F] mr-2.5"></span> 주일 예배
+            <h3 className="font-bold text-[16px] md:text-[18px] text-black mb-3 md:mb-5 flex items-center">
+              <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-[#8DC63F] mr-2 md:mr-2.5"></span> 주일 예배
             </h3>
-            <ul className="space-y-3.5 text-[15px]">
-              <li className="flex justify-between border-b border-gray-100 pb-2.5"><span className="font-medium text-gray-800">1부 예배</span> <span className="text-gray-500 font-bold">오전 09:00</span></li>
-              <li className="flex justify-between border-b border-gray-100 pb-2.5"><span className="font-medium text-gray-800">2부 예배</span> <span className="text-gray-500 font-bold">오전 11:00</span></li>
+            <ul className="space-y-2 md:space-y-3.5 text-[14px] md:text-[15px]">
+              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">1부 예배</span> <span className="text-gray-500 font-bold">오전 09:00</span></li>
+              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">2부 예배</span> <span className="text-gray-500 font-bold">오전 11:00</span></li>
               <li className="flex justify-between pb-1"><span className="font-medium text-gray-800">오후 예배</span> <span className="text-gray-500 font-bold">오후 02:00</span></li>
             </ul>
           </div>
 
           {/* Group 2: 주중예배 */}
           <div>
-            <h3 className="font-bold text-[18px] text-black mb-5 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-black mr-2.5"></span> 주중 예배
+            <h3 className="font-bold text-[16px] md:text-[18px] text-black mb-3 md:mb-5 flex items-center">
+              <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-black mr-2 md:mr-2.5"></span> 주중 예배
             </h3>
-            <ul className="space-y-3.5 text-[15px]">
-              <li className="flex justify-between border-b border-gray-100 pb-2.5"><span className="font-medium text-gray-800">수요 기도회</span> <span className="text-gray-500 font-bold">오후 07:30</span></li>
-              <li className="flex justify-between border-b border-gray-100 pb-2.5"><span className="font-medium text-gray-800">금요 성령집회</span> <span className="text-gray-500 font-bold">오후 08:30</span></li>
+            <ul className="space-y-2 md:space-y-3.5 text-[14px] md:text-[15px]">
+              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">수요 기도회</span> <span className="text-gray-500 font-bold">오후 07:30</span></li>
+              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">금요 성령집회</span> <span className="text-gray-500 font-bold">오후 08:30</span></li>
               <li className="flex justify-between pb-1"><span className="font-medium text-gray-800">새벽 기도회</span> <span className="text-gray-500 font-bold">오전 05:00</span></li>
             </ul>
           </div>
 
           {/* Group 3: 다음세대 */}
           <div>
-            <h3 className="font-bold text-[18px] text-black mb-5 flex items-center">
-              <span className="w-2 h-2 rounded-full bg-gray-400 mr-2.5"></span> 다음 세대
+            <h3 className="font-bold text-[16px] md:text-[18px] text-black mb-3 md:mb-5 flex items-center">
+              <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-gray-400 mr-2 md:mr-2.5"></span> 다음 세대
             </h3>
-            <ul className="space-y-3.5 text-[15px]">
-              <li className="flex justify-between border-b border-gray-100 pb-2.5"><span className="font-medium text-gray-800">유치·아동부</span> <span className="text-gray-500 font-bold">오전 11:00</span></li>
-              <li className="flex justify-between border-b border-gray-100 pb-2.5"><span className="font-medium text-gray-800">중·고등부</span> <span className="text-gray-500 font-bold">오전 10:30</span></li>
+            <ul className="space-y-2 md:space-y-3.5 text-[14px] md:text-[15px]">
+              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">유치·아동부</span> <span className="text-gray-500 font-bold">오전 11:00</span></li>
+              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">중·고등부</span> <span className="text-gray-500 font-bold">오전 10:30</span></li>
               <li className="flex justify-between pb-1"><span className="font-medium text-gray-800">청년부 예배</span> <span className="text-gray-500 font-bold">오후 02:00</span></li>
             </ul>
           </div>
@@ -707,7 +734,7 @@ function PastorGreeting() {
   return (
     <section 
       id="pastor-greeting" 
-      className="relative flex items-center justify-center min-h-[85vh] pt-32 pb-[378px] px-4 bg-fixed bg-center bg-cover bg-no-repeat"
+      className="relative flex items-center justify-center min-h-[85vh] pt-32 pb-[378px] px-4 bg-fixed bg-[85%_center] md:bg-center bg-cover bg-no-repeat"
       style={{ backgroundImage: 'url("/pastor-bg.png")' }}
     >
       {/* Gradient Overlay for text readability on left, visibility on right */}
@@ -795,8 +822,8 @@ function PhotoGallery() {
         </motion.div>
 
         {/* 4x2 Cards Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8 md:gap-y-10">
-          {photos.map((item, index) => (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-10">
+          {photos.slice(0, 4).map((item, index) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 30 }}
