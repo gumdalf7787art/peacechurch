@@ -141,31 +141,31 @@ const Admin = () => {
 
   if (!isAdminAuthenticated) {
     return (
-      <div className="w-full min-h-screen bg-[#fafafc] flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 w-full max-w-sm text-center">
+      <div className="w-full h-screen bg-[#fafafc] flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 w-[380px] min-w-[300px] flex flex-col text-center">
           <div className="flex justify-center mb-6">
             <img src="/logo.jpg" alt="로고" className="w-16 h-16 object-contain rounded-xl shadow-sm border border-black/5" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">관리자 로그인</h2>
-          <p className="text-sm text-gray-500 mb-8">제작자 전용 마스터 비밀번호를 입력해주세요.</p>
+          <h2 className="text-[20px] font-bold text-gray-900 mb-2">관리자 로그인</h2>
+          <p className="text-[14px] text-gray-500 mb-8">제작자 전용 마스터 비밀번호를 입력해주세요.</p>
           
-          <form onSubmit={handleAdminLogin} className="space-y-4">
+          <form onSubmit={handleAdminLogin} className="flex flex-col space-y-4 w-full">
             <input 
               type="password" 
               value={adminPassword}
               onChange={(e) => setAdminPassword(e.target.value)}
               placeholder="마스터 비밀번호"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-black outline-none transition-all text-sm text-center"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-black outline-none transition-all text-[14px] text-center"
               autoFocus
             />
             <button 
               type="submit"
-              className="w-full bg-black text-white font-bold rounded-lg py-3 hover:bg-gray-800 transition-colors"
+              className="w-full bg-black text-white font-bold rounded-lg py-3 hover:bg-gray-800 transition-colors text-[15px]"
             >
               접속하기
             </button>
           </form>
-          <button onClick={() => navigate('/')} className="mt-6 text-sm text-gray-400 hover:text-black underline underline-offset-4">
+          <button onClick={() => navigate('/')} className="mt-6 text-[13px] text-gray-400 hover:text-black underline underline-offset-4">
             홈페이지로 돌아가기
           </button>
         </div>
