@@ -231,6 +231,40 @@ export default function AdminHomeManager() {
     });
   };
 
+  const DEFAULT_FOOTER_SECTION = {
+    logo: '/logo.jpg',
+    description: '하나님의 사랑과 은혜가 넘치는 진정한 쉼터\n세상의 빛과 소금이 되는 평화교회입니다.',
+    churchName: '기독교대한감리회 평화교회',
+    repName: '',
+    address: '서울 중랑구 봉화산로 120',
+    phone: '02-000-0000',
+    fax: '',
+    email: 'peace@peacechurch.com',
+    copyright: 'Copyright © 2026 Peace Church. All rights reserved.'
+  };
+
+  const [footerSection, setFooterSection] = useState(() => {
+    const saved = localStorage.getItem('cms_footerSection');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return DEFAULT_FOOTER_SECTION;
+  });
+
+  const updateFooterSection = (field, value) => {
+    const newSec = { ...footerSection, [field]: value };
+    setFooterSection(newSec);
+    localStorage.setItem('cms_footerSection', JSON.stringify(newSec));
+    window.dispatchEvent(new Event('cms_footer_updated'));
+    triggerAutoSave();
+  };
+
+  const handleFooterLogoUpload = (e) => {
+    processAndUploadImage(e.target.files[0], (optimizedDataUrl) => {
+      updateFooterSection('logo', optimizedDataUrl);
+    });
+  };
+
   const [locationGroups, setLocationGroups] = useState([
     {
       id: 'contact',
@@ -735,21 +769,27 @@ export default function AdminHomeManager() {
                 <div className="col-span-1 md:col-span-4 space-y-6">
                   <div>
                     <label className="block text-[14px] font-bold text-gray-700 mb-2">하단 로고</label>
-                    <div className="aspect-[2/1] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors">
-                      <div className="text-gray-400 text-center flex flex-col items-center">
-                        <ImageIcon size={24} className="mb-2 opacity-50" />
-                        <span className="text-[12px] font-bold">클릭하여 로고 업로드</span>
-                      </div>
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                    <label className="aspect-[2/1] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors block">
+                      {footerSection.logo ? (
+                        <img src={footerSection.logo} alt="로고" className="w-full h-full object-contain p-4 opacity-80" />
+                      ) : (
+                        <div className="text-gray-400 text-center flex flex-col items-center">
+                          <ImageIcon size={24} className="mb-2 opacity-50" />
+                          <span className="text-[12px] font-bold">클릭하여 로고 업로드</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity z-10">
                         <ImageIcon color="white" size={24} className="mb-2" />
                         <span className="text-white font-bold text-[12px]">사진 변경</span>
                       </div>
-                    </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleFooterLogoUpload} />
+                    </label>
                   </div>
                   <div>
                     <label className="block text-[14px] font-bold text-gray-700 mb-2">로고 하단 문구</label>
                     <textarea 
-                      defaultValue="평화교회는 이 땅에 주님의 평화를 전하며, 지역사회와 함께하는 믿음의 공동체입니다." 
+                      value={footerSection.description}
+                      onChange={(e) => updateFooterSection('description', e.target.value)}
                       className="w-full px-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[13px] leading-relaxed focus:border-black outline-none resize-none h-24" 
                     />
                   </div>
@@ -759,31 +799,31 @@ export default function AdminHomeManager() {
                 <div className="col-span-1 md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <div>
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">교회(기관)명</label>
-                    <input type="text" defaultValue="대한예수교장로회 평화교회" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                    <input type="text" value={footerSection.churchName} onChange={(e) => updateFooterSection('churchName', e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
                   </div>
                   <div>
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">대표자명 (선택)</label>
-                    <input type="text" defaultValue="" placeholder="홍길동 목사" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                    <input type="text" value={footerSection.repName} onChange={(e) => updateFooterSection('repName', e.target.value)} placeholder="홍길동 목사" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
                   </div>
                   <div className="col-span-1 md:col-span-2">
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">주소</label>
-                    <input type="text" defaultValue="서울특별시 평화구 평화로 123 평화빌딩 1층" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                    <input type="text" value={footerSection.address} onChange={(e) => updateFooterSection('address', e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
                   </div>
                   <div>
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">대표 전화번호</label>
-                    <input type="text" defaultValue="02-123-4567" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                    <input type="text" value={footerSection.phone} onChange={(e) => updateFooterSection('phone', e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
                   </div>
                   <div>
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">팩스번호 (선택)</label>
-                    <input type="text" defaultValue="02-123-4568" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                    <input type="text" value={footerSection.fax} onChange={(e) => updateFooterSection('fax', e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
                   </div>
                   <div>
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">이메일 주소 (선택)</label>
-                    <input type="text" defaultValue="peace@peacechurch.com" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                    <input type="text" value={footerSection.email} onChange={(e) => updateFooterSection('email', e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
                   </div>
                   <div className="col-span-1 md:col-span-2 mt-2 pt-4 border-t border-gray-100">
                     <label className="block text-[13px] font-bold text-gray-700 mb-2">카피라이트 (Copyright)</label>
-                    <input type="text" defaultValue="Copyright © 2026 Peace Church. All rights reserved." className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[13px] text-gray-500 focus:border-black outline-none" />
+                    <input type="text" value={footerSection.copyright} onChange={(e) => updateFooterSection('copyright', e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[13px] text-gray-500 focus:border-black outline-none" />
                   </div>
                 </div>
               </div>

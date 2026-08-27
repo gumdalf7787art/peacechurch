@@ -1140,6 +1140,36 @@ function Location() {
 
 function Footer() {
   const navigate = useNavigate();
+  
+  const [footer, setFooter] = React.useState(() => {
+    const saved = localStorage.getItem('cms_footerSection');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return {
+      logo: '/logo.jpg',
+      description: '하나님의 사랑과 은혜가 넘치는 진정한 쉼터\n세상의 빛과 소금이 되는 평화교회입니다.',
+      churchName: '기독교대한감리회 평화교회',
+      repName: '',
+      address: '서울 중랑구 봉화산로 120',
+      phone: '02-000-0000',
+      fax: '',
+      email: 'peace@peacechurch.com',
+      copyright: 'Copyright © 2026 Peace Church. All rights reserved.'
+    };
+  });
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      const saved = localStorage.getItem('cms_footerSection');
+      if (saved) {
+        try { setFooter(JSON.parse(saved)); } catch(e) {}
+      }
+    };
+    window.addEventListener('cms_footer_updated', handleUpdate);
+    return () => window.removeEventListener('cms_footer_updated', handleUpdate);
+  }, []);
+
   return (
     <footer className="bg-[#0a0a0a] text-[#888] pt-20 pb-12 px-6 border-t border-white/5 text-[14px] font-body">
       <div className="max-w-[1200px] mx-auto">
@@ -1149,22 +1179,28 @@ function Footer() {
           <div className="md:w-1/2">
             <div className="flex items-center mb-6">
               <div className="bg-white px-3 py-2 rounded-lg inline-block">
-                <img src="/logo.jpg" alt="평화교회 로고" className="h-10 w-auto object-contain" />
+                <img src={footer.logo || "/logo.jpg"} alt="교회 로고" className="h-10 w-auto object-contain" />
               </div>
             </div>
             <p className="text-[16px] text-[#999] mb-8 max-w-[400px] leading-[1.6] break-keep">
-              하나님의 사랑과 은혜가 넘치는 진정한 쉼터<br/>
-              세상의 빛과 소금이 되는 평화교회입니다.
+              {footer.description?.split('\n').map((line, i) => (
+                <React.Fragment key={i}>
+                  {line}
+                  {i < footer.description.split('\n').length - 1 && <br/>}
+                </React.Fragment>
+              ))}
             </p>
           </div>
 
           {/* Business Info */}
           <div className="md:w-1/2 flex flex-col md:items-end">
             <div className="space-y-2 text-left md:text-right text-[13px] leading-relaxed mt-4 md:mt-0">
-              <p><strong className="text-white font-medium text-[15px]">기독교대한감리회 평화교회</strong></p>
-              <p>서울 중랑구 봉화산로 120</p>
+              <p><strong className="text-white font-medium text-[15px]">{footer.churchName}</strong> {footer.repName && <span className="ml-2 opacity-80">(대표: {footer.repName})</span>}</p>
+              <p>{footer.address}</p>
               <div className="pt-3 flex flex-col md:flex-row md:justify-end gap-2 md:gap-6">
-                <span>Tel: <strong className="text-white font-medium tracking-wider">02-000-0000</strong></span>
+                {footer.phone && <span>Tel: <strong className="text-white font-medium tracking-wider">{footer.phone}</strong></span>}
+                {footer.fax && <span>Fax: <strong className="text-white font-medium tracking-wider">{footer.fax}</strong></span>}
+                {footer.email && <span>Email: <strong className="text-white font-medium">{footer.email}</strong></span>}
               </div>
             </div>
           </div>
@@ -1172,7 +1208,7 @@ function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col-reverse md:flex-row justify-between items-center pt-8 border-t border-white/10 text-[12px] text-[#666]">
-          <p className="mt-4 md:mt-0">© 2026 Peace Methodist Church. All rights reserved.</p>
+          <p className="mt-4 md:mt-0">{footer.copyright}</p>
           <div className="flex space-x-6">
             <a href="#" className="hover:text-white transition-colors">이용약관</a>
             <a href="#" className="hover:text-white transition-colors">개인정보처리방침</a>
