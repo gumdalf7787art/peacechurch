@@ -493,7 +493,7 @@ function QuickMenu() {
       </div>
       
       {/* Quick Menus Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 w-full max-w-5xl px-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 w-[85%] sm:w-[80%] max-w-4xl mx-auto">
         {menus.map((menu, idx) => (
           <Link 
             key={idx} 
