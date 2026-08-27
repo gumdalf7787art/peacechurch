@@ -438,52 +438,108 @@ function Hero() {
   );
 }
 
+const DEFAULT_QUICK_SECTION = {
+  mottoYear: '2026년 표어',
+  mottoMain: '주 안에서 하나 되는 평화교회',
+  mottoSub: '평화교회에 오신 여러분을 환영합니다',
+  bgImage: ''
+};
+
+const DEFAULT_QUICK_LINKS = [
+  { id: 1, name: '예배안내', path: '/about/worship', image: '/hero-2-bg.webp', icon: 'Clock' },
+  { id: 2, name: '주보', path: '/about/bulletin', image: '/korean-bible-bg.webp', icon: 'FileText' },
+  { id: 3, name: '유튜브채널', path: '/worship/word', image: '/hero-3-bg.webp', icon: 'PlayCircle' },
+  { id: 4, name: '오시는길', path: '/about/location', image: '/hero-1-bg.webp', icon: 'MapPin' }
+];
+
+const ICONS = {
+  Clock: <Clock />,
+  FileText: <FileText />,
+  PlayCircle: <PlayCircle />,
+  MapPin: <MapPin />,
+  Search: <Search />,
+  Users: <Users />
+};
+
 function QuickMenu() {
-  const menus = [
-    { name: '예배안내', path: '/about/worship', image: '/hero-2-bg.webp', icon: <Clock /> },
-    { name: '주보', path: '/about/bulletin', image: '/korean-bible-bg.webp', icon: <FileText /> },
-    { name: '유튜브채널', path: '/worship/word', image: '/hero-3-bg.webp', icon: <PlayCircle /> },
-    { name: '오시는길', path: '/about/location', image: '/hero-1-bg.webp', icon: <MapPin /> }
-  ];
+  const [section, setSection] = useState(DEFAULT_QUICK_SECTION);
+  const [menus, setMenus] = useState(DEFAULT_QUICK_LINKS);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const savedSec = localStorage.getItem('cms_quickSection');
+        if (savedSec) setSection(JSON.parse(savedSec));
+        
+        const savedLinks = localStorage.getItem('cms_quickLinks');
+        if (savedLinks) setMenus(JSON.parse(savedLinks));
+      } catch (e) {}
+    };
+
+    handleStorage();
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('cms_quick_updated', handleStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('cms_quick_updated', handleStorage);
+    };
+  }, []);
 
   return (
-    <section className="bg-[#f5f5f7] py-16 md:py-24 px-4 flex flex-col items-center overflow-hidden">
-      {/* Motto */}
-      <motion.div 
-        initial={{ opacity: 0, y: 50, scale: 0.9 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-        viewport={{ once: false, margin: "-50px" }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="text-center mb-10 md:mb-16 flex flex-col items-center"
-      >
-        <span className="text-[18px] md:text-[22px] font-semibold text-[#8DC63F] mb-3 tracking-wide uppercase">2026년 표어</span>
-        <h2 className="text-[32px] md:text-[46px] font-black text-black tracking-tight leading-tight">
-          주 안에서 하나 되는 평화교회
-        </h2>
-      </motion.div>
-      
-      {/* Welcome Line */}
-      <div className="flex items-center w-full max-w-5xl mb-12 sm:mb-16">
-        <div className="flex-1 h-[1px] bg-gray-300 hidden sm:block"></div>
-        <span className="px-4 sm:px-8 text-[16px] sm:text-[18px] md:text-[20px] font-semibold text-gray-600 tracking-wide text-center w-full sm:w-auto break-keep">
-          평화교회에 오신 여러분을 환영합니다
-        </span>
-        <div className="flex-1 h-[1px] bg-gray-300 hidden sm:block"></div>
-      </div>
+    <section className="relative bg-[#f5f5f7] py-16 md:py-24 px-4 flex flex-col items-center overflow-hidden">
+      {section.bgImage && (
+        <div className="absolute inset-0 z-0">
+          <img src={section.bgImage} alt="Background" className="w-full h-full object-cover opacity-10" />
+        </div>
+      )}
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {/* Motto */}
+        <motion.div 
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="text-center mb-10 md:mb-16 flex flex-col items-center"
+        >
+          {section.mottoYear && (
+            <span className="text-[18px] md:text-[22px] font-semibold text-[#8DC63F] mb-3 tracking-wide uppercase">{section.mottoYear}</span>
+          )}
+          {section.mottoMain && (
+            <h2 className="text-[32px] md:text-[46px] font-black text-black tracking-tight leading-tight">
+              {section.mottoMain.split('\n').map((line, i) => (
+                <React.Fragment key={i}>
+                  {line}<br/>
+                </React.Fragment>
+              ))}
+            </h2>
+          )}
+        </motion.div>
+        
+        {/* Welcome Line */}
+        {section.mottoSub && (
+          <div className="flex items-center w-full max-w-5xl mb-12 sm:mb-16">
+            <div className="flex-1 h-[1px] bg-gray-300 hidden sm:block"></div>
+            <span className="px-4 sm:px-8 text-[16px] sm:text-[18px] md:text-[20px] font-semibold text-gray-600 tracking-wide text-center w-full sm:w-auto break-keep">
+              {section.mottoSub}
+            </span>
+            <div className="flex-1 h-[1px] bg-gray-300 hidden sm:block"></div>
+          </div>
+        )}
       
       {/* Quick Menus Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 w-[85%] sm:w-[80%] max-w-4xl mx-auto">
         {menus.map((menu, idx) => (
           <Link 
             key={idx} 
-            to={menu.path} 
+            to={menu.link || menu.path} 
             className="group relative w-full aspect-square sm:aspect-[3/5] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer block"
           >
             {/* Background Image */}
             <div className="absolute inset-0 bg-black/20 z-10 group-hover:bg-black/10 transition-colors duration-500" />
             <img 
-              src={menu.image} 
-              alt={menu.name} 
+              src={menu.image || menu.bgImage} 
+              alt={menu.title || menu.name} 
               className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-110" 
             />
             
@@ -493,15 +549,21 @@ function QuickMenu() {
             {/* Content */}
             <div className="absolute inset-0 z-20 flex flex-col justify-end p-5 sm:p-6 text-white transform transition-transform duration-500 group-hover:-translate-y-2">
               <div className="mb-3 text-[#8DC63F] opacity-90 group-hover:opacity-100 group-hover:scale-110 origin-bottom-left transition-all duration-500">
-                {React.cloneElement(menu.icon, { className: 'w-8 h-8 sm:w-10 sm:h-10' })}
+                {ICONS[menu.icon] ? React.cloneElement(ICONS[menu.icon], { className: 'w-8 h-8 sm:w-10 sm:h-10' }) : <Clock className="w-8 h-8 sm:w-10 sm:h-10" />}
               </div>
               <span className="text-[18px] sm:text-[20px] md:text-[24px] font-bold tracking-tight">
-                {menu.name}
+                {menu.title || menu.name}
               </span>
+              {(menu.subtitle || menu.sub) && (
+                <span className="text-[12px] sm:text-[14px] text-white/80 mt-1 block">
+                  {menu.subtitle || menu.sub}
+                </span>
+              )}
               <div className="w-0 h-1 bg-[#8DC63F] mt-3 group-hover:w-12 transition-all duration-500 ease-out" />
             </div>
           </Link>
         ))}
+      </div>
       </div>
     </section>
   );

@@ -94,19 +94,53 @@ export default function AdminHomeManager() {
     window.dispatchEvent(new Event('cms_hero_updated'));
   };
 
-  const [quickSection, setQuickSection] = useState({
+  const DEFAULT_QUICK_SECTION = {
     mottoYear: '2026년 표어',
-    mottoMain: '주안에서 하나되는 평화교회',
+    mottoMain: '주 안에서 하나 되는 평화교회',
     mottoSub: '평화교회에 오신 여러분을 환영합니다',
-    bgImage: '/motto-bg.jpg'
+    bgImage: ''
+  };
+
+  const DEFAULT_QUICK_LINKS = [
+    { id: 1, title: '예배안내', path: '/about/worship', bgImage: '/hero-2-bg.webp', icon: 'Clock' },
+    { id: 2, title: '주보', path: '/about/bulletin', bgImage: '/korean-bible-bg.webp', icon: 'FileText' },
+    { id: 3, title: '유튜브채널', path: '/worship/word', bgImage: '/hero-3-bg.webp', icon: 'PlayCircle' },
+    { id: 4, title: '오시는길', path: '/about/location', bgImage: '/hero-1-bg.webp', icon: 'MapPin' }
+  ];
+
+  const [quickSection, setQuickSection] = useState(() => {
+    const saved = localStorage.getItem('cms_quickSection');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return DEFAULT_QUICK_SECTION;
   });
 
-  const [quickLinks, setQuickLinks] = useState([
-    { id: 1, title: '예배안내', subtitle: '예배 시간 및 장소', icon: 'Clock', link: '/worship/time' },
-    { id: 2, title: '온라인 헌금', subtitle: '계좌 안내', icon: 'CreditCard', link: '/about/offering' },
-    { id: 3, title: '찾아오시는 길', subtitle: '오시는 방법', icon: 'MapPin', link: '/about/location' },
-    { id: 4, title: '새가족 등록', subtitle: '환영합니다', icon: 'UserPlus', link: '/about/newcomer' },
-  ]);
+  const [quickLinks, setQuickLinks] = useState(() => {
+    const saved = localStorage.getItem('cms_quickLinks');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) {}
+    }
+    return DEFAULT_QUICK_LINKS;
+  });
+
+  const updateQuickSection = (field, value) => {
+    const newSec = { ...quickSection, [field]: value };
+    setQuickSection(newSec);
+    localStorage.setItem('cms_quickSection', JSON.stringify(newSec));
+    window.dispatchEvent(new Event('cms_quick_updated'));
+    triggerAutoSave();
+  };
+
+  const updateQuickLink = (id, field, value) => {
+    const newLinks = quickLinks.map(link => 
+      link.id === id ? { ...link, [field]: value } : link
+    );
+    setQuickLinks(newLinks);
+    localStorage.setItem('cms_quickLinks', JSON.stringify(newLinks));
+    window.dispatchEvent(new Event('cms_quick_updated'));
+    triggerAutoSave();
+  };
 
   const [locationGroups, setLocationGroups] = useState([
     {
@@ -345,15 +379,15 @@ export default function AdminHomeManager() {
                       <h4 className="text-[15px] font-bold text-gray-900">올해의 표어 설정</h4>
                       <div>
                         <label className="block text-[12px] font-bold text-gray-500 mb-1">표어 연도 및 타이틀</label>
-                        <input type="text" defaultValue={quickSection.mottoYear} className="w-full px-4 py-2 border border-gray-200 rounded-xl text-[14px] font-bold focus:border-black outline-none bg-gray-50 focus:bg-white" />
+                        <input type="text" value={quickSection.mottoYear || ''} onChange={(e) => updateQuickSection('mottoYear', e.target.value)} className="w-full px-4 py-2 border border-gray-200 rounded-xl text-[14px] font-bold focus:border-black outline-none bg-gray-50 focus:bg-white" />
                       </div>
                       <div>
                         <label className="block text-[12px] font-bold text-gray-500 mb-1">표어 내용 (큰 글씨)</label>
-                        <input type="text" defaultValue={quickSection.mottoMain} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[18px] font-black focus:border-black outline-none text-[#5227FF] bg-gray-50 focus:bg-white" />
+                        <textarea value={quickSection.mottoMain || ''} onChange={(e) => updateQuickSection('mottoMain', e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[18px] font-black focus:border-black outline-none text-[#5227FF] bg-gray-50 focus:bg-white resize-none h-24" />
                       </div>
                       <div>
                         <label className="block text-[12px] font-bold text-gray-500 mb-1">서브 표어 (작은 글씨)</label>
-                        <input type="text" defaultValue={quickSection.mottoSub} className="w-full px-4 py-2 border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none bg-gray-50 focus:bg-white" />
+                        <input type="text" value={quickSection.mottoSub || ''} onChange={(e) => updateQuickSection('mottoSub', e.target.value)} className="w-full px-4 py-2 border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none bg-gray-50 focus:bg-white" />
                       </div>
                     </div>
 
@@ -378,22 +412,23 @@ export default function AdminHomeManager() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {quickLinks.map((link, idx) => (
                         <div key={link.id} className="border border-gray-200 p-5 rounded-xl flex gap-4 bg-white relative group hover:border-black transition-colors shadow-sm">
-                          <div className="w-16 h-16 bg-gray-50 rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100">
-                            <span className="text-[24px]">📌</span>
-                            <span className="text-[10px] text-gray-500 font-bold mt-1">변경</span>
+                          <div className="w-20 h-20 bg-gray-50 rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 relative overflow-hidden">
+                            {link.bgImage && <img src={link.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-30" />}
+                            <span className="text-[20px] relative z-10">{link.icon === 'Clock' ? '⏱️' : (link.icon === 'FileText' ? '📄' : (link.icon === 'PlayCircle' ? '▶️' : '📍'))}</span>
+                            <span className="text-[10px] text-gray-700 font-bold mt-1 relative z-10 bg-white/80 px-1 rounded">아이콘/배경</span>
                           </div>
                           <div className="flex-1 space-y-3">
                             <div>
                               <label className="block text-[11px] font-bold text-gray-500 mb-1">메뉴명 (타이틀)</label>
-                              <input type="text" defaultValue={link.title} className="w-full px-3 py-1.5 border border-gray-200 bg-gray-50 focus:bg-white rounded-md text-[14px] font-bold outline-none focus:border-black" />
+                              <input type="text" value={link.title || link.name || ''} onChange={(e) => updateQuickLink(link.id, 'title', e.target.value)} className="w-full px-3 py-1.5 border border-gray-200 bg-gray-50 focus:bg-white rounded-md text-[14px] font-bold outline-none focus:border-black" />
                             </div>
                             <div>
                               <label className="block text-[11px] font-bold text-gray-500 mb-1">설명 (서브 타이틀)</label>
-                              <input type="text" defaultValue={link.subtitle} className="w-full px-3 py-1.5 border border-gray-200 bg-gray-50 focus:bg-white rounded-md text-[13px] outline-none focus:border-black" />
+                              <input type="text" value={link.subtitle || ''} onChange={(e) => updateQuickLink(link.id, 'subtitle', e.target.value)} className="w-full px-3 py-1.5 border border-gray-200 bg-gray-50 focus:bg-white rounded-md text-[13px] outline-none focus:border-black" />
                             </div>
                             <div>
                               <label className="block text-[11px] font-bold text-gray-500 mb-1">연결 URL</label>
-                              <input type="text" defaultValue={link.link} className="w-full px-3 py-1.5 border border-gray-200 bg-blue-50 focus:bg-white rounded-md text-[12px] font-mono text-blue-600 outline-none focus:border-black" />
+                              <input type="text" value={link.path || link.link || ''} onChange={(e) => updateQuickLink(link.id, 'path', e.target.value)} className="w-full px-3 py-1.5 border border-gray-200 bg-blue-50 focus:bg-white rounded-md text-[12px] font-mono text-blue-600 outline-none focus:border-black" />
                             </div>
                           </div>
                         </div>
