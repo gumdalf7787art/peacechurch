@@ -318,7 +318,7 @@ function Hero() {
     <section className="relative w-full h-[480px] lg:h-[600px] overflow-hidden bg-black">
       <AnimatePresence>
         <motion.div
-          key={currentSlide}
+          key={`${currentSlide}-${slides[currentSlide].zoomEffect}-${slides[currentSlide].image}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

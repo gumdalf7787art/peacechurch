@@ -92,6 +92,18 @@ export default function AdminHomeManager() {
     setHeroSlides(newSlides);
     localStorage.setItem('cms_heroSlides', JSON.stringify(newSlides));
     window.dispatchEvent(new Event('cms_hero_updated'));
+    triggerAutoSave();
+  };
+
+  const handleHeroImageUpload = (id, e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateHeroSlide(id, 'image', reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const DEFAULT_QUICK_SECTION = {
@@ -283,9 +295,15 @@ export default function AdminHomeManager() {
                       <div className="w-full md:w-[280px] h-[200px] md:h-auto bg-gray-200 relative group shrink-0 border-r border-gray-200">
                         <img src={slide.image} alt="배너" className="w-full h-full object-cover absolute inset-0" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <button className="bg-white text-black text-[12px] font-bold px-3 py-1.5 rounded-lg flex items-center shadow-md">
+                          <label className="bg-white text-black text-[12px] font-bold px-3 py-1.5 rounded-lg flex items-center shadow-md cursor-pointer hover:bg-gray-100 transition-colors">
                             <ImageIcon size={14} className="mr-1" /> 이미지 변경
-                          </button>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={(e) => handleHeroImageUpload(slide.id, e)} 
+                            />
+                          </label>
                         </div>
                       </div>
 
