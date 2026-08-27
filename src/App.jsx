@@ -725,10 +725,28 @@ function WorshipSchedule() {
             <h3 className="font-bold text-[16px] md:text-[18px] text-black mb-3 md:mb-5 flex items-center">
               <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-[#8DC63F] mr-2 md:mr-2.5"></span> 주일 예배
             </h3>
-            <ul className="space-y-2 md:space-y-3.5 text-[14px] md:text-[15px]">
-              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">1부 예배</span> <span className="text-gray-500 font-bold">오전 09:00</span></li>
-              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">2부 예배</span> <span className="text-gray-500 font-bold">오전 11:00</span></li>
-              <li className="flex justify-between pb-1"><span className="font-medium text-gray-800">오후 예배</span> <span className="text-gray-500 font-bold">오후 02:00</span></li>
+            <ul className="space-y-2 md:space-y-3 text-[14px] md:text-[15px]">
+              <li className="flex flex-col border-b border-gray-100 pb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">1부예배</span>
+                  <span className="text-gray-600 font-medium">오전 7시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">글로리아홀(B1)</div>
+              </li>
+              <li className="flex flex-col border-b border-gray-100 pb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">2부예배</span>
+                  <span className="text-gray-600 font-medium">오전 9시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">글로리아홀(B1)</div>
+              </li>
+              <li className="flex flex-col pb-1">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">3부예배</span>
+                  <span className="text-gray-600 font-medium">오전 11시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">글로리아홀(B1)</div>
+              </li>
             </ul>
           </div>
 
@@ -737,10 +755,28 @@ function WorshipSchedule() {
             <h3 className="font-bold text-[16px] md:text-[18px] text-black mb-3 md:mb-5 flex items-center">
               <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-black mr-2 md:mr-2.5"></span> 주중 예배
             </h3>
-            <ul className="space-y-2 md:space-y-3.5 text-[14px] md:text-[15px]">
-              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">수요 기도회</span> <span className="text-gray-500 font-bold">오후 07:30</span></li>
-              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">금요 성령집회</span> <span className="text-gray-500 font-bold">오후 08:30</span></li>
-              <li className="flex justify-between pb-1"><span className="font-medium text-gray-800">새벽 기도회</span> <span className="text-gray-500 font-bold">오전 05:00</span></li>
+            <ul className="space-y-2 md:space-y-3 text-[14px] md:text-[15px]">
+              <li className="flex flex-col border-b border-gray-100 pb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">수요예배</span>
+                  <span className="text-gray-600 font-medium">오후 7시 30분</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">글로리아홀(B1)</div>
+              </li>
+              <li className="flex flex-col border-b border-gray-100 pb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">금요기도회</span>
+                  <span className="text-gray-600 font-medium">오후 9시 00분</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">글로리아홀(B1)</div>
+              </li>
+              <li className="flex flex-col pb-1">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">새벽기도회</span>
+                  <span className="text-gray-600 font-medium">평일 오전 5시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">소예배실(2F)</div>
+              </li>
             </ul>
           </div>
 
@@ -749,10 +785,28 @@ function WorshipSchedule() {
             <h3 className="font-bold text-[16px] md:text-[18px] text-black mb-3 md:mb-5 flex items-center">
               <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-gray-400 mr-2 md:mr-2.5"></span> 다음 세대
             </h3>
-            <ul className="space-y-2 md:space-y-3.5 text-[14px] md:text-[15px]">
-              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">유치·아동부</span> <span className="text-gray-500 font-bold">오전 11:00</span></li>
-              <li className="flex justify-between border-b border-gray-100 pb-1.5 md:pb-2.5"><span className="font-medium text-gray-800">중·고등부</span> <span className="text-gray-500 font-bold">오전 10:30</span></li>
-              <li className="flex justify-between pb-1"><span className="font-medium text-gray-800">청년부 예배</span> <span className="text-gray-500 font-bold">오후 02:00</span></li>
+            <ul className="space-y-2 md:space-y-3 text-[14px] md:text-[15px]">
+              <li className="flex flex-col border-b border-gray-100 pb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">유치·아동부</span>
+                  <span className="text-gray-600 font-medium">주일 오전 11시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">비전홀(3F)</div>
+              </li>
+              <li className="flex flex-col border-b border-gray-100 pb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">중·고등부</span>
+                  <span className="text-gray-600 font-medium">주일 오전 9시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">청소년실(4F)</div>
+              </li>
+              <li className="flex flex-col pb-1">
+                <div className="flex justify-between">
+                  <span className="font-bold text-gray-800">청년부 예배</span>
+                  <span className="text-gray-600 font-medium">주일 오후 2시</span>
+                </div>
+                <div className="text-right text-[12px] md:text-[13px] text-gray-400 mt-0.5">글로리아홀(B1)</div>
+              </li>
             </ul>
           </div>
         </motion.div>
