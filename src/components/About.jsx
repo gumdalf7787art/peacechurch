@@ -23,7 +23,7 @@ function Vision() {
   ];
 
   return (
-    <div className="flex flex-col space-y-24 py-8">
+    <div className="flex flex-col space-y-16 md:space-y-24 py-4 md:py-8 px-2 md:px-0">
       {/* 1. 우리의 비전 */}
       <section className="text-center">
         <motion.div 
@@ -32,17 +32,17 @@ function Vision() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-[#8DC63F] font-bold tracking-widest text-sm mb-4 block">OUR VISION</span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-10 tracking-tight">우리의 비전</h2>
-          <div className="bg-[#f8f9fa] border-l-[6px] border-[#cc0000] p-8 md:p-14 rounded-r-3xl shadow-sm text-left md:text-center relative">
-            <h3 className="text-2xl md:text-[32px] font-bold text-gray-900 mb-8 leading-[1.4] tracking-tight">
+          <span className="text-[#8DC63F] font-bold tracking-widest text-[12px] md:text-sm mb-3 md:mb-4 block">OUR VISION</span>
+          <h2 className="text-[28px] md:text-4xl font-extrabold text-black mb-8 md:mb-10 tracking-tight">우리의 비전</h2>
+          <div className="bg-[#f8f9fa] border-l-[4px] md:border-l-[6px] border-[#cc0000] p-6 md:p-14 rounded-r-2xl md:rounded-r-3xl shadow-sm text-left md:text-center relative">
+            <h3 className="text-[20px] md:text-[32px] font-bold text-gray-900 mb-6 md:mb-8 leading-[1.5] tracking-tight">
               "예수 그리스도의 사랑으로 사람을 세우고,<br className="hidden md:block" /> 세상을 섬기는 교회"
             </h3>
-            <div className="text-lg text-gray-700 leading-loose break-keep max-w-4xl mx-auto space-y-5">
+            <div className="text-[15px] md:text-lg text-gray-700 leading-relaxed md:leading-loose break-keep max-w-4xl mx-auto space-y-4 md:space-y-5">
               <p>평화교회는 예수 그리스도를 삶의 유일한 길로 고백하며, 말씀과 기도 위에 굳게 서서 하나님의 사랑을 세상 가운데 나누는 교회를 꿈꿉니다.</p>
               <p>교회 안에서만 머무르는 신앙이 아니라 가정과 일터, 이웃과 지역사회 속에서 그리스도의 사랑을 실천하며, 상처받은 이들을 품고 소외된 이들과 함께하는 것이 우리의 사명입니다.</p>
               <p>한 사람의 변화가 한 가정을 변화시키고, 한 가정의 변화가 지역사회를 변화시키며, 그 변화가 세상을 향한 하나님의 사랑으로 이어지기를 소망합니다.</p>
-              <p className="font-semibold text-black mt-8 text-[19px]">
+              <p className="font-semibold text-black mt-6 md:mt-8 text-[16px] md:text-[19px]">
                 평화교회는 모든 세대가 믿음 안에서 함께 성장하고 세상 속에서 복음의 빛을 밝히는 <strong className="text-[#cc0000] font-extrabold">건강하고 따뜻한 신앙공동체</strong>를 세워가겠습니다.
               </p>
             </div>
@@ -57,12 +57,12 @@ function Vision() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-extrabold text-black tracking-tight">우리가 세워가는 교회</h2>
+          <h2 className="text-[26px] md:text-4xl font-extrabold text-black tracking-tight">우리가 세워가는 교회</h2>
         </motion.div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {coreValues.map((value, idx) => (
             <motion.div 
               key={idx}
@@ -70,16 +70,16 @@ function Vision() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 hover:shadow-[0_10px_30px_rgba(204,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group"
+              className="bg-white p-6 md:p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 hover:shadow-[0_10px_30px_rgba(204,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group"
             >
-              <div className="flex items-center justify-between mb-6">
-                <div className="text-[#cc0000] bg-[#cc0000]/10 p-4 rounded-xl group-hover:scale-110 group-hover:bg-[#cc0000] group-hover:text-white transition-all duration-300">
-                  {value.icon}
+              <div className="flex items-center justify-between mb-5 md:mb-6">
+                <div className="text-[#cc0000] bg-[#cc0000]/10 p-3 md:p-4 rounded-xl group-hover:scale-110 group-hover:bg-[#cc0000] group-hover:text-white transition-all duration-300">
+                  {React.cloneElement(value.icon, { className: 'w-6 h-6 md:w-8 md:h-8' })}
                 </div>
-                <span className="text-4xl font-black text-gray-100 group-hover:text-[#cc0000]/20 transition-colors duration-300">{value.num}</span>
+                <span className="text-3xl md:text-4xl font-black text-gray-100 group-hover:text-[#cc0000]/20 transition-colors duration-300">{value.num}</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 tracking-tight">{value.title}</h3>
-              <p className="text-[15px] text-gray-600 leading-relaxed break-keep">{value.desc}</p>
+              <h3 className="text-[18px] md:text-xl font-bold text-gray-900 mb-3 md:mb-4 tracking-tight">{value.title}</h3>
+              <p className="text-[14px] md:text-[15px] text-gray-600 leading-relaxed break-keep">{value.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -92,15 +92,15 @@ function Vision() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-extrabold text-black tracking-tight">우리의 목표</h2>
+          <h2 className="text-[26px] md:text-4xl font-extrabold text-black tracking-tight">우리의 목표</h2>
         </motion.div>
 
-        <div className="bg-black text-white rounded-3xl p-8 md:p-14 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-[#cc0000] opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="bg-black text-white rounded-[24px] md:rounded-3xl p-6 md:p-14 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 md:w-80 h-40 md:h-80 bg-[#cc0000] opacity-10 rounded-full blur-2xl md:blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 md:gap-y-10 relative z-10">
             {goals.map((goal, idx) => (
               <motion.div 
                 key={idx}
@@ -110,11 +110,11 @@ function Vision() {
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 className="flex flex-col"
               >
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-2 h-2 rounded-full bg-[#cc0000] shadow-[0_0_10px_rgba(204,0,0,0.8)]"></div>
-                  <h3 className="text-[20px] font-bold text-white">{goal.title}</h3>
+                <div className="flex items-center space-x-2.5 md:space-x-3 mb-2 md:mb-3">
+                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#cc0000] shadow-[0_0_10px_rgba(204,0,0,0.8)]"></div>
+                  <h3 className="text-[17px] md:text-[20px] font-bold text-white tracking-tight">{goal.title}</h3>
                 </div>
-                <p className="text-[15px] text-gray-400 pl-5 break-keep leading-relaxed">{goal.desc}</p>
+                <p className="text-[14px] md:text-[15px] text-gray-400 pl-4 md:pl-5 break-keep leading-relaxed">{goal.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -128,21 +128,21 @@ function Vision() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1 }}
-          className="relative bg-gradient-to-br from-[#f8f9fa] to-white border border-gray-200 rounded-3xl p-10 md:p-16 text-center overflow-hidden shadow-sm"
+          className="relative bg-gradient-to-br from-[#f8f9fa] to-white border border-gray-200 rounded-2xl md:rounded-3xl p-8 md:p-16 text-center overflow-hidden shadow-sm"
         >
-          <span className="text-[18px] font-black text-[#cc0000] tracking-[0.3em] mb-4 block">ONE WAY JESUS</span>
-          <h2 className="text-[28px] md:text-[36px] font-extrabold text-black mb-8 tracking-tight">
+          <span className="text-[14px] md:text-[18px] font-black text-[#cc0000] tracking-[0.2em] md:tracking-[0.3em] mb-3 md:mb-4 block">ONE WAY JESUS</span>
+          <h2 className="text-[22px] md:text-[36px] font-extrabold text-black mb-5 md:mb-8 tracking-tight">
             오직 예수, 사랑으로 세상을 향하여
           </h2>
           
-          <p className="text-[17px] text-gray-700 leading-relaxed mb-10 break-keep max-w-2xl mx-auto">
+          <p className="text-[14px] md:text-[17px] text-gray-700 leading-relaxed md:leading-relaxed mb-8 md:mb-10 break-keep max-w-2xl mx-auto px-2 md:px-0">
             평화교회는 예수 그리스도를 따라 <strong className="text-black font-bold">예배하고, 배우고, 사랑하며, 섬기고, 전하는 교회</strong>가 되겠습니다.<br className="hidden md:block"/>
             그리고 우리를 통해 한 사람이 살아나고, 한 가정이 회복되며,<br className="hidden md:block"/>
             지역사회와 세상에 하나님의 평화가 흘러가기를 소망합니다.
           </p>
 
-          <div className="inline-block mt-2 border-t-2 border-[#cc0000] pt-6">
-            <h3 className="text-[18px] md:text-[20px] font-bold text-gray-900 tracking-widest">
+          <div className="inline-block mt-1 md:mt-2 border-t border-[#cc0000] pt-4 md:pt-6">
+            <h3 className="text-[14px] md:text-[20px] font-bold text-gray-900 tracking-wider md:tracking-widest">
               평화교회 · Peace Methodist Church
             </h3>
           </div>
