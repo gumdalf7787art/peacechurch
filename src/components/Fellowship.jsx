@@ -405,7 +405,7 @@ function GalleryList() {
         <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>24</span>개의 앨범이 있습니다.</p>
         <Link to="/fellowship/gallery/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>사진 올리기</Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
         {images.map((img, i) => (
           <Link to={`/fellowship/gallery/${i}`} key={i} style={{ textDecoration: 'none', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'block' }} className="group">
             <div style={{ position: 'relative', width: '100%', paddingBottom: '70%', overflow: 'hidden' }}>
