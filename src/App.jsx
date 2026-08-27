@@ -31,6 +31,7 @@ function ScrollToTop() {
 function Navbar({ isLoggedIn }) {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState({ name: '고객' });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -210,7 +211,76 @@ function Navbar({ isLoggedIn }) {
             </>
           )}
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="lg:hidden p-2 text-gray-700"
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Toggle menu"
+        >
+          <Menu size={28} />
+        </button>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/50 z-[100] lg:hidden"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-white z-[110] shadow-2xl flex flex-col lg:hidden"
+            >
+              <div className="flex justify-between items-center p-4 border-b border-gray-100">
+                <span className="font-bold text-lg">전체메뉴</span>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-black">
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto py-6 px-6 space-y-8">
+                <div>
+                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">교회소개</h3>
+                  <div className="flex flex-col space-y-4 pl-2">
+                    <Link to="/about/vision" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">교회비전과 목표</Link>
+                    <Link to="/about/pastor" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">담임목사 소개</Link>
+                    <Link to="/about/location" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">찾아오시는 길</Link>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">예배와찬양</h3>
+                  <div className="flex flex-col space-y-4 pl-2">
+                    <Link to="/worship/word" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">예배와말씀</Link>
+                    <Link to="/worship/choir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">찬양단</Link>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">교육과선교</h3>
+                  <div className="flex flex-col space-y-4 pl-2">
+                    <Link to="/education/kids" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">유초등부</Link>
+                    <Link to="/education/youth" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">중고등부</Link>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">나눔과교제</h3>
+                  <div className="flex flex-col space-y-4 pl-2">
+                    <Link to="/fellowship/grace" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">은혜의글</Link>
+                    <Link to="/fellowship/gallery" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">갤러리</Link>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
@@ -275,7 +345,7 @@ function Hero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.1 }}
-                className="text-[20px] md:text-[24px] lg:text-[28px] font-bold text-white/95 mb-2 drop-shadow-md tracking-tight"
+                className="text-[14px] sm:text-[18px] md:text-[24px] lg:text-[28px] font-bold text-white/95 mb-1 sm:mb-2 drop-shadow-md tracking-tight"
               >
                 {HERO_SLIDES[currentSlide].topText}
               </motion.div>
@@ -290,7 +360,7 @@ function Hero() {
               from={{ opacity: 0, y: 80, rotationX: -30 }}
               to={{ opacity: 1, y: 0, rotationX: 0 }}
               ease="back.out(1.2)"
-              className="text-[50px] md:text-[70px] lg:text-[90px] font-black text-white mb-2 tracking-tight drop-shadow-lg leading-none"
+              className="text-[40px] sm:text-[50px] md:text-[70px] lg:text-[90px] font-black text-white mb-2 sm:mb-4 tracking-tight drop-shadow-lg leading-[1.1] sm:leading-none"
             >
               {HERO_SLIDES[currentSlide].main.split('\n').map((line, i, arr) => (
                 <React.Fragment key={i}>
@@ -305,7 +375,7 @@ function Hero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.3 }}
-                className="text-[16px] md:text-[20px] font-medium text-white/80 mb-6 drop-shadow-md tracking-[0.35em] uppercase"
+                className="text-[11px] sm:text-[14px] md:text-[20px] font-medium text-white/80 mb-4 sm:mb-6 drop-shadow-md tracking-[0.2em] sm:tracking-[0.35em] uppercase"
               >
                 {HERO_SLIDES[currentSlide].engText}
               </motion.div>
@@ -320,7 +390,7 @@ function Hero() {
               from={{ opacity: 0, y: 40 }}
               to={{ opacity: 1, y: 0 }}
               ease="power3.out"
-              className="text-[18px] md:text-[22px] lg:text-[24px] text-white/90 drop-shadow-md font-medium max-w-2xl leading-snug"
+              className="text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] text-white/95 drop-shadow-md font-medium max-w-2xl leading-[1.4] sm:leading-snug break-keep"
             >
               {HERO_SLIDES[currentSlide].sub.split('\n').map((line, i, arr) => (
                 <React.Fragment key={i}>
@@ -375,22 +445,22 @@ function QuickMenu() {
       </motion.div>
       
       {/* Welcome Line */}
-      <div className="flex items-center w-full max-w-4xl mb-16">
-        <div className="flex-1 h-[2px] bg-white shadow-sm"></div>
-        <span className="px-6 text-[18px] md:text-[20px] font-semibold text-black tracking-wide">
+      <div className="flex items-center w-full max-w-4xl mb-10 sm:mb-16">
+        <div className="flex-1 h-[2px] bg-white shadow-sm hidden sm:block"></div>
+        <span className="px-2 sm:px-6 text-[16px] sm:text-[18px] md:text-[20px] font-semibold text-black tracking-wide text-center w-full sm:w-auto break-keep">
           평화교회에 오신 여러분을 환영합니다.
         </span>
-        <div className="flex-1 h-[2px] bg-white shadow-sm"></div>
+        <div className="flex-1 h-[2px] bg-white shadow-sm hidden sm:block"></div>
       </div>
       
       {/* Quick Menus */}
-      <div className="flex flex-wrap justify-center gap-8 md:gap-12 max-w-4xl">
+      <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:gap-8 md:gap-12 w-full max-w-4xl px-2 sm:px-4">
         {menus.map((menu, idx) => (
-          <Link key={idx} to={menu.path} className="flex flex-col items-center cursor-pointer group">
-            <div className="w-20 h-20 md:w-24 md:h-24 bg-[#8DC63F] rounded-full flex items-center justify-center shadow-sm mb-4 text-white group-hover:shadow-lg group-hover:-translate-y-2 transition-all duration-300">
-              {menu.icon}
+          <Link key={idx} to={menu.path} className="flex flex-col items-center cursor-pointer group p-4 sm:p-0 bg-white sm:bg-transparent rounded-xl sm:rounded-none shadow-sm sm:shadow-none border border-gray-100 sm:border-none">
+            <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-[#8DC63F] rounded-full flex items-center justify-center shadow-sm mb-3 sm:mb-4 text-white group-hover:shadow-lg group-hover:-translate-y-2 transition-all duration-300">
+              {React.cloneElement(menu.icon, { className: 'w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10' })}
             </div>
-            <span className="text-[15px] md:text-[17px] font-bold text-black group-hover:text-[#8DC63F] transition-colors">
+            <span className="text-[14px] sm:text-[15px] md:text-[17px] font-bold text-black group-hover:text-[#8DC63F] transition-colors text-center break-keep">
               {menu.name}
             </span>
           </Link>
