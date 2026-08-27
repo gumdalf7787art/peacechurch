@@ -13,6 +13,7 @@ import MyPage from './components/MyPage';
 import KakaoCallback from './components/KakaoCallback';
 import NaverCallback from './components/NaverCallback';
 import GoogleCallback from './components/GoogleCallback';
+import Admin from './components/Admin';
 import About from './components/About';
 import Worship from './components/Worship';
 import Education from './components/Education';
@@ -1224,6 +1225,7 @@ function App() {
         <Route path="/auth/kakao/callback" element={<KakaoCallback setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/auth/naver/callback" element={<NaverCallback setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/auth/google/callback" element={<GoogleCallback setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </div>
   );
