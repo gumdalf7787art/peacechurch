@@ -461,47 +461,66 @@ function Hero() {
 
 function QuickMenu() {
   const menus = [
-    { name: '예배안내', path: '/about/worship', icon: <Clock className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '주보', path: '/about/bulletin', icon: <FileText className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '유튜브채널', path: '/worship/word', icon: <PlayCircle className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '오시는길', path: '/about/location', icon: <MapPin className="w-8 h-8 md:w-10 md:h-10" /> }
+    { name: '예배안내', path: '/about/worship', image: '/hero-2-bg.webp', icon: <Clock /> },
+    { name: '주보', path: '/about/bulletin', image: '/korean-bible-bg.webp', icon: <FileText /> },
+    { name: '유튜브채널', path: '/worship/word', image: '/hero-3-bg.webp', icon: <PlayCircle /> },
+    { name: '오시는길', path: '/about/location', image: '/hero-1-bg.webp', icon: <MapPin /> }
   ];
 
   return (
-    <section className="bg-[#f5f5f7] py-12 md:py-20 px-4 flex flex-col items-center overflow-hidden">
+    <section className="bg-[#f5f5f7] py-16 md:py-24 px-4 flex flex-col items-center overflow-hidden">
       {/* Motto */}
       <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: false, margin: "-50px" }}
         transition={{ duration: 1, ease: "easeOut" }}
-        className="text-center mb-10 flex flex-col items-center"
+        className="text-center mb-10 md:mb-16 flex flex-col items-center"
       >
-        <span className="text-[20px] md:text-[24px] font-semibold text-[#8DC63F] mb-2 tracking-wide">2026년 표어</span>
-        <h2 className="text-[32px] md:text-[42px] font-bold text-black tracking-tight leading-snug">
+        <span className="text-[18px] md:text-[22px] font-semibold text-[#8DC63F] mb-3 tracking-wide uppercase">2026년 표어</span>
+        <h2 className="text-[32px] md:text-[46px] font-black text-black tracking-tight leading-tight">
           주 안에서 하나 되는 평화교회
         </h2>
       </motion.div>
       
       {/* Welcome Line */}
-      <div className="flex items-center w-full max-w-4xl mb-10 sm:mb-16">
-        <div className="flex-1 h-[2px] bg-white shadow-sm hidden sm:block"></div>
-        <span className="px-2 sm:px-6 text-[16px] sm:text-[18px] md:text-[20px] font-semibold text-black tracking-wide text-center w-full sm:w-auto break-keep">
-          평화교회에 오신 여러분을 환영합니다.
+      <div className="flex items-center w-full max-w-5xl mb-12 sm:mb-16">
+        <div className="flex-1 h-[1px] bg-gray-300 hidden sm:block"></div>
+        <span className="px-4 sm:px-8 text-[16px] sm:text-[18px] md:text-[20px] font-semibold text-gray-600 tracking-wide text-center w-full sm:w-auto break-keep">
+          평화교회에 오신 여러분을 환영합니다
         </span>
-        <div className="flex-1 h-[2px] bg-white shadow-sm hidden sm:block"></div>
+        <div className="flex-1 h-[1px] bg-gray-300 hidden sm:block"></div>
       </div>
       
-      {/* Quick Menus */}
-      <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:gap-8 md:gap-12 w-full max-w-4xl px-2 sm:px-4">
+      {/* Quick Menus Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 w-full max-w-5xl px-2">
         {menus.map((menu, idx) => (
-          <Link key={idx} to={menu.path} className="flex flex-col items-center cursor-pointer group p-4 sm:p-0 bg-white sm:bg-transparent rounded-xl sm:rounded-none shadow-sm sm:shadow-none border border-gray-100 sm:border-none">
-            <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-[#8DC63F] rounded-full flex items-center justify-center shadow-sm mb-3 sm:mb-4 text-white group-hover:shadow-lg group-hover:-translate-y-2 transition-all duration-300">
-              {React.cloneElement(menu.icon, { className: 'w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10' })}
+          <Link 
+            key={idx} 
+            to={menu.path} 
+            className="group relative w-full aspect-[3/5] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer block"
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0 bg-black/20 z-10 group-hover:bg-black/10 transition-colors duration-500" />
+            <img 
+              src={menu.image} 
+              alt={menu.name} 
+              className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-700 group-hover:scale-110" 
+            />
+            
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            {/* Content */}
+            <div className="absolute inset-0 z-20 flex flex-col justify-end p-5 sm:p-6 text-white transform transition-transform duration-500 group-hover:-translate-y-2">
+              <div className="mb-3 text-[#8DC63F] opacity-90 group-hover:opacity-100 group-hover:scale-110 origin-bottom-left transition-all duration-500">
+                {React.cloneElement(menu.icon, { className: 'w-8 h-8 sm:w-10 sm:h-10' })}
+              </div>
+              <span className="text-[18px] sm:text-[20px] md:text-[24px] font-bold tracking-tight">
+                {menu.name}
+              </span>
+              <div className="w-0 h-1 bg-[#8DC63F] mt-3 group-hover:w-12 transition-all duration-500 ease-out" />
             </div>
-            <span className="text-[14px] sm:text-[15px] md:text-[17px] font-bold text-black group-hover:text-[#8DC63F] transition-colors text-center break-keep">
-              {menu.name}
-            </span>
           </Link>
         ))}
       </div>
