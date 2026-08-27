@@ -47,15 +47,51 @@ export default function AdminHomeManager() {
     { id: 4, title: '새가족 등록', subtitle: '환영합니다', icon: 'UserPlus', link: '/about/newcomer' },
   ]);
 
-  const [locationFields, setLocationFields] = useState([
-    { id: 'phone', label: '연락처', value: '02-123-4567' },
-    { id: 'address', label: '주소 (입력 시 지도 자동변동)', value: '서울특별시 평화구 평화로 123' },
-    { id: 'transit', label: '대중교통 안내', value: '지하철 1호선 평화역 3번 출구 도보 5분' },
-    { id: 'parking', label: '주차 안내', value: '교회 건물 지하 주차장 이용 가능 (주일 무료)' },
+  const [locationGroups, setLocationGroups] = useState([
+    {
+      id: 'contact',
+      title: '연락처',
+      items: [
+        { id: 'c1', label: '전화번호', value: '02-123-4567' },
+        { id: 'c2', label: '팩스', value: '02-123-4568' },
+        { id: 'c3', label: '이메일', value: 'peacechurch@example.com' },
+      ]
+    },
+    {
+      id: 'address',
+      title: '주소',
+      items: [
+        { id: 'a1', label: '', value: '서울 중랑구 봉화산로 120\n(지번: 서울 중랑구 신내동 613)' }
+      ]
+    },
+    {
+      id: 'transit',
+      title: '대중교통',
+      items: [
+        { id: 't1', label: '지하철', value: '1호선 평화역 3번 출구에서 도보 5분' },
+        { id: 't2', label: '버스', value: '간선: 100, 200, 300\n지선: 1011, 2022' }
+      ]
+    },
+    {
+      id: 'parking',
+      title: '주차 안내',
+      items: [
+        { id: 'p1', label: '', value: '교회 본관 지하 주차장 이용 가능 (무료)\n주일에는 혼잡할 수 있으니 대중교통 이용을 권장합니다.' }
+      ]
+    }
   ]);
 
-  const handleAddLocationField = () => {
-    setLocationFields([...locationFields, { id: Date.now().toString(), label: '새 입력항목', value: '' }]);
+  const handleAddLocationGroup = () => {
+    setLocationGroups([...locationGroups, { id: Date.now().toString(), title: '새 항목 그룹', items: [{ id: Date.now().toString() + '-1', label: '', value: '' }] }]);
+  };
+
+  const handleAddLocationItem = (groupId) => {
+    setLocationGroups(locationGroups.map(group => {
+      if (group.id === groupId) {
+        return { ...group, items: [...group.items, { id: Date.now().toString(), label: '', value: '' }] };
+      }
+      return group;
+    }));
   };
 
   const handleFakeSave = () => {
@@ -378,28 +414,66 @@ export default function AdminHomeManager() {
                     <span className="mr-2 text-[14px]">{sections.location ? '섹션 노출됨' : '섹션 숨김'}</span>
                     {sections.location ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
                   </button>
-                  <button onClick={handleAddLocationField} className="text-[#5227FF] bg-[#5227FF]/10 hover:bg-[#5227FF]/20 px-4 py-2 rounded-lg text-[14px] font-bold flex items-center transition-colors">
-                    <Plus size={16} className="mr-2" /> 항목 추가
+                  <button onClick={handleAddLocationGroup} className="text-[#5227FF] bg-[#5227FF]/10 hover:bg-[#5227FF]/20 px-4 py-2 rounded-lg text-[14px] font-bold flex items-center transition-colors">
+                    <Plus size={16} className="mr-2" /> 새 그룹 추가
                   </button>
                 </div>
               </div>
 
-              <div className={`space-y-4 transition-opacity ${!sections.location ? 'opacity-40 pointer-events-none' : ''}`}>
-                {locationFields.map((field) => (
-                  <div key={field.id} className="flex space-x-4 items-start">
-                    <div className="w-[150px]">
-                      <input type="text" defaultValue={field.label} className="w-full px-3 py-2.5 bg-gray-100 border border-gray-200 rounded-lg text-[13px] font-bold text-gray-700 focus:outline-none focus:bg-white focus:border-black" />
-                    </div>
-                    <div className="flex-1 flex space-x-2">
-                      <input type="text" defaultValue={field.value} className="flex-1 px-4 py-2.5 border border-gray-200 bg-gray-50 focus:bg-white rounded-lg text-[14px] focus:border-black outline-none" />
-                      {!['phone', 'address', 'transit', 'parking'].includes(field.id) && (
-                        <button className="px-3 py-2 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 rounded-lg border border-gray-200 hover:border-red-200 transition-colors">
-                          <Trash2 size={18} />
+              <div className={`space-y-8 transition-opacity ${!sections.location ? 'opacity-40 pointer-events-none' : ''}`}>
+                {locationGroups.map((group, groupIdx) => (
+                  <div key={group.id} className="border border-gray-200 rounded-xl bg-white p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
+                      <input 
+                        type="text" 
+                        defaultValue={group.title} 
+                        className="text-[16px] font-bold text-gray-900 border-none bg-transparent focus:ring-0 w-[200px] outline-none" 
+                        placeholder="항목 그룹명 (예: 연락처)"
+                      />
+                      <div className="flex space-x-2">
+                        <button onClick={() => handleAddLocationItem(group.id)} className="text-[#5227FF] text-[13px] font-bold bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
+                          + 하위 입력줄 추가
                         </button>
-                      )}
+                        {groupIdx > 3 && (
+                          <button className="text-red-500 text-[13px] font-bold bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
+                            그룹 삭제
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {group.items.map((item, itemIdx) => (
+                        <div key={item.id} className="flex space-x-4 items-start">
+                          <div className="w-[120px]">
+                            <input 
+                              type="text" 
+                              defaultValue={item.label} 
+                              placeholder="라벨 (선택)"
+                              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[13px] font-bold text-gray-700 focus:outline-none focus:bg-white focus:border-black" 
+                            />
+                          </div>
+                          <div className="flex-1 flex space-x-2">
+                            <textarea 
+                              defaultValue={item.value} 
+                              placeholder="내용을 입력하세요 (엔터로 줄바꿈 가능)"
+                              className="flex-1 px-4 py-2 border border-gray-200 bg-gray-50 focus:bg-white rounded-lg text-[14px] focus:border-black outline-none resize-none min-h-[42px] h-[42px] focus:h-[84px] transition-all overflow-hidden" 
+                            />
+                            {(group.items.length > 1 || groupIdx > 3) && (
+                              <button className="px-3 py-2 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 rounded-lg border border-gray-200 hover:border-red-200 transition-colors h-[42px]">
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
+
+                <button onClick={handleAddLocationGroup} className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:text-black transition-colors flex items-center justify-center">
+                  <Plus size={18} className="mr-2" /> 새로운 항목 그룹 추가 (예: 예배시간 안내 등)
+                </button>
               </div>
             </div>
           )}
