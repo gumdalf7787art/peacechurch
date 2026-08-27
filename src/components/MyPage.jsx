@@ -8,6 +8,7 @@ import {
   FolderTree
 } from 'lucide-react';
 import AdminMenuManager from './AdminMenuManager';
+import AdminHomeManager from './AdminHomeManager';
 
 export default function MyPage({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -330,7 +331,8 @@ export default function MyPage({ setIsLoggedIn }) {
 
         {/* Admin Views */}
         {activeMenu === 'admin-menu' && <AdminMenuManager />}
-        {['admin-home', 'admin-pages', 'admin-media'].includes(activeMenu) && (
+        {activeMenu === 'admin-home' && <AdminHomeManager />}
+        {['admin-pages', 'admin-media'].includes(activeMenu) && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
