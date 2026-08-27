@@ -37,11 +37,62 @@ export default function AdminHomeManager() {
     { id: 'footer', label: '풋터 설정', icon: <Layout size={18} /> },
   ];
 
-  // Dummy State for Frontend Preview
-  const [heroSlides, setHeroSlides] = useState([
-    { id: 1, title: '오직 예수,\n진리가 너희를 자유롭게 하리라', subtitle: '요한복음 8:32', image: '/hero-1.jpg', btnText: '교회소개', btnLink: '/about', align: 'center', zoomEffect: 'zoom-in' },
-    { id: 2, title: '다음 세대를 세우는\n평화교회', subtitle: '하나님의 비전을 품은 아이들', image: '/hero-2.jpg', btnText: '교육기관', btnLink: '/education', align: 'left', zoomEffect: 'none' },
-  ]);
+  const DEFAULT_HERO_SLIDES = [
+    {
+      id: 1,
+      image: "/hero-1-bg.webp",
+      topText: "기독교대한감리회",
+      main: "평화교회",
+      engText: "PEACE METHODIST CHURCH",
+      sub: "예수님의 사랑으로 사람을 세우고,\n세상을 섬기는 교회",
+      align: "left",
+      zoomEffect: "zoom-in"
+    },
+    {
+      id: 2,
+      image: "/hero-2-bg.webp",
+      main: "말씀이 삶이 되는\n은혜의 예배",
+      sub: "진리와 성령으로 드리는\n참된 예배의 자리",
+      align: "left",
+      zoomEffect: "zoom-in"
+    },
+    {
+      id: 3,
+      image: "/hero-3-bg.webp",
+      main: "세상을 섬기는\n사랑의 공동체",
+      sub: "이웃과 함께하며\n세상의 빛과 소금의 역할을 다합니다",
+      align: "left",
+      zoomEffect: "zoom-in"
+    },
+    {
+      id: 4,
+      image: "/hero4.jpg",
+      main: "",
+      sub: "",
+      align: "left",
+      zoomEffect: "none",
+      noDim: true
+    }
+  ];
+
+  const [heroSlides, setHeroSlides] = useState(() => {
+    const saved = localStorage.getItem('cms_heroSlides');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return DEFAULT_HERO_SLIDES;
+  });
+
+  const updateHeroSlide = (id, field, value) => {
+    const newSlides = heroSlides.map(slide => 
+      slide.id === id ? { ...slide, [field]: value } : slide
+    );
+    setHeroSlides(newSlides);
+    localStorage.setItem('cms_heroSlides', JSON.stringify(newSlides));
+    window.dispatchEvent(new Event('cms_hero_updated'));
+  };
 
   const [quickSection, setQuickSection] = useState({
     mottoYear: '2026년 표어',
@@ -209,37 +260,45 @@ export default function AdminHomeManager() {
                           <div>
                             <label className="block text-[12px] font-bold text-gray-500 mb-2">텍스트 정렬</label>
                             <div className="flex bg-gray-50 border border-gray-200 rounded-lg p-1 w-fit">
-                              <button className={`p-1.5 rounded-md ${slide.align === 'left' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><AlignLeft size={16}/></button>
-                              <button className={`p-1.5 rounded-md ${slide.align === 'center' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><AlignCenter size={16}/></button>
-                              <button className={`p-1.5 rounded-md ${slide.align === 'right' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><AlignRight size={16}/></button>
+                              <button onClick={() => updateHeroSlide(slide.id, 'align', 'left')} className={`p-1.5 rounded-md ${slide.align === 'left' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><AlignLeft size={16}/></button>
+                              <button onClick={() => updateHeroSlide(slide.id, 'align', 'center')} className={`p-1.5 rounded-md ${slide.align === 'center' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><AlignCenter size={16}/></button>
+                              <button onClick={() => updateHeroSlide(slide.id, 'align', 'right')} className={`p-1.5 rounded-md ${slide.align === 'right' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><AlignRight size={16}/></button>
                             </div>
                           </div>
                           <div>
                             <label className="block text-[12px] font-bold text-gray-500 mb-2">줌 효과</label>
                             <div className="flex bg-gray-50 border border-gray-200 rounded-lg p-1 w-fit">
-                              <button className={`px-3 py-1.5 rounded-md text-[12px] font-bold flex items-center ${slide.zoomEffect === 'zoom-in' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><ZoomIn size={14} className="mr-1"/> 줌인</button>
-                              <button className={`px-3 py-1.5 rounded-md text-[12px] font-bold flex items-center ${slide.zoomEffect === 'zoom-out' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><ZoomOut size={14} className="mr-1"/> 줌아웃</button>
-                              <button className={`px-3 py-1.5 rounded-md text-[12px] font-bold flex items-center ${slide.zoomEffect === 'none' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><MousePointer2 size={14} className="mr-1"/> 없음</button>
+                              <button onClick={() => updateHeroSlide(slide.id, 'zoomEffect', 'zoom-in')} className={`px-3 py-1.5 rounded-md text-[12px] font-bold flex items-center ${slide.zoomEffect === 'zoom-in' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><ZoomIn size={14} className="mr-1"/> 줌인</button>
+                              <button onClick={() => updateHeroSlide(slide.id, 'zoomEffect', 'zoom-out')} className={`px-3 py-1.5 rounded-md text-[12px] font-bold flex items-center ${slide.zoomEffect === 'zoom-out' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><ZoomOut size={14} className="mr-1"/> 줌아웃</button>
+                              <button onClick={() => updateHeroSlide(slide.id, 'zoomEffect', 'none')} className={`px-3 py-1.5 rounded-md text-[12px] font-bold flex items-center ${!slide.zoomEffect || slide.zoomEffect === 'none' ? 'bg-white shadow-sm border border-gray-200 text-black' : 'text-gray-400'}`}><MousePointer2 size={14} className="mr-1"/> 없음</button>
                             </div>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
+                          <div className="col-span-1">
+                            <label className="block text-[12px] font-bold text-gray-500 mb-1">상단 문구 (Top Text)</label>
+                            <input type="text" value={slide.topText || ''} onChange={(e) => updateHeroSlide(slide.id, 'topText', e.target.value)} placeholder="예: 기독교대한감리회" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[13px] focus:border-black outline-none bg-gray-50 focus:bg-white" />
+                          </div>
+                          <div className="col-span-1">
+                            <label className="block text-[12px] font-bold text-gray-500 mb-1">영문 문구 (English Text)</label>
+                            <input type="text" value={slide.engText || ''} onChange={(e) => updateHeroSlide(slide.id, 'engText', e.target.value)} placeholder="예: PEACE METHODIST CHURCH" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[13px] focus:border-black outline-none bg-gray-50 focus:bg-white uppercase" />
+                          </div>
                           <div className="col-span-2">
                             <label className="block text-[12px] font-bold text-gray-500 mb-1 flex items-center"><Type size={14} className="mr-1"/> 메인 카피</label>
-                            <textarea defaultValue={slide.title} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[14px] font-bold focus:border-black outline-none resize-none h-16 bg-gray-50 focus:bg-white" />
+                            <textarea value={slide.main || ''} onChange={(e) => updateHeroSlide(slide.id, 'main', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[14px] font-bold focus:border-black outline-none resize-none h-16 bg-gray-50 focus:bg-white" />
                           </div>
                           <div className="col-span-2">
                             <label className="block text-[12px] font-bold text-gray-500 mb-1">서브 카피</label>
-                            <input type="text" defaultValue={slide.subtitle} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[14px] focus:border-black outline-none bg-gray-50 focus:bg-white" />
+                            <textarea value={slide.sub || ''} onChange={(e) => updateHeroSlide(slide.id, 'sub', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[14px] focus:border-black outline-none resize-none h-16 bg-gray-50 focus:bg-white" />
                           </div>
                           <div>
                             <label className="block text-[12px] font-bold text-gray-500 mb-1">버튼 텍스트</label>
-                            <input type="text" defaultValue={slide.btnText} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[13px] focus:border-black outline-none bg-gray-50 focus:bg-white" />
+                            <input type="text" value={slide.btnText || ''} onChange={(e) => updateHeroSlide(slide.id, 'btnText', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[13px] focus:border-black outline-none bg-gray-50 focus:bg-white" />
                           </div>
                           <div>
                             <label className="block text-[12px] font-bold text-gray-500 mb-1">연결 주소</label>
-                            <input type="text" defaultValue={slide.btnLink} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[13px] focus:border-black outline-none bg-gray-50 focus:bg-white font-mono" />
+                            <input type="text" value={slide.btnLink || ''} onChange={(e) => updateHeroSlide(slide.id, 'btnLink', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-[13px] focus:border-black outline-none bg-gray-50 focus:bg-white font-mono" />
                           </div>
                         </div>
                       </div>

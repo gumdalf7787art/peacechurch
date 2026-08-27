@@ -239,45 +239,80 @@ function Navbar({ isLoggedIn }) {
   );
 }
 
-const HERO_SLIDES = [
+const DEFAULT_HERO_SLIDES = [
   {
+    id: 1,
     image: "/hero-1-bg.webp",
     topText: "기독교대한감리회",
     main: "평화교회",
     engText: "PEACE METHODIST CHURCH",
     sub: "예수님의 사랑으로 사람을 세우고,\n세상을 섬기는 교회",
-    align: "left"
+    align: "left",
+    zoomEffect: "zoom-in"
   },
   {
+    id: 2,
     image: "/hero-2-bg.webp",
     main: "말씀이 삶이 되는\n은혜의 예배",
     sub: "진리와 성령으로 드리는\n참된 예배의 자리",
-    align: "left"
+    align: "left",
+    zoomEffect: "zoom-in"
   },
   {
+    id: 3,
     image: "/hero-3-bg.webp",
     main: "세상을 섬기는\n사랑의 공동체",
     sub: "이웃과 함께하며\n세상의 빛과 소금의 역할을 다합니다",
-    align: "left"
+    align: "left",
+    zoomEffect: "zoom-in"
   },
   {
+    id: 4,
     image: "/hero4.jpg",
     main: "",
     sub: "",
     align: "left",
+    zoomEffect: "none",
     noDim: true
   }
 ];
 
 function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState(DEFAULT_HERO_SLIDES);
 
   useEffect(() => {
+    const saved = localStorage.getItem('cms_heroSlides');
+    if (saved) {
+      try {
+        setSlides(JSON.parse(saved));
+      } catch (e) {
+        setSlides(DEFAULT_HERO_SLIDES);
+      }
+    }
+    
+    const handleStorage = () => {
+      const updated = localStorage.getItem('cms_heroSlides');
+      if (updated) {
+        try {
+          setSlides(JSON.parse(updated));
+        } catch (e) {}
+      }
+    };
+    
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('cms_hero_updated', handleStorage);
+
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('cms_hero_updated', handleStorage);
+    };
+  }, [slides.length]);
 
   return (
     <section className="relative w-full h-[480px] lg:h-[600px] overflow-hidden bg-black">
@@ -291,36 +326,36 @@ function Hero() {
           className="absolute inset-0 w-full h-full"
         >
           {/* Background Image */}
-          {!HERO_SLIDES[currentSlide].noDim && (
+          {!slides[currentSlide].noDim && (
             <div className="absolute inset-0 bg-black/40 z-10" />
           )}
           <motion.img 
-            src={HERO_SLIDES[currentSlide].image} 
+            src={slides[currentSlide].image} 
             alt="Hero Background" 
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.1 }}
+            initial={{ scale: slides[currentSlide].zoomEffect === 'zoom-out' ? 1.1 : 1 }}
+            animate={{ scale: slides[currentSlide].zoomEffect === 'none' ? 1 : (slides[currentSlide].zoomEffect === 'zoom-out' ? 1 : 1.1) }}
             transition={{ duration: 6, ease: "linear" }}
             className="absolute inset-0 w-full h-full object-cover z-0 origin-center" 
           />
           
           {/* Text Content */}
-          <div className={`relative z-20 flex flex-col justify-center h-full max-w-7xl mx-auto px-8 md:px-12 ${HERO_SLIDES[currentSlide].align === 'left' ? 'items-start text-left md:pl-24 lg:pl-32' : 'items-center text-center'}`}>
+          <div className={`relative z-20 flex flex-col justify-center h-full max-w-7xl mx-auto px-8 md:px-12 ${slides[currentSlide].align === 'left' ? 'items-start text-left md:pl-24 lg:pl-32' : (slides[currentSlide].align === 'right' ? 'items-end text-right md:pr-24 lg:pr-32' : 'items-center text-center')}`}>
             
-            {HERO_SLIDES[currentSlide].topText && (
+            {slides[currentSlide].topText && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.1 }}
                 className="text-[14px] sm:text-[18px] md:text-[24px] lg:text-[28px] font-bold text-white/95 mb-1 sm:mb-2 drop-shadow-md tracking-tight"
               >
-                {HERO_SLIDES[currentSlide].topText}
+                {slides[currentSlide].topText}
               </motion.div>
             )}
 
-            {HERO_SLIDES[currentSlide].main && (
+            {slides[currentSlide].main && (
               <SplitText
                 tag="h1"
-                textAlign={HERO_SLIDES[currentSlide].align}
+                textAlign={slides[currentSlide].align}
                 delay={40}
                 duration={1.2}
                 splitType="chars"
@@ -329,7 +364,7 @@ function Hero() {
                 ease="back.out(1.2)"
                 className="text-[40px] sm:text-[50px] md:text-[70px] lg:text-[90px] font-black text-white mb-2 sm:mb-4 tracking-tight drop-shadow-lg leading-[1.1] sm:leading-none"
               >
-                {HERO_SLIDES[currentSlide].main.split('\n').map((line, i, arr) => (
+                {slides[currentSlide].main.split('\n').map((line, i, arr) => (
                   <React.Fragment key={i}>
                     {line}
                     {i < arr.length - 1 && <br />}
@@ -338,21 +373,21 @@ function Hero() {
               </SplitText>
             )}
 
-            {HERO_SLIDES[currentSlide].engText && (
+            {slides[currentSlide].engText && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.3 }}
                 className="text-[11px] sm:text-[14px] md:text-[20px] font-medium text-white/80 mb-4 sm:mb-6 drop-shadow-md tracking-[0.2em] sm:tracking-[0.35em] uppercase"
               >
-                {HERO_SLIDES[currentSlide].engText}
+                {slides[currentSlide].engText}
               </motion.div>
             )}
 
-            {HERO_SLIDES[currentSlide].sub && (
+            {slides[currentSlide].sub && (
               <SplitText
                 tag="p"
-                textAlign={HERO_SLIDES[currentSlide].align}
+                textAlign={slides[currentSlide].align}
                 delay={30}
                 duration={1}
                 splitType="words"
@@ -361,7 +396,7 @@ function Hero() {
                 ease="power3.out"
                 className="text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] text-white/95 drop-shadow-md font-medium max-w-2xl leading-[1.4] sm:leading-snug break-keep"
               >
-                {HERO_SLIDES[currentSlide].sub.split('\n').map((line, i, arr) => (
+                {slides[currentSlide].sub.split('\n').map((line, i, arr) => (
                   <React.Fragment key={i}>
                     {line}
                     {i < arr.length - 1 && <br />}
@@ -369,13 +404,26 @@ function Hero() {
                 ))}
               </SplitText>
             )}
+
+            {slides[currentSlide].btnText && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="mt-6 sm:mt-8"
+              >
+                <Link to={slides[currentSlide].btnLink || '#'} className="inline-block bg-white text-black text-[14px] sm:text-[16px] font-bold px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-gray-100 transition-colors shadow-lg">
+                  {slides[currentSlide].btnText}
+                </Link>
+              </motion.div>
+            )}
           </div>
         </motion.div>
       </AnimatePresence>
       
       {/* Indicators */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex space-x-3">
-        {HERO_SLIDES.map((_, idx) => (
+        {slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentSlide(idx)}
