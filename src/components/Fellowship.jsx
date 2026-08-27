@@ -57,7 +57,8 @@ function GraceList() {
         <Link to="/fellowship/grace/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>글쓰기</Link>
       </div>
       
-      <table style={{ width: '100%', borderTop: '2px solid #333', borderCollapse: 'collapse', textAlign: 'center', fontSize: '15px' }}>
+      <div className="overflow-x-auto w-full">
+        <table style={{ width: '100%', minWidth: '600px', borderTop: '2px solid #333', borderCollapse: 'collapse', textAlign: 'center', fontSize: '15px' }}>
         <thead>
           <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
             <th style={{ padding: '16px 8px', width: '80px', fontWeight: '600', color: '#475569' }}>번호</th>
@@ -83,6 +84,7 @@ function GraceList() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Pagination */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
@@ -395,7 +397,7 @@ function GalleryList() {
         <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>24</span>개의 앨범이 있습니다.</p>
         <Link to="/fellowship/gallery/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>사진 올리기</Link>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {images.map((img, i) => (
           <Link to={`/fellowship/gallery/${i}`} key={i} style={{ textDecoration: 'none', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'block' }} className="group">
             <div style={{ position: 'relative', width: '100%', paddingBottom: '70%', overflow: 'hidden' }}>
@@ -471,16 +473,16 @@ function BusinessDetail() {
 
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid #f8fafc' }}>
-      <div style={{ width: '100%', height: '360px', backgroundImage: `url(${activeImage})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', transition: 'background-image 0.3s ease-in-out' }}>
+      <div className="w-full h-[250px] md:h-[360px] bg-cover bg-center relative transition-all duration-300" style={{ backgroundImage: `url(${activeImage})` }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)' }} />
-        <div style={{ position: 'absolute', bottom: '40px', left: '40px', color: '#fff' }}>
+        <div className="absolute bottom-5 left-5 md:bottom-10 md:left-10 text-white">
           <span style={{ display: 'inline-block', fontSize: '14px', backgroundColor: '#cc0000', color: '#fff', padding: '6px 16px', borderRadius: '20px', fontWeight: 'bold', marginBottom: '16px', boxShadow: '0 4px 10px rgba(204,0,0,0.3)' }}>{biz.tag}</span>
-          <h2 style={{ fontSize: '42px', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-1px', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{biz.name}</h2>
+          <h2 className="text-[28px] md:text-[42px] font-[900] m-0 mb-2 md:mb-3 tracking-[-1px] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">{biz.name}</h2>
           <p style={{ fontSize: '18px', margin: 0, opacity: 0.9, fontWeight: '500' }}>대표: {biz.owner}</p>
         </div>
       </div>
       
-      <div style={{ padding: '48px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '48px' }}>
+      <div className="p-6 md:p-12 flex flex-col md:grid md:grid-cols-[2fr_1fr] gap-8 md:gap-12">
         <div style={{ minWidth: 0 }}>
           
           {images.length > 1 && (
@@ -609,10 +611,10 @@ function BusinessList() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {businesses.map((biz, idx) => (
-          <Link to={`/fellowship/business/${idx}`} key={idx} style={{ display: 'flex', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', transition: 'all 0.3s', textDecoration: 'none' }} className="hover:-translate-y-1 hover:shadow-lg group">
-            <div style={{ width: '160px', flexShrink: 0, backgroundImage: `url(${biz.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <Link to={`/fellowship/business/${idx}`} key={idx} className="flex flex-col sm:flex-row border border-[#e2e8f0] rounded-[16px] overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 no-underline hover:-translate-y-1 hover:shadow-lg group">
+            <div className="w-full sm:w-[160px] h-[200px] sm:h-auto shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${biz.img})` }}>
             </div>
             <div style={{ padding: '24px', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
@@ -754,17 +756,10 @@ export default function Fellowship() {
       </div>
 
       {/* ── Body: Sidebar + Content ── */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '60px 20px',
-        display: 'flex',
-        gap: '60px',
-        alignItems: 'flex-start'
-      }}>
+      <div className="max-w-[1200px] mx-auto px-4 md:px-5 py-8 md:py-[60px] flex flex-col md:flex-row gap-8 md:gap-[60px] items-start w-full">
         
         {/* ── Sidebar (LNB) ── */}
-        <nav style={{ width: '240px', flexShrink: 0 }}>
+        <nav className="hidden md:block w-[240px] shrink-0">
           <div style={{ background: '#2a4358', color: '#fff', textAlign: 'center', padding: '18px 0', fontSize: '20px', fontWeight: 500 }}>
             나눔과교제
           </div>
@@ -799,7 +794,7 @@ export default function Fellowship() {
         </nav>
 
         {/* ── Main Content ── */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 w-full min-w-0">
           
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '16px' }}>
@@ -815,7 +810,7 @@ export default function Fellowship() {
           </div>
 
           {/* Page Title */}
-          <h2 style={{ fontSize: '32px', fontWeight: 'normal', color: '#333', paddingBottom: '20px', borderBottom: '1px solid #999', marginBottom: '40px' }}>
+          <h2 className="text-[26px] md:text-[32px] font-normal text-[#333] pb-4 md:pb-5 border-b border-[#999] mb-6 md:mb-10 m-0">
             {currentMenu.label}
           </h2>
 
