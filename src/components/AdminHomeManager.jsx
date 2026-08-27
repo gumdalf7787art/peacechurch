@@ -12,8 +12,7 @@ export default function AdminHomeManager() {
     quick: true,
     pastor: true,
     location: true,
-    footer: true,
-    popup: false
+    footer: true
   });
 
   const toggleSection = (key) => setSections(prev => ({ ...prev, [key]: !prev[key] }));
@@ -24,7 +23,6 @@ export default function AdminHomeManager() {
     { id: 'pastor', label: '담임목사 인사말', icon: <MessageSquare size={18} /> },
     { id: 'location', label: '오시는길', icon: <MapPin size={18} /> },
     { id: 'footer', label: '풋터 설정', icon: <Layout size={18} /> },
-    { id: 'popup', label: '팝업 공지', icon: <Megaphone size={18} /> },
   ];
 
   // Dummy State for Frontend Preview
@@ -497,90 +495,61 @@ export default function AdminHomeManager() {
                 </button>
               </div>
               
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity ${!sections.footer ? 'opacity-40 pointer-events-none' : ''}`}>
-                <div>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">교회(기관)명</label>
-                  <input type="text" defaultValue="대한예수교장로회 평화교회" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">대표자명 (선택)</label>
-                  <input type="text" defaultValue="" placeholder="홍길동 목사" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">주소</label>
-                  <input type="text" defaultValue="서울특별시 평화구 평화로 123 평화빌딩 1층" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">대표 전화번호</label>
-                  <input type="text" defaultValue="02-123-4567" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">팩스번호 (선택)</label>
-                  <input type="text" defaultValue="02-123-4568" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">이메일 주소 (선택)</label>
-                  <input type="text" defaultValue="peace@peacechurch.com" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
-                </div>
-                <div className="col-span-1 md:col-span-2 mt-2">
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">카피라이트 (Copyright)</label>
-                  <input type="text" defaultValue="Copyright © 2026 Peace Church. All rights reserved." className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[13px] text-gray-500 focus:border-black outline-none" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* POPUP NOTICES */}
-          {activeTab === 'popup' && (
-            <div className={`bg-white rounded-[24px] p-8 border ${sections.popup ? 'border-gray-200 shadow-sm' : 'border-gray-100 bg-gray-50'}`}>
-              <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 pb-6 border-b border-gray-100 gap-4">
-                <div>
-                  <h3 className="text-[20px] font-bold text-gray-900 flex items-center">
-                    팝업 공지 활성화
-                    <span className={`ml-3 text-[12px] px-2 py-0.5 rounded-full ${sections.popup ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
-                      {sections.popup ? 'ON' : 'OFF'}
-                    </span>
-                  </h3>
-                  <p className="text-[13px] text-gray-500 mt-1">접속 시 띄울 중요 팝업 배너입니다.</p>
-                </div>
-                <button 
-                  onClick={() => toggleSection('popup')}
-                  className={`flex items-center font-bold ${sections.popup ? 'text-[#5227FF]' : 'text-gray-400'}`}
-                >
-                  <span className="mr-2 text-[14px]">{sections.popup ? '사용 중' : '사용 안함'}</span>
-                  {sections.popup ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-                </button>
-              </div>
-
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 transition-opacity ${!sections.popup ? 'opacity-40 pointer-events-none' : ''}`}>
-                <div>
-                  <label className="block text-[13px] font-bold text-gray-700 mb-2">팝업 이미지 등록</label>
-                  <div className="w-full aspect-[4/5] bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50 hover:text-gray-600 transition-colors">
-                    <ImageIcon size={48} className="mb-3 opacity-50" />
-                    <span className="font-bold text-[14px]">클릭하여 포스터 업로드</span>
-                    <span className="text-[11px] mt-1">JPG, PNG 형식 (최대 5MB)</span>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
+              <div className={`grid grid-cols-1 md:grid-cols-12 gap-8 transition-opacity ${!sections.footer ? 'opacity-40 pointer-events-none' : ''}`}>
+                
+                {/* Logo Section */}
+                <div className="col-span-1 md:col-span-4 space-y-6">
                   <div>
-                    <label className="block text-[13px] font-bold text-gray-700 mb-2">클릭 시 이동할 링크 주소</label>
-                    <input type="text" placeholder="예: /about/notice/1" className="w-full px-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] font-mono text-blue-600 focus:border-black outline-none" />
-                    <p className="text-[12px] text-gray-400 mt-1">비워두면 이미지만 표시되고 클릭되지 않습니다.</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-[13px] font-bold text-gray-700 mb-2">표시 기간 (선택사항)</label>
-                    <div className="flex items-center space-x-2">
-                      <input type="date" className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-[13px]" />
-                      <span className="text-gray-400">~</span>
-                      <input type="date" className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-[13px]" />
+                    <label className="block text-[14px] font-bold text-gray-700 mb-2">하단 로고</label>
+                    <div className="aspect-[2/1] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors">
+                      <div className="text-gray-400 text-center flex flex-col items-center">
+                        <ImageIcon size={24} className="mb-2 opacity-50" />
+                        <span className="text-[12px] font-bold">클릭하여 로고 업로드</span>
+                      </div>
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                        <ImageIcon color="white" size={24} className="mb-2" />
+                        <span className="text-white font-bold text-[12px]">사진 변경</span>
+                      </div>
                     </div>
                   </div>
+                  <div>
+                    <label className="block text-[14px] font-bold text-gray-700 mb-2">로고 하단 문구</label>
+                    <textarea 
+                      defaultValue="평화교회는 이 땅에 주님의 평화를 전하며, 지역사회와 함께하는 믿음의 공동체입니다." 
+                      className="w-full px-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[13px] leading-relaxed focus:border-black outline-none resize-none h-24" 
+                    />
+                  </div>
+                </div>
 
-                  <div className="bg-[#fff5f5] text-[#d63d3d] p-4 rounded-xl text-[13px] font-medium border border-[#ffe0e0] flex items-start">
-                    <Info size={16} className="mr-2 shrink-0 mt-0.5" />
-                    "오늘 하루 이 창을 열지 않음" 체크박스는 사용자 편의를 위해 자동으로 생성됩니다.
+                {/* Info Section */}
+                <div className="col-span-1 md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <div>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">교회(기관)명</label>
+                    <input type="text" defaultValue="대한예수교장로회 평화교회" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">대표자명 (선택)</label>
+                    <input type="text" defaultValue="" placeholder="홍길동 목사" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">주소</label>
+                    <input type="text" defaultValue="서울특별시 평화구 평화로 123 평화빌딩 1층" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">대표 전화번호</label>
+                    <input type="text" defaultValue="02-123-4567" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">팩스번호 (선택)</label>
+                    <input type="text" defaultValue="02-123-4568" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">이메일 주소 (선택)</label>
+                    <input type="text" defaultValue="peace@peacechurch.com" className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[14px] focus:border-black outline-none" />
+                  </div>
+                  <div className="col-span-1 md:col-span-2 mt-2 pt-4 border-t border-gray-100">
+                    <label className="block text-[13px] font-bold text-gray-700 mb-2">카피라이트 (Copyright)</label>
+                    <input type="text" defaultValue="Copyright © 2026 Peace Church. All rights reserved." className="w-full px-4 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 rounded-xl text-[13px] text-gray-500 focus:border-black outline-none" />
                   </div>
                 </div>
               </div>
