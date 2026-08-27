@@ -356,7 +356,7 @@ function Hero() {
 
   return (
     <section className="relative w-full h-[480px] lg:h-[600px] overflow-hidden bg-black">
-      <AnimatePresence initial={false}>
+      <AnimatePresence>
         <motion.div
           key={currentSlide}
           initial={{ opacity: 0 }}
