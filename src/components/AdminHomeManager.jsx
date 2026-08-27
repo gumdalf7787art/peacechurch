@@ -157,7 +157,8 @@ export default function AdminHomeManager() {
     mottoYear: '2026년 표어',
     mottoMain: '주 안에서 하나 되는 평화교회',
     mottoSub: '평화교회에 오신 여러분을 환영합니다',
-    bgImage: ''
+    bgImage: '',
+    useBgImage: true
   };
 
   const DEFAULT_QUICK_LINKS = [
@@ -523,13 +524,19 @@ export default function AdminHomeManager() {
                     <div className="w-full md:w-1/3 shrink-0">
                       <div className="flex justify-between items-end mb-4">
                         <h4 className="text-[15px] font-bold text-gray-900">표어 배경 이미지</h4>
-                        {quickSection.bgImage && (
-                          <button onClick={() => updateQuickSection('bgImage', '')} className="text-[12px] font-bold text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
-                            배경 이미지 삭제
+                        <div className="flex items-center space-x-2">
+                          <span className="text-[12px] font-bold text-gray-500">배경 사용</span>
+                          <button onClick={() => updateQuickSection('useBgImage', quickSection.useBgImage === false ? true : false)} className={`${quickSection.useBgImage !== false ? 'text-[#5227FF]' : 'text-gray-400'}`}>
+                            {quickSection.useBgImage !== false ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
                           </button>
-                        )}
+                          {quickSection.bgImage && (
+                            <button onClick={() => updateQuickSection('bgImage', '')} className="text-[12px] font-bold text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors ml-2">
+                              삭제
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <label className="aspect-video bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-colors block">
+                      <label className={`aspect-video bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-gray-50 transition-all block ${quickSection.useBgImage === false ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
                         {quickSection.bgImage ? (
                           <div className="w-full h-full bg-blue-900 flex items-center justify-center text-white/50 text-[12px]">
                             <img src={quickSection.bgImage} className="w-full h-full object-cover opacity-50" />

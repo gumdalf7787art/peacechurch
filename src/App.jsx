@@ -442,7 +442,8 @@ const DEFAULT_QUICK_SECTION = {
   mottoYear: '2026년 표어',
   mottoMain: '주 안에서 하나 되는 평화교회',
   mottoSub: '평화교회에 오신 여러분을 환영합니다',
-  bgImage: ''
+  bgImage: '',
+  useBgImage: true
 };
 
 const DEFAULT_QUICK_LINKS = [
@@ -488,7 +489,7 @@ function QuickMenu() {
 
   return (
     <section className="relative bg-[#f5f5f7] py-16 md:py-24 px-4 flex flex-col items-center overflow-hidden">
-      {section.bgImage && (
+      {section.useBgImage !== false && section.bgImage && (
         <div className="absolute inset-0 z-0">
           <img src={section.bgImage} alt="Background" className="w-full h-full object-cover opacity-10" />
         </div>
