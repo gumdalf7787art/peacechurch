@@ -112,8 +112,8 @@ export default function MyPage({ setIsLoggedIn }) {
         {/* Logo & Back */}
         <div className="h-[70px] flex items-center px-6 border-b border-black/5 justify-between">
           <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-            <img src="/assets/images/logo.png" alt="Platform Maker Logo" className="w-7 h-7 object-cover rounded-lg mr-2 shadow-sm border border-black/5" />
-            <span className="font-display font-bold text-[16px] text-black tracking-tight">Platform Maker</span>
+            <img src="/logo.jpg" alt="평화교회 로고" className="w-7 h-7 object-cover rounded-lg mr-2 shadow-sm border border-black/5" />
+            <span className="font-display font-bold text-[16px] text-black tracking-tight">평화교회</span>
           </div>
         </div>
 
@@ -196,7 +196,7 @@ export default function MyPage({ setIsLoggedIn }) {
             <h1 className="text-[24px] font-bold text-black tracking-tight mb-1">
               {menuItems.find(m => m.id === activeMenu)?.label}
             </h1>
-            <p className="text-[14px] text-gray-500">{userProfile.name}님의 비즈니스 현황입니다.</p>
+            <p className="text-[14px] text-gray-500">{userProfile.name}님의 활동 현황입니다.</p>
           </div>
           
           <div className="flex items-center space-x-4">
