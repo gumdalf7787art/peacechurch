@@ -57,33 +57,41 @@ function GraceList() {
         <Link to="/fellowship/grace/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>글쓰기</Link>
       </div>
       
-      <div className="overflow-x-auto w-full">
-        <table style={{ width: '100%', minWidth: '600px', borderTop: '2px solid #333', borderCollapse: 'collapse', textAlign: 'center', fontSize: '15px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-            <th style={{ padding: '16px 8px', width: '80px', fontWeight: '600', color: '#475569' }}>번호</th>
-            <th style={{ padding: '16px 8px', fontWeight: '600', color: '#475569' }}>제목</th>
-            <th style={{ padding: '16px 8px', width: '120px', fontWeight: '600', color: '#475569' }}>작성자</th>
-            <th style={{ padding: '16px 8px', width: '120px', fontWeight: '600', color: '#475569' }}>등록일</th>
-            <th style={{ padding: '16px 8px', width: '80px', fontWeight: '600', color: '#475569' }}>조회</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyPosts.map(post => (
-            <tr key={post.id} style={{ borderBottom: '1px solid #f1f5f9' }} className="group">
-              <td style={{ padding: '16px 8px', color: '#94a3b8' }}>{post.id}</td>
-              <td style={{ padding: '16px 8px', textAlign: 'left' }}>
-                <Link to={`/fellowship/grace/${post.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }} className="group-hover:text-[#cc0000] transition-colors">
-                  {post.title}
-                </Link>
-              </td>
-              <td style={{ padding: '16px 8px', color: '#64748b' }}>{post.author}</td>
-              <td style={{ padding: '16px 8px', color: '#94a3b8' }}>{post.date}</td>
-              <td style={{ padding: '16px 8px', color: '#94a3b8' }}>{post.views}</td>
+      <div className="w-full">
+        <table className="w-full border-t-[2px] border-[#333] border-collapse text-center text-[15px]">
+          <thead>
+            <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">번호</th>
+              <th className="py-4 px-2 font-semibold text-[#475569]">제목</th>
+              <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">작성자</th>
+              <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">등록일</th>
+              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {dummyPosts.map(post => (
+              <tr key={post.id} className="border-b border-[#f1f5f9] group">
+                <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.id}</td>
+                <td className="py-4 px-2 text-left">
+                  <Link to={`/fellowship/grace/${post.id}`} className="block no-underline text-inherit group-hover:text-[#cc0000] transition-colors mb-1 sm:mb-0">
+                    {post.title}
+                  </Link>
+                  {/* Mobile only info stack */}
+                  <div className="flex sm:hidden items-center gap-2 text-[13px] text-[#94a3b8] mt-2">
+                    <span>{post.author}</span>
+                    <span className="text-[#e2e8f0]">|</span>
+                    <span>{post.date}</span>
+                    <span className="text-[#e2e8f0]">|</span>
+                    <span>조회 {post.views}</span>
+                  </div>
+                </td>
+                <td className="hidden sm:table-cell py-4 px-2 text-[#64748b]">{post.author}</td>
+                <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.date}</td>
+                <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.views}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Pagination */}
