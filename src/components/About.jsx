@@ -284,7 +284,7 @@ function Staff() {
     <div>
       {/* ── 목회자 ── */}
       <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#222', borderLeft: '4px solid #cc0000', paddingLeft: '12px', marginBottom: '24px' }}>목회자</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '48px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8 md:mb-12">
         <StaffCard name="김목사" role="부목사" department="교구 총괄" />
         <StaffCard name="이전도사" role="전도사" department="유초등부 담당" />
         <StaffCard name="박전도사" role="전도사" department="청년부 담당" />
@@ -293,7 +293,7 @@ function Staff() {
 
       {/* ── 장로 ── */}
       <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#222', borderLeft: '4px solid #cc0000', paddingLeft: '12px', marginBottom: '24px' }}>장로</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '48px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8 md:mb-12">
         <StaffCard name="최장로" role="시무장로" />
         <StaffCard name="정장로" role="시무장로" />
         <StaffCard name="강장로" role="시무장로" />
@@ -301,7 +301,7 @@ function Staff() {
 
       {/* ── 사역자 ── */}
       <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#222', borderLeft: '4px solid #cc0000', paddingLeft: '12px', marginBottom: '24px' }}>사역자</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '48px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8 md:mb-12">
         <StaffCard name="윤간사" role="행정간사" department="사무실 및 행정" />
         <StaffCard name="조지휘자" role="지휘자" department="할렐루야 찬양대" />
         <StaffCard name="홍반주자" role="반주자" department="할렐루야 찬양대" />
