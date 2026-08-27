@@ -246,13 +246,13 @@ function Navbar({ isLoggedIn }) {
                   <X size={24} />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto py-6 px-6 space-y-8">
+              <div className="flex-1 overflow-y-auto py-5 px-5 space-y-5">
                 {/* Mobile Auth Buttons */}
-                <div className="flex flex-col space-y-3 border-b border-gray-100 pb-6">
+                <div className="flex flex-col space-y-2 border-b border-gray-100 pb-4">
                   {isLoggedIn ? (
                     <button 
                       onClick={() => { setIsMobileMenuOpen(false); navigate('/mypage'); }}
-                      className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-center font-bold text-gray-700 transition-colors"
+                      className="w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-center font-bold text-gray-700 text-[14px] transition-colors"
                     >
                       내 정보 ({userProfile.name})
                     </button>
@@ -260,13 +260,13 @@ function Navbar({ isLoggedIn }) {
                     <>
                       <button 
                         onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
-                        className="w-full py-2.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg text-center font-bold text-gray-700 transition-colors"
+                        className="w-full py-2 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg text-center font-bold text-gray-700 text-[14px] transition-colors"
                       >
                         로그인
                       </button>
                       <button 
                         onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
-                        className="w-full py-2.5 bg-black hover:bg-gray-900 text-[#F6BE00] rounded-lg text-center font-bold transition-colors"
+                        className="w-full py-2 bg-black hover:bg-gray-900 text-[#F6BE00] rounded-lg text-center font-bold text-[14px] transition-colors"
                       >
                         회원가입
                       </button>
@@ -275,32 +275,41 @@ function Navbar({ isLoggedIn }) {
                 </div>
                 
                 <div>
-                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">교회소개</h3>
-                  <div className="flex flex-col space-y-4 pl-2">
-                    <Link to="/about/vision" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">교회비전과 목표</Link>
-                    <Link to="/about/pastor" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">담임목사 소개</Link>
-                    <Link to="/about/location" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">찾아오시는 길</Link>
+                  <h3 className="text-[#8DC63F] text-[13px] font-bold mb-2 uppercase tracking-wider">교회소개</h3>
+                  <div className="grid grid-cols-2 gap-y-2.5 pl-1">
+                    <Link to="/about/vision" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">교회비전과 목표</Link>
+                    <Link to="/about/pastor" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">담임목사 소개</Link>
+                    <Link to="/about/staff" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">섬기는 분</Link>
+                    <Link to="/about/worship" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">예배안내</Link>
+                    <Link to="/about/bulletin" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">교회주보</Link>
+                    <Link to="/about/offering" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">온라인헌금</Link>
+                    <Link to="/about/facility" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">시설안내</Link>
+                    <Link to="/about/location" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">찾아오시는 길</Link>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">예배와찬양</h3>
-                  <div className="flex flex-col space-y-4 pl-2">
-                    <Link to="/worship/word" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">예배와말씀</Link>
-                    <Link to="/worship/choir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">찬양단</Link>
+                  <h3 className="text-[#8DC63F] text-[13px] font-bold mb-2 uppercase tracking-wider">예배와찬양</h3>
+                  <div className="grid grid-cols-2 gap-y-2.5 pl-1">
+                    <Link to="/worship/word" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">예배와말씀</Link>
+                    <Link to="/worship/choir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">찬양단</Link>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">교육과선교</h3>
-                  <div className="flex flex-col space-y-4 pl-2">
-                    <Link to="/education/kids" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">유초등부</Link>
-                    <Link to="/education/youth" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">중고등부</Link>
+                  <h3 className="text-[#8DC63F] text-[13px] font-bold mb-2 uppercase tracking-wider">교육과선교</h3>
+                  <div className="grid grid-cols-2 gap-y-2.5 pl-1">
+                    <Link to="/education/kids" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">유초등부</Link>
+                    <Link to="/education/youth" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">중고등부</Link>
+                    <Link to="/education/young-adult" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">청년부</Link>
+                    <Link to="/education/womens" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">여선교회</Link>
+                    <Link to="/education/mens" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">남선교회</Link>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-[#8DC63F] text-sm font-bold mb-3 uppercase tracking-wider">나눔과교제</h3>
-                  <div className="flex flex-col space-y-4 pl-2">
-                    <Link to="/fellowship/grace" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">은혜의글</Link>
-                    <Link to="/fellowship/gallery" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[16px]">갤러리</Link>
+                  <h3 className="text-[#8DC63F] text-[13px] font-bold mb-2 uppercase tracking-wider">나눔과교제</h3>
+                  <div className="grid grid-cols-2 gap-y-2.5 pl-1">
+                    <Link to="/fellowship/grace" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">은혜의글</Link>
+                    <Link to="/fellowship/gallery" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">갤러리</Link>
+                    <Link to="/fellowship/business" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 font-medium text-[14px]">교우사업장소개</Link>
                   </div>
                 </div>
               </div>
