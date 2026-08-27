@@ -142,6 +142,17 @@ export default function AdminHomeManager() {
     });
   };
 
+  const handleQuickLinkIconUpload = (id, e) => {
+    processAndUploadImage(e.target.files[0], (optimizedDataUrl) => {
+      updateQuickLink(id, 'customIcon', optimizedDataUrl);
+    });
+  };
+
+  const handleQuickLinkIconReset = (id, e) => {
+    e.preventDefault();
+    updateQuickLink(id, 'customIcon', null);
+  };
+
   const DEFAULT_QUICK_SECTION = {
     mottoYear: '2026년 표어',
     mottoMain: '주 안에서 하나 되는 평화교회',
@@ -469,12 +480,35 @@ export default function AdminHomeManager() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {quickLinks.map((link, idx) => (
                         <div key={link.id} className="border border-gray-200 p-5 rounded-xl flex gap-4 bg-white relative group hover:border-black transition-colors shadow-sm">
-                          <label className="w-20 h-20 bg-gray-50 rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 relative overflow-hidden block">
-                            {link.bgImage && <img src={link.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-30" />}
-                            <span className="text-[20px] relative z-10">{link.icon === 'Clock' ? '⏱️' : (link.icon === 'FileText' ? '📄' : (link.icon === 'PlayCircle' ? '▶️' : '📍'))}</span>
-                            <span className="text-[10px] text-gray-700 font-bold mt-1 relative z-10 bg-white/80 px-1 rounded">배경 변경</span>
-                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleQuickLinkImageUpload(link.id, e)} />
-                          </label>
+                          <div className="flex flex-col gap-2 shrink-0">
+                            <label className="w-20 h-20 bg-gray-50 rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 relative overflow-hidden group/bg block">
+                              {link.bgImage && <img src={link.bgImage} className="absolute inset-0 w-full h-full object-cover opacity-50" />}
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/bg:opacity-100 transition-opacity flex flex-col items-center justify-center z-20">
+                                <span className="text-white text-[11px] font-bold">배경 변경</span>
+                              </div>
+                              <span className="text-[10px] text-gray-700 font-bold mt-auto mb-1 relative z-10 bg-white/80 px-1 rounded">배경 이미지</span>
+                              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleQuickLinkImageUpload(link.id, e)} />
+                            </label>
+                            
+                            <label className="w-20 h-20 bg-white rounded-xl border border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 relative overflow-hidden group/icon block">
+                              {link.customIcon ? (
+                                <img src={link.customIcon} className="w-10 h-10 object-contain z-10" />
+                              ) : (
+                                <span className="text-[24px] relative z-10">{link.icon === 'Clock' ? '⏱️' : (link.icon === 'FileText' ? '📄' : (link.icon === 'PlayCircle' ? '▶️' : '📍'))}</span>
+                              )}
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/icon:opacity-100 transition-opacity flex flex-col items-center justify-center z-20">
+                                <span className="text-white text-[11px] font-bold">아이콘 변경</span>
+                              </div>
+                              <span className="text-[10px] text-gray-500 font-bold mt-auto mb-1 relative z-10 bg-white/90 px-1 rounded">아이콘</span>
+                              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleQuickLinkIconUpload(link.id, e)} />
+                            </label>
+                            
+                            {link.customIcon && (
+                              <button onClick={(e) => handleQuickLinkIconReset(link.id, e)} className="text-[11px] text-red-500 font-bold hover:underline text-center w-full mt-1">
+                                기본 아이콘 복구
+                              </button>
+                            )}
+                          </div>
                           <div className="flex-1 space-y-3">
                             <div>
                               <label className="block text-[11px] font-bold text-gray-500 mb-1">메뉴명 (타이틀)</label>
