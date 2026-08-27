@@ -217,19 +217,22 @@ function Navbar({ isLoggedIn }) {
 
 const HERO_SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?auto=format&fit=crop&w=2000&q=80",
+    image: "/hero-1-bg.webp",
     main: "평화교회에 오신 것을 환영합니다",
-    sub: "하나님의 사랑과 은혜가 넘치는 진정한 쉼터"
+    sub: "하나님의 사랑과 은혜가 넘치는 진정한 쉼터",
+    align: "center"
   },
   {
-    image: "https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=2000&q=80",
-    main: "말씀이 삶이 되는 은혜의 예배",
-    sub: "진리와 성령으로 드리는 참된 예배의 자리"
+    image: "/hero-2-bg.webp",
+    main: "말씀이 삶이 되는\n은혜의 예배",
+    sub: "진리와 성령으로 드리는\n참된 예배의 자리",
+    align: "left"
   },
   {
-    image: "https://images.unsplash.com/photo-1510590337019-5ef8d3d32116?auto=format&fit=crop&w=2000&q=80",
-    main: "세상을 섬기는 사랑의 공동체",
-    sub: "이웃과 함께하며 세상의 빛과 소금의 역할을 다합니다"
+    image: "/hero-3-bg.webp",
+    main: "세상을 섬기는\n사랑의 공동체",
+    sub: "이웃과 함께하며\n세상의 빛과 소금의 역할을 다합니다",
+    align: "left"
   }
 ];
 
@@ -263,23 +266,43 @@ function Hero() {
           />
           
           {/* Text Content */}
-          <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4">
-            <motion.h1 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-[40px] md:text-[56px] lg:text-[64px] font-bold text-white mb-4 tracking-tight drop-shadow-lg"
+          <div className={`relative z-20 flex flex-col justify-center h-full max-w-7xl mx-auto px-8 md:px-12 ${HERO_SLIDES[currentSlide].align === 'left' ? 'items-start text-left md:pl-24 lg:pl-32' : 'items-center text-center'}`}>
+            <SplitText
+              tag="h1"
+              textAlign={HERO_SLIDES[currentSlide].align}
+              delay={40}
+              duration={1.2}
+              splitType="chars"
+              from={{ opacity: 0, y: 80, rotationX: -30 }}
+              to={{ opacity: 1, y: 0, rotationX: 0 }}
+              ease="back.out(1.2)"
+              className="text-[40px] md:text-[56px] lg:text-[64px] font-bold text-white mb-4 tracking-tight drop-shadow-lg leading-tight"
             >
-              {HERO_SLIDES[currentSlide].main}
-            </motion.h1>
-            <motion.p 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-[18px] md:text-[22px] lg:text-[24px] text-white/90 drop-shadow-md font-medium max-w-2xl"
+              {HERO_SLIDES[currentSlide].main.split('\n').map((line, i, arr) => (
+                <React.Fragment key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </SplitText>
+            <SplitText
+              tag="p"
+              textAlign={HERO_SLIDES[currentSlide].align}
+              delay={30}
+              duration={1}
+              splitType="words"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              ease="power3.out"
+              className="text-[18px] md:text-[22px] lg:text-[24px] text-white/90 drop-shadow-md font-medium max-w-2xl leading-snug"
             >
-              {HERO_SLIDES[currentSlide].sub}
-            </motion.p>
+              {HERO_SLIDES[currentSlide].sub.split('\n').map((line, i, arr) => (
+                <React.Fragment key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </SplitText>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -303,25 +326,27 @@ function Hero() {
 
 function QuickMenu() {
   const menus = [
-    { name: '예배안내', icon: <Clock className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '주보', icon: <FileText className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '유튜브채널', icon: <PlayCircle className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '오시는길', icon: <MapPin className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: '새가족안내', icon: <Users className="w-8 h-8 md:w-10 md:h-10" /> },
+    { name: '예배안내', path: '/about/worship', icon: <Clock className="w-8 h-8 md:w-10 md:h-10" /> },
+    { name: '주보', path: '/about/bulletin', icon: <FileText className="w-8 h-8 md:w-10 md:h-10" /> },
+    { name: '유튜브채널', path: '/worship/word', icon: <PlayCircle className="w-8 h-8 md:w-10 md:h-10" /> },
+    { name: '오시는길', path: '/about/location', icon: <MapPin className="w-8 h-8 md:w-10 md:h-10" /> }
   ];
 
   return (
     <section className="bg-[#f5f5f7] py-20 px-4 flex flex-col items-center overflow-hidden">
       {/* Motto */}
-      <motion.h2 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-[28px] md:text-[36px] font-bold text-black mb-10 text-center tracking-tight"
+      <motion.div 
+        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: false, margin: "-50px" }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="text-center mb-10 flex flex-col items-center"
       >
-        2026년 표어: 주 안에서 하나 되는 평화교회
-      </motion.h2>
+        <span className="text-[20px] md:text-[24px] font-semibold text-[#8DC63F] mb-2 tracking-wide">2026년 표어</span>
+        <h2 className="text-[32px] md:text-[42px] font-bold text-black tracking-tight leading-snug">
+          주 안에서 하나 되는 평화교회
+        </h2>
+      </motion.div>
       
       {/* Welcome Line */}
       <div className="flex items-center w-full max-w-4xl mb-16">
@@ -335,14 +360,14 @@ function QuickMenu() {
       {/* Quick Menus */}
       <div className="flex flex-wrap justify-center gap-8 md:gap-12 max-w-4xl">
         {menus.map((menu, idx) => (
-          <div key={idx} className="flex flex-col items-center cursor-pointer group">
+          <Link key={idx} to={menu.path} className="flex flex-col items-center cursor-pointer group">
             <div className="w-20 h-20 md:w-24 md:h-24 bg-[#8DC63F] rounded-full flex items-center justify-center shadow-sm mb-4 text-white group-hover:shadow-lg group-hover:-translate-y-2 transition-all duration-300">
               {menu.icon}
             </div>
             <span className="text-[15px] md:text-[17px] font-bold text-black group-hover:text-[#8DC63F] transition-colors">
               {menu.name}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
@@ -429,10 +454,10 @@ function WorshipVideos() {
 
       <div className="max-w-[1200px] mx-auto relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 80 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 1, ease: "easeOut" }}
           className="text-center mb-16 md:mb-24"
         >
           <h2 className="text-[36px] md:text-[48px] font-bold tracking-tight leading-[1.2]">
@@ -661,10 +686,10 @@ function PhotoGallery() {
         
         {/* Title Area */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 1, ease: "easeOut" }}
           className="text-center mb-10 md:mb-12"
         >
           <div className="text-sm font-bold tracking-widest text-[#8DC63F] mb-3">나눔과 교제</div>
@@ -725,14 +750,48 @@ function PhotoGallery() {
 
 
 function Location() {
+  const mapRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+      const geocoder = new window.kakao.maps.services.Geocoder();
+      // Search for the address
+      geocoder.addressSearch('서울 중랑구 봉화산로 120', function(result, status) {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+          
+          const options = {
+            center: coords,
+            level: 3 // Zoom level
+          };
+          
+          const map = new window.kakao.maps.Map(mapRef.current, options);
+          
+          const marker = new window.kakao.maps.Marker({
+            map: map,
+            position: coords
+          });
+          
+          const content = `<div style="padding:5px 10px; border-radius:8px; background:white; font-size:14px; font-weight:bold; color:#cc0000; border:1px solid #ddd; box-shadow:0 2px 4px rgba(0,0,0,0.1);">평화교회</div>`;
+          const customOverlay = new window.kakao.maps.CustomOverlay({
+              position: coords,
+              content: content,
+              yAnchor: 2.3
+          });
+          customOverlay.setMap(map);
+        }
+      });
+    }
+  }, []);
+
   return (
     <section id="location" className="bg-[#f8f9fa] text-[#111] relative py-20 md:py-24 px-4 border-t border-black/5">
       <div className="max-w-[1200px] mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 1, ease: "easeOut" }}
           className="text-center mb-12 md:mb-16"
         >
           <div className="text-sm font-bold tracking-widest text-[#8DC63F] mb-3">LOCATION</div>
@@ -750,16 +809,7 @@ function Location() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="w-full lg:w-[60%] h-[400px] md:h-[500px] bg-gray-200 rounded-2xl overflow-hidden shadow-md relative"
           >
-            {/* Kakao Map Placeholder */}
-            <div className="w-full h-full flex flex-col items-center justify-center bg-[#e9ecef] text-gray-500">
-              <div className="w-16 h-16 bg-[#fae100] rounded-full flex items-center justify-center mb-4 shadow-sm">
-                <MapPin className="w-8 h-8 text-[#371d1e]" />
-              </div>
-              <p className="font-bold text-[#371d1e] text-[18px]">카카오맵 API 연동 영역</p>
-              <p className="text-[14px] mt-2 text-gray-500 max-w-[300px] text-center break-keep">
-                실제 서비스 시 카카오맵 스크립트를 삽입하여 동적 지도가 표시됩니다.
-              </p>
-            </div>
+            <div ref={mapRef} className="w-full h-full"></div>
           </motion.div>
 
           {/* Info Area */}
@@ -775,8 +825,8 @@ function Location() {
               <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '10px', textAlign: 'left', alignItems: 'start' }}>
                 <h3 className="text-[16px] md:text-[17px] font-bold text-gray-900 pt-0.5">주소</h3>
                 <div className="text-[15px] md:text-[16px] text-gray-700 break-keep leading-relaxed font-medium">
-                  서울특별시 중구 평화로 1004
-                  <span className="text-[14px] text-gray-500 mt-1 block">(지번: 서울특별시 중구 평화동 1-1)</span>
+                  서울 중랑구 봉화산로 120
+                  <span className="text-[14px] text-gray-500 mt-1 block">(지번: 서울 중랑구 신내동 613)</span>
                 </div>
               </div>
 
@@ -838,7 +888,7 @@ function Footer() {
           <div className="md:w-1/2 flex flex-col md:items-end">
             <div className="space-y-2 text-left md:text-right text-[13px] leading-relaxed mt-4 md:mt-0">
               <p><strong className="text-white font-medium text-[15px]">기독교대한감리회 평화교회</strong></p>
-              <p>서울특별시 중구 평화로 1004</p>
+              <p>서울 중랑구 봉화산로 120</p>
               <div className="pt-3 flex flex-col md:flex-row md:justify-end gap-2 md:gap-6">
                 <span>Tel: <strong className="text-white font-medium tracking-wider">02-000-0000</strong></span>
               </div>

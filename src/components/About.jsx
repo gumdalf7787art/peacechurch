@@ -1,19 +1,153 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Home, MapPin } from 'lucide-react';
+import { ChevronRight, Home, MapPin, BookOpen, Heart, Users, Globe, Flame } from 'lucide-react';
 
 /* ─────────────────────────── Sub-page Components ─────────────────────────── */
 
 function Vision() {
+  const coreValues = [
+    { num: '01', title: '말씀 위에 바로 서는 교회', desc: '하나님의 말씀을 신앙과 삶의 중심에 두고, 말씀을 배우고 묵상하며 삶으로 실천하는 성도를 세워갑니다.', icon: <BookOpen className="w-8 h-8" /> },
+    { num: '02', title: '기도하는 교회', desc: '기도를 통해 하나님의 뜻을 구하며 개인과 가정, 교회와 이웃, 그리고 세상을 위해 함께 기도하는 공동체가 됩니다.', icon: <Flame className="w-8 h-8" /> },
+    { num: '03', title: '다음 세대를 세우는 교회', desc: '어린이와 청소년, 청년들이 믿음 안에서 자신의 꿈과 사명을 발견하고 세상을 섬기는 그리스도인으로 성장하도록 돕습니다.', icon: <Users className="w-8 h-8" /> },
+    { num: '04', title: '이웃을 사랑하고 섬기는 교회', desc: '도움이 필요한 이웃과 소외된 이들에게 먼저 다가가 예수님의 사랑을 말이 아닌 삶과 행동으로 전합니다.', icon: <Heart className="w-8 h-8" /> },
+    { num: '05', title: '세상에 복음을 전하는 교회', desc: '지역사회를 넘어 국내외 선교와 이주민 사역에 동참하며 모든 민족과 세대를 향해 복음과 사랑을 나누는 교회가 됩니다.', icon: <Globe className="w-8 h-8" /> },
+  ];
+
+  const goals = [
+    { title: '예배가 살아있는 교회', desc: '하나님을 기쁘시게 하는 진실한 예배를 드립니다.' },
+    { title: '말씀으로 성장하는 교회', desc: '말씀을 배우고 삶으로 살아내는 성숙한 그리스도인을 세웁니다.' },
+    { title: '기도로 하나 되는 교회', desc: '서로를 위해 기도하며 사랑과 믿음으로 하나 되는 공동체를 만듭니다.' },
+    { title: '다음 세대와 함께하는 교회', desc: '다음 세대가 교회의 미래가 아니라 오늘의 교회로 함께 서도록 돕습니다.' },
+    { title: '지역과 세상을 섬기는 교회', desc: '교회의 문을 세상을 향해 열고 도움이 필요한 곳으로 먼저 찾아갑니다.' },
+  ];
+
   return (
-    <div>
-      <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#cc0000', marginBottom: '16px' }}>
-        교회비전과 목표
-      </h3>
-      <div style={{ fontSize: '15px', color: '#444', lineHeight: 1.8, wordBreak: 'keep-all' }}>
-        평화교회는 예수 그리스도의 복음을 전하고, 하나님 나라를 이 땅에 실현하기 위해 세워진 교회입니다.
-      </div>
+    <div className="flex flex-col space-y-24 py-8">
+      {/* 1. 우리의 비전 */}
+      <section className="text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <span className="text-[#8DC63F] font-bold tracking-widest text-sm mb-4 block">OUR VISION</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-10 tracking-tight">우리의 비전</h2>
+          <div className="bg-[#f8f9fa] border-l-[6px] border-[#cc0000] p-8 md:p-14 rounded-r-3xl shadow-sm text-left md:text-center relative">
+            <h3 className="text-2xl md:text-[32px] font-bold text-gray-900 mb-8 leading-[1.4] tracking-tight">
+              "예수 그리스도의 사랑으로 사람을 세우고,<br className="hidden md:block" /> 세상을 섬기는 교회"
+            </h3>
+            <div className="text-lg text-gray-700 leading-loose break-keep max-w-4xl mx-auto space-y-5">
+              <p>평화교회는 예수 그리스도를 삶의 유일한 길로 고백하며, 말씀과 기도 위에 굳게 서서 하나님의 사랑을 세상 가운데 나누는 교회를 꿈꿉니다.</p>
+              <p>교회 안에서만 머무르는 신앙이 아니라 가정과 일터, 이웃과 지역사회 속에서 그리스도의 사랑을 실천하며, 상처받은 이들을 품고 소외된 이들과 함께하는 것이 우리의 사명입니다.</p>
+              <p>한 사람의 변화가 한 가정을 변화시키고, 한 가정의 변화가 지역사회를 변화시키며, 그 변화가 세상을 향한 하나님의 사랑으로 이어지기를 소망합니다.</p>
+              <p className="font-semibold text-black mt-8 text-[19px]">
+                평화교회는 모든 세대가 믿음 안에서 함께 성장하고 세상 속에서 복음의 빛을 밝히는 <strong className="text-[#cc0000] font-extrabold">건강하고 따뜻한 신앙공동체</strong>를 세워가겠습니다.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* 2. 우리가 세워가는 교회 */}
+      <section>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-4xl font-extrabold text-black tracking-tight">우리가 세워가는 교회</h2>
+        </motion.div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {coreValues.map((value, idx) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 hover:shadow-[0_10px_30px_rgba(204,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="text-[#cc0000] bg-[#cc0000]/10 p-4 rounded-xl group-hover:scale-110 group-hover:bg-[#cc0000] group-hover:text-white transition-all duration-300">
+                  {value.icon}
+                </div>
+                <span className="text-4xl font-black text-gray-100 group-hover:text-[#cc0000]/20 transition-colors duration-300">{value.num}</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4 tracking-tight">{value.title}</h3>
+              <p className="text-[15px] text-gray-600 leading-relaxed break-keep">{value.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. 우리의 목표 */}
+      <section>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-4xl font-extrabold text-black tracking-tight">우리의 목표</h2>
+        </motion.div>
+
+        <div className="bg-black text-white rounded-3xl p-8 md:p-14 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[#cc0000] opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 relative z-10">
+            {goals.map((goal, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="flex flex-col"
+              >
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-[#cc0000] shadow-[0_0_10px_rgba(204,0,0,0.8)]"></div>
+                  <h3 className="text-[20px] font-bold text-white">{goal.title}</h3>
+                </div>
+                <p className="text-[15px] text-gray-400 pl-5 break-keep leading-relaxed">{goal.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. ONE WAY JESUS */}
+      <section>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="relative bg-gradient-to-br from-[#f8f9fa] to-white border border-gray-200 rounded-3xl p-10 md:p-16 text-center overflow-hidden shadow-sm"
+        >
+          <span className="text-[18px] font-black text-[#cc0000] tracking-[0.3em] mb-4 block">ONE WAY JESUS</span>
+          <h2 className="text-[28px] md:text-[36px] font-extrabold text-black mb-8 tracking-tight">
+            오직 예수, 사랑으로 세상을 향하여
+          </h2>
+          
+          <p className="text-[17px] text-gray-700 leading-relaxed mb-10 break-keep max-w-2xl mx-auto">
+            평화교회는 예수 그리스도를 따라 <strong className="text-black font-bold">예배하고, 배우고, 사랑하며, 섬기고, 전하는 교회</strong>가 되겠습니다.<br className="hidden md:block"/>
+            그리고 우리를 통해 한 사람이 살아나고, 한 가정이 회복되며,<br className="hidden md:block"/>
+            지역사회와 세상에 하나님의 평화가 흘러가기를 소망합니다.
+          </p>
+
+          <div className="inline-block mt-2 border-t-2 border-[#cc0000] pt-6">
+            <h3 className="text-[18px] md:text-[20px] font-bold text-gray-900 tracking-widest">
+              평화교회 · Peace Methodist Church
+            </h3>
+          </div>
+        </motion.div>
+      </section>
     </div>
   );
 }
