@@ -341,6 +341,13 @@ const HERO_SLIDES = [
     main: "세상을 섬기는\n사랑의 공동체",
     sub: "이웃과 함께하며\n세상의 빛과 소금의 역할을 다합니다",
     align: "left"
+  },
+  {
+    image: "/hero4.jpg",
+    main: "",
+    sub: "",
+    align: "left",
+    noDim: true
   }
 ];
 
@@ -366,7 +373,9 @@ function Hero() {
           className="absolute inset-0 w-full h-full"
         >
           {/* Background Image */}
-          <div className="absolute inset-0 bg-black/40 z-10" />
+          {!HERO_SLIDES[currentSlide].noDim && (
+            <div className="absolute inset-0 bg-black/40 z-10" />
+          )}
           <motion.img 
             src={HERO_SLIDES[currentSlide].image} 
             alt="Hero Background" 
@@ -390,24 +399,26 @@ function Hero() {
               </motion.div>
             )}
 
-            <SplitText
-              tag="h1"
-              textAlign={HERO_SLIDES[currentSlide].align}
-              delay={40}
-              duration={1.2}
-              splitType="chars"
-              from={{ opacity: 0, y: 80, rotationX: -30 }}
-              to={{ opacity: 1, y: 0, rotationX: 0 }}
-              ease="back.out(1.2)"
-              className="text-[40px] sm:text-[50px] md:text-[70px] lg:text-[90px] font-black text-white mb-2 sm:mb-4 tracking-tight drop-shadow-lg leading-[1.1] sm:leading-none"
-            >
-              {HERO_SLIDES[currentSlide].main.split('\n').map((line, i, arr) => (
-                <React.Fragment key={i}>
-                  {line}
-                  {i < arr.length - 1 && <br />}
-                </React.Fragment>
-              ))}
-            </SplitText>
+            {HERO_SLIDES[currentSlide].main && (
+              <SplitText
+                tag="h1"
+                textAlign={HERO_SLIDES[currentSlide].align}
+                delay={40}
+                duration={1.2}
+                splitType="chars"
+                from={{ opacity: 0, y: 80, rotationX: -30 }}
+                to={{ opacity: 1, y: 0, rotationX: 0 }}
+                ease="back.out(1.2)"
+                className="text-[40px] sm:text-[50px] md:text-[70px] lg:text-[90px] font-black text-white mb-2 sm:mb-4 tracking-tight drop-shadow-lg leading-[1.1] sm:leading-none"
+              >
+                {HERO_SLIDES[currentSlide].main.split('\n').map((line, i, arr) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < arr.length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </SplitText>
+            )}
 
             {HERO_SLIDES[currentSlide].engText && (
               <motion.div
@@ -420,24 +431,26 @@ function Hero() {
               </motion.div>
             )}
 
-            <SplitText
-              tag="p"
-              textAlign={HERO_SLIDES[currentSlide].align}
-              delay={30}
-              duration={1}
-              splitType="words"
-              from={{ opacity: 0, y: 40 }}
-              to={{ opacity: 1, y: 0 }}
-              ease="power3.out"
-              className="text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] text-white/95 drop-shadow-md font-medium max-w-2xl leading-[1.4] sm:leading-snug break-keep"
-            >
-              {HERO_SLIDES[currentSlide].sub.split('\n').map((line, i, arr) => (
-                <React.Fragment key={i}>
-                  {line}
-                  {i < arr.length - 1 && <br />}
-                </React.Fragment>
-              ))}
-            </SplitText>
+            {HERO_SLIDES[currentSlide].sub && (
+              <SplitText
+                tag="p"
+                textAlign={HERO_SLIDES[currentSlide].align}
+                delay={30}
+                duration={1}
+                splitType="words"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                ease="power3.out"
+                className="text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] text-white/95 drop-shadow-md font-medium max-w-2xl leading-[1.4] sm:leading-snug break-keep"
+              >
+                {HERO_SLIDES[currentSlide].sub.split('\n').map((line, i, arr) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < arr.length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </SplitText>
+            )}
           </div>
         </motion.div>
       </AnimatePresence>
