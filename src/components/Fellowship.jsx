@@ -1356,34 +1356,39 @@ function Gallery() {
 
 function BusinessDetail() {
   const { id } = useParams();
-  
-  const bizIdx = parseInt(id) || 0;
-  const businesses = [
-    { 
-      name: '평화 베이커리', 
-      owner: '김평화 집사', 
-      desc: '유기농 밀가루로 당일 구워내는 건강한 빵집입니다. 단체 주문 환영합니다.', 
-      phone: '02-123-4567', 
-      addr: '서울시 구로구 평화로 1길 10', 
-      tag: '음식점', 
-      img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&q=80',
-      gallery: [
-        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&q=80',
-        'https://images.unsplash.com/photo-1555507036-ab1e4006a8a0?w=1200&q=80',
-        'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?w=1200&q=80',
-        'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=1200&q=80',
-        'https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=1200&q=80',
-        'https://images.unsplash.com/photo-1515037893149-de7f840978e2?w=1200&q=80'
-      ]
-    },
-    { name: '믿음 플라워', owner: '이믿음 권사', desc: '각종 기념일 꽃바구니, 화환, 실내 공기정화 식물 전문 꽃집입니다.', phone: '02-987-6543', addr: '서울시 구로구 평화로 2길 15', tag: '꽃/식물', img: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=1200&q=80' },
-    { name: '소망 인테리어', owner: '박소망 장로', desc: '주거공간 및 상업공간 맞춤형 인테리어 전문. 성실하게 시공해 드립니다.', phone: '010-1111-2222', addr: '서울시 구로구 평화로 3길 20', tag: '인테리어', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80' },
-    { name: '사랑 안경원', owner: '최사랑 안수집사', desc: '정확한 시력검사와 트렌디한 안경테를 다수 보유하고 있습니다.', phone: '02-555-7777', addr: '서울시 구로구 평화로 4길 25', tag: '안경/렌즈', img: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=1200&q=80' },
-  ];
-  const biz = businesses[bizIdx % businesses.length];
+  const navigate = useNavigate();
+  const [biz, setBiz] = React.useState(null);
 
-  const images = biz.gallery || [biz.img];
-  const [activeImage, setActiveImage] = React.useState(images[0]);
+  React.useEffect(() => {
+    fetch('/api/posts?type=business')
+      .then(res => res.json())
+      .then(data => {
+        const found = data.find(item => item.id.toString() === id);
+        if (found) {
+          let extra = {};
+          try { extra = JSON.parse(found.content); } catch (e) {}
+          setBiz({
+            id: found.id,
+            name: found.title,
+            owner: found.author,
+            desc: extra.desc || '',
+            phone: extra.phone || '',
+            addr: extra.addr || '',
+            tag: extra.tag || '',
+            gallery: found.image_urls?.length ? found.image_urls : ['https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80'],
+          });
+        }
+      });
+  }, [id]);
+
+  const images = biz ? biz.gallery : [];
+  const [activeImage, setActiveImage] = React.useState('');
+  
+  React.useEffect(() => {
+    if (images.length > 0 && !activeImage) {
+      setActiveImage(images[0]);
+    }
+  }, [images, activeImage]);
   const scrollRef = React.useRef(null);
 
   const scrollLeft = () => {
@@ -1392,6 +1397,8 @@ function BusinessDetail() {
   const scrollRight = () => {
     if (scrollRef.current) scrollRef.current.scrollBy({ left: 250, behavior: 'smooth' });
   };
+
+  if (!biz) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid #f8fafc' }}>
@@ -1584,16 +1591,23 @@ function BusinessWrite() {
   const [phone, setPhone] = React.useState('');
   const [addr, setAddr] = React.useState('');
   const [desc, setDesc] = React.useState('');
-  const [file, setFile] = React.useState(null);
-  const [preview, setPreview] = React.useState('');
+  const [files, setFiles] = React.useState([]);
+  const [previews, setPreviews] = React.useState([]);
   const [isUploading, setIsUploading] = React.useState(false);
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const f = e.target.files[0];
-      setFile(f);
-      setPreview(URL.createObjectURL(f));
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      const totalFiles = [...files, ...newFiles].slice(0, 10);
+      setFiles(totalFiles);
+      setPreviews(totalFiles.map(f => URL.createObjectURL(f)));
     }
+  };
+
+  const removeFile = (index) => {
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+    setPreviews(newFiles.map(f => URL.createObjectURL(f)));
   };
 
   const handleSubmit = async () => {
@@ -1603,17 +1617,15 @@ function BusinessWrite() {
     }
     setIsUploading(true);
     let imageUrls = [];
-    if (file) {
+    for (const f of files) {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', f);
       try {
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
         const uploadData = await uploadRes.json();
         if (uploadData.url) imageUrls.push(uploadData.url);
       } catch (err) {
-        alert('이미지 업로드에 실패했습니다.');
-        setIsUploading(false);
-        return;
+        console.error('이미지 업로드 실패:', err);
       }
     }
     
@@ -1686,21 +1698,27 @@ function BusinessWrite() {
       </div>
 
       <div style={{ marginBottom: '40px' }}>
-        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>매장 사진 등록</label>
-        <div onClick={() => fileInputRef.current && fileInputRef.current.click()} style={{ width: '100%', height: preview ? 'auto' : '200px', border: '2px dashed #cbd5e1', borderRadius: '16px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.3s ease', overflow: 'hidden' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}>
-          {preview ? (
-            <img src={preview} alt="미리보기" style={{ width: '100%', height: 'auto', display: 'block' }} />
-          ) : (
-            <>
-              <UploadCloud size={40} color="#94a3b8" />
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold', color: '#334155' }}>첫 번째 사진이 대표 이미지로 설정됩니다</p>
-                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>이곳을 클릭하여 사진을 업로드하세요</p>
-              </div>
-            </>
-          )}
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>매장 사진 등록 (최대 10장)</label>
+        
+        <div onClick={() => fileInputRef.current && fileInputRef.current.click()} style={{ width: '100%', height: '120px', border: '2px dashed #cbd5e1', borderRadius: '16px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.3s ease', marginBottom: '16px' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}>
+          <UploadCloud size={32} color="#94a3b8" />
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold', color: '#334155' }}>사진 추가하기 ({files.length}/10)</p>
+          <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>이곳을 클릭하세요</p>
         </div>
-        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
+        <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
+
+        {previews.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
+            {previews.map((previewUrl, index) => (
+              <div key={index} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                <img src={previewUrl} alt={`미리보기 ${index + 1}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button onClick={(e) => { e.stopPropagation(); removeFile(index); }} style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       
       <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
