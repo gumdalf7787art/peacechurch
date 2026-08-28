@@ -419,10 +419,10 @@ function GraceWrite() {
       </div>
 
       {/* Naver-style Editor Toolbar */}
-      <div style={{ border: '1px solid #e5e5ea', borderRadius: '8px', overflow: 'hidden', marginBottom: '24px', backgroundColor: '#fff' }}>
+      <div style={{ border: '1px solid #e5e5ea', borderRadius: '8px', overflow: 'visible', marginBottom: '24px', backgroundColor: '#fff' }}>
         
         {/* Top Row */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid #f0f0f0', backgroundColor: '#fff', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid #f0f0f0', backgroundColor: '#fff', gap: '4px', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}>
           
           <input type="file" ref={photoInputRef} multiple accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
           <TopToolbarButton title="사진" onClick={() => photoInputRef.current.click()}>
@@ -453,7 +453,7 @@ function GraceWrite() {
         </div>
 
         {/* Bottom Row */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', backgroundColor: '#fafafa', gap: '4px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', backgroundColor: '#fafafa', gap: '4px', flexWrap: 'wrap', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
           
           <select onChange={(e) => formatText('fontName', e.target.value)} style={{ padding: '6px', border: '1px solid transparent', backgroundColor: 'transparent', fontSize: '13px', color: '#555', outline: 'none', cursor: 'pointer' }}>
             <option value="맑은 고딕">본문 (맑은 고딕)</option>
