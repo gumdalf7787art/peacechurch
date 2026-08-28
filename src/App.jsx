@@ -19,6 +19,7 @@ import About from './components/About';
 import Worship from './components/Worship';
 import Education from './components/Education';
 import Fellowship from './components/Fellowship';
+import DynamicPage from './components/DynamicPage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -1231,6 +1232,13 @@ function App() {
           <>
             <Navbar isLoggedIn={isLoggedIn} />
             <Fellowship />
+            <Footer />
+          </>
+        } />
+        <Route path="/sub/:slug" element={
+          <>
+            <Navbar isLoggedIn={isLoggedIn} />
+            <DynamicPage />
             <Footer />
           </>
         } />
