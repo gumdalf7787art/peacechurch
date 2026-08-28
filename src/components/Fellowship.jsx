@@ -18,12 +18,20 @@ function GraceDetail() {
 
   React.useEffect(() => {
     if (id) {
-      // Increment view count
-      fetch('/api/posts', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, increment_view: true })
-      });
+      const today = new Date().toISOString().split('T')[0];
+      const viewedPosts = JSON.parse(localStorage.getItem('viewedPosts') || '{}');
+      const postKey = `grace_${id}`;
+
+      if (viewedPosts[postKey] !== today) {
+        viewedPosts[postKey] = today;
+        localStorage.setItem('viewedPosts', JSON.stringify(viewedPosts));
+        
+        fetch('/api/posts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id, increment_view: true })
+        });
+      }
     }
 
     fetch(`/api/posts?type=grace${isAdmin ? '&admin=true' : ''}`)
@@ -753,11 +761,20 @@ function GalleryDetail() {
   
   React.useEffect(() => {
     if (id) {
-      fetch('/api/posts', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, increment_view: true })
-      });
+      const today = new Date().toISOString().split('T')[0];
+      const viewedPosts = JSON.parse(localStorage.getItem('viewedPosts') || '{}');
+      const postKey = `gallery_${id}`;
+
+      if (viewedPosts[postKey] !== today) {
+        viewedPosts[postKey] = today;
+        localStorage.setItem('viewedPosts', JSON.stringify(viewedPosts));
+        
+        fetch('/api/posts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id, increment_view: true })
+        });
+      }
     }
 
     fetch(`/api/posts?type=gallery${isAdmin ? '&admin=true' : ''}`)
