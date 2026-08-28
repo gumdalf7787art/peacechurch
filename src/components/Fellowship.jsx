@@ -37,15 +37,21 @@ function GraceDetail() {
         </div>
       </div>
       
-      <div style={{ padding: '40px 16px', minHeight: '300px', fontSize: '16px', color: '#333', lineHeight: '1.8', borderBottom: '1px solid #eee' }}>
+      <div style={{ padding: '40px 16px', minHeight: '300px', fontSize: '16px', color: '#1d1d1f', lineHeight: '1.8', borderBottom: '1px solid #e5e5ea', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}>
         {post.image_urls && post.image_urls.map((url, i) => {
            if (url.match(/\.(jpeg|jpg|gif|png)$/i)) {
-             return <div key={i} style={{ marginBottom: '24px' }}><img src={url} alt={`첨부이미지 ${i+1}`} style={{ maxWidth: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} /></div>;
+             // In the new WYSIWYG editor, images are embedded directly in the content. 
+             // We still render legacy attached images here for backward compatibility.
+             return <div key={i} style={{ marginBottom: '24px' }}><img src={url} alt={`첨부이미지 ${i+1}`} style={{ maxWidth: '100%', borderRadius: '14px', boxShadow: '0 4px 14px rgba(0,0,0,0.06)' }} /></div>;
            } else {
-             return <div key={i} style={{ marginBottom: '24px' }}><a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 16px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#0f172a', textDecoration: 'none', fontWeight: '500' }}><Paperclip size={16} /> 첨부파일 다운로드 ({i+1})</a></div>;
+             return <div key={i} style={{ marginBottom: '24px' }}><a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 18px', backgroundColor: '#f5f5f7', border: '1px solid #d2d2d7', borderRadius: '12px', color: '#1d1d1f', textDecoration: 'none', fontWeight: '500', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e8e8ed'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f5f5f7'}><Paperclip size={16} color="#007aff" /> 첨부파일 다운로드 ({i+1})</a></div>;
            }
         })}
-        <p style={{ whiteSpace: 'pre-wrap', marginTop: '20px' }}>{post.content}</p>
+        <div 
+          className="wysiwyg-content" 
+          style={{ marginTop: '20px', wordBreak: 'break-word' }} 
+          dangerouslySetInnerHTML={{ __html: post.content }} 
+        />
       </div>
       
       <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
@@ -168,6 +174,8 @@ function GraceWrite() {
   const [pendingPath, setPendingPath] = React.useState(null);
   
   const fileInputRef = React.useRef(null);
+  const photoInputRef = React.useRef(null);
+  const editorRef = React.useRef(null);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -199,18 +207,57 @@ function GraceWrite() {
     };
   }, [isDirty]);
 
-  const handleFileClick = () => {
-    if (fileInputRef.current) fileInputRef.current.click();
-  };
-
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setFiles(prev => [...prev, ...Array.from(e.target.files)]);
     }
+    e.target.value = null; // Reset input
   };
 
   const removeFile = (idx) => {
     setFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  // WYSIWYG Editor Commands
+  const formatText = (command, value = null) => {
+    document.execCommand(command, false, value);
+    if (editorRef.current) editorRef.current.focus();
+    setContent(editorRef.current.innerHTML);
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+    
+    setIsUploading(true);
+    for (const file of selectedFiles) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+          // Insert image instantly into the editor
+          editorRef.current.focus();
+          document.execCommand('insertImage', false, data.url);
+          // Apply minimal Apple-like styling to the inserted image via standard CSS in the global stylesheet or inline
+          const imgs = editorRef.current.getElementsByTagName('img');
+          const lastImg = imgs[imgs.length - 1];
+          if (lastImg) {
+            lastImg.style.maxWidth = '100%';
+            lastImg.style.borderRadius = '14px';
+            lastImg.style.marginTop = '16px';
+            lastImg.style.marginBottom = '16px';
+            lastImg.style.boxShadow = '0 4px 14px rgba(0,0,0,0.06)';
+          }
+          setContent(editorRef.current.innerHTML);
+        }
+      } catch (err) {
+        console.error("사진 업로드 실패:", err);
+      }
+    }
+    setIsUploading(false);
+    e.target.value = null; // Reset input
   };
 
   const handleSubmit = async () => {
@@ -225,13 +272,11 @@ function GraceWrite() {
       const author = userProfile?.name || '평화교인';
 
       const uploadedUrls = [];
+      // Only upload generic files here. Photos are already uploaded and embedded in `content` HTML.
       for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
         const data = await res.json();
         if (data.success) {
           uploadedUrls.push(data.url);
@@ -262,7 +307,7 @@ function GraceWrite() {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', padding: '48px', border: '1px solid #f8fafc' }}>
+    <div style={{ backgroundColor: '#ffffff', borderRadius: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', padding: '56px', border: '1px solid #e5e5ea', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}>
       
       {/* Title Input */}
       <div style={{ marginBottom: '32px' }}>
@@ -270,48 +315,73 @@ function GraceWrite() {
           type="text" 
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목을 입력하세요..." 
+          placeholder="제목을 입력하세요" 
           style={{ 
             width: '100%', 
             padding: '16px 0', 
             border: 'none', 
-            borderBottom: '2px solid #e2e8f0', 
-            fontSize: '36px', 
-            fontWeight: '800', 
-            letterSpacing: '-1px',
-            color: '#0f172a', 
+            borderBottom: '2px solid #e5e5ea', 
+            fontSize: '40px', 
+            fontWeight: '700', 
+            letterSpacing: '-1.5px',
+            color: '#1d1d1f', 
             outline: 'none', 
             background: 'transparent',
             transition: 'border-color 0.3s ease'
           }} 
-          onFocus={(e) => e.target.style.borderBottom = '2px solid #cc0000'} 
-          onBlur={(e) => e.target.style.borderBottom = '2px solid #e2e8f0'} 
+          onFocus={(e) => e.target.style.borderBottom = '2px solid #007aff'} 
+          onBlur={(e) => e.target.style.borderBottom = '2px solid #e5e5ea'} 
         />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '12px 20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
-          <ToolbarButton title="글꼴 설정"><Type size={18} /></ToolbarButton>
-          <ToolbarButton title="글자 크기"><span style={{ fontSize: '13px', fontWeight: 'bold' }}>15px</span></ToolbarButton>
+      {/* Apple-style Editor Toolbar */}
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(245, 245, 247, 0.8)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: '18px', border: '1px solid #d2d2d7', marginBottom: '24px' }}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '12px', borderRight: '1px solid #d2d2d7' }}>
+          <ToolbarButton title="굵게" onClick={() => formatText('bold')}><Bold size={16} /></ToolbarButton>
+          <ToolbarButton title="기울임" onClick={() => formatText('italic')}><Italic size={16} /></ToolbarButton>
+          <ToolbarButton title="밑줄" onClick={() => formatText('underline')}><Underline size={16} /></ToolbarButton>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
-          <ToolbarButton title="굵게"><Bold size={18} /></ToolbarButton>
-          <ToolbarButton title="기울임"><Italic size={18} /></ToolbarButton>
-          <ToolbarButton title="밑줄"><Underline size={18} /></ToolbarButton>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '12px', borderRight: '1px solid #d2d2d7' }}>
+          <ToolbarButton title="왼쪽 정렬" onClick={() => formatText('justifyLeft')}><AlignLeft size={16} /></ToolbarButton>
+          <ToolbarButton title="가운데 정렬" onClick={() => formatText('justifyCenter')}><AlignCenter size={16} /></ToolbarButton>
+          <ToolbarButton title="오른쪽 정렬" onClick={() => formatText('justifyRight')}><AlignRight size={16} /></ToolbarButton>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
-          <ToolbarButton title="왼쪽 정렬"><AlignLeft size={18} /></ToolbarButton>
-          <ToolbarButton title="가운데 정렬"><AlignCenter size={18} /></ToolbarButton>
-          <ToolbarButton title="오른쪽 정렬"><AlignRight size={18} /></ToolbarButton>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <ToolbarButton title="링크 삽입"><Link2 size={18} /></ToolbarButton>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '12px', borderRight: '1px solid #d2d2d7' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Palette size={16} color="#86868b" />
+            <input 
+              type="color" 
+              title="글자 색상"
+              onChange={(e) => formatText('foreColor', e.target.value)} 
+              style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', cursor: 'pointer', padding: 0, backgroundColor: 'transparent' }} 
+            />
+          </div>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+          <input type="file" ref={photoInputRef} multiple accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
+          <button 
+            onClick={() => photoInputRef.current.click()} 
+            title="본문에 사진을 바로 삽입합니다"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: '#ffffff', border: '1px solid #d2d2d7', borderRadius: '12px', color: '#1d1d1f', fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} 
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f5f5f7'; }} 
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+          >
+            <ImageIcon size={16} color="#007aff" /> 사진 첨부
+          </button>
+
           <input type="file" ref={fileInputRef} multiple onChange={handleFileChange} style={{ display: 'none' }} />
-          <button onClick={handleFileClick} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.borderColor = '#94a3b8'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#cbd5e1'; }}>
-            <Paperclip size={16} /> 첨부파일 / 사진
+          <button 
+            onClick={() => fileInputRef.current.click()} 
+            title="문서 등 일반 파일을 첨부합니다"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: '#ffffff', border: '1px solid #d2d2d7', borderRadius: '12px', color: '#1d1d1f', fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} 
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f5f5f7'; }} 
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+          >
+            <Paperclip size={16} color="#86868b" /> 일반 파일
           </button>
         </div>
       </div>
@@ -319,70 +389,73 @@ function GraceWrite() {
       {files.length > 0 && (
         <div style={{ marginBottom: '24px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
           {files.map((f, idx) => (
-            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#f1f5f9', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-              <span style={{ fontSize: '14px', color: '#475569', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
-              <button onClick={() => removeFile(idx)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#cc0000', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button>
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#f5f5f7', borderRadius: '12px', border: '1px solid #d2d2d7' }}>
+              <Paperclip size={14} color="#86868b" />
+              <span style={{ fontSize: '14px', color: '#1d1d1f', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+              <button onClick={() => removeFile(idx)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#ff3b30', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Content Area */}
-      <textarea 
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="내용을 입력하세요..."
+      {/* WYSIWYG Content Area */}
+      <div 
+        ref={editorRef}
+        contentEditable
+        onInput={(e) => setContent(e.currentTarget.innerHTML)}
         style={{ 
           width: '100%', 
           minHeight: '400px', 
-          padding: '32px', 
-          border: '1px solid #e2e8f0', 
-          borderRadius: '16px', 
-          fontSize: '16px', 
-          lineHeight: '1.8', 
-          color: '#334155',
+          padding: '24px', 
+          border: '1px solid #e5e5ea', 
+          borderRadius: '18px', 
+          fontSize: '17px', 
+          lineHeight: '1.6', 
+          color: '#1d1d1f',
           outline: 'none', 
-          backgroundColor: '#fff',
+          backgroundColor: '#ffffff',
           transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
           boxSizing: 'border-box',
-          resize: 'vertical'
+          overflowY: 'auto'
         }} 
-        onFocus={(e) => { e.target.style.borderColor = '#cc0000'; e.target.style.boxShadow = '0 0 0 4px rgba(204,0,0,0.05)'; }} 
-        onBlur={(e) => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
+        onFocus={(e) => { e.target.style.borderColor = '#007aff'; e.target.style.boxShadow = '0 0 0 4px rgba(0, 122, 255, 0.1)'; }} 
+        onBlur={(e) => { e.target.style.borderColor = '#e5e5ea'; e.target.style.boxShadow = 'none'; }}
       />
+      {!content && (
+        <div style={{ position: 'absolute', pointerEvents: 'none', color: '#86868b', marginTop: '-390px', marginLeft: '24px', fontSize: '17px' }}>
+          자유롭게 글을 작성하고 사진을 삽입해 보세요...
+        </div>
+      )}
       
       {/* Footer Buttons */}
-      <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'center', gap: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
-        <Link to="/fellowship/grace" style={{ padding: '16px 48px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '12px', fontSize: '16px', fontWeight: '600', textDecoration: 'none', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}>
+      <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'center', gap: '16px', borderTop: '1px solid #e5e5ea', paddingTop: '32px' }}>
+        <Link to="/fellowship/grace" style={{ padding: '16px 48px', backgroundColor: '#f5f5f7', border: '1px solid #d2d2d7', color: '#1d1d1f', borderRadius: '14px', fontSize: '17px', fontWeight: '600', textDecoration: 'none', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e8e8ed'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f5f5f7'}>
           작성 취소
         </Link>
         <button 
           onClick={handleSubmit} 
           disabled={isUploading} 
-          style={{ padding: '16px 64px', background: isUploading ? '#cbd5e1' : 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: isUploading ? 'not-allowed' : 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: isUploading ? 'none' : '0 10px 20px -5px rgba(204,0,0,0.4)' }} 
-          onMouseEnter={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; } }} 
-          onMouseLeave={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; } }}
+          style={{ padding: '16px 64px', backgroundColor: isUploading ? '#86868b' : '#007aff', color: '#ffffff', border: 'none', borderRadius: '14px', cursor: isUploading ? 'not-allowed' : 'pointer', fontSize: '17px', fontWeight: '600', textDecoration: 'none', transition: 'background-color 0.2s, transform 0.2s', boxShadow: '0 4px 14px rgba(0, 122, 255, 0.3)' }} 
+          onMouseEnter={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.backgroundColor = '#0061cc'; } }} 
+          onMouseLeave={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.backgroundColor = '#007aff'; } }}
         >
-          {isUploading ? '등록 중...' : '글 등록하기'}
+          {isUploading ? '업로드 중...' : '글 등록하기'}
         </button>
       </div>
 
       {showExitModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-            <div style={{ width: '48px', height: '48px', backgroundColor: '#fee2e2', color: '#cc0000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <span style={{ fontSize: '24px', fontWeight: 'bold' }}>!</span>
-            </div>
-            <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>정말 나가시겠습니까?</h3>
-            <p style={{ margin: '0 0 24px 0', fontSize: '15px', color: '#64748b', lineHeight: '1.5' }}>
-              현재 작성 중인 게시물이 있습니다.<br/>페이지를 나가시면 작성 중인 내용은<br/>모두 사라지며 업로드되지 않습니다.
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(5px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '24px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '22px', fontWeight: '700', color: '#1d1d1f' }}>정말 나가시겠습니까?</h3>
+            <p style={{ margin: '0 0 32px 0', fontSize: '16px', color: '#86868b', lineHeight: '1.5' }}>
+              현재 작성 중인 게시물이 있습니다.<br/>페이지를 나가시면 작성 중인 내용은<br/>모두 사라지며 복구할 수 없습니다.
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 
                 onClick={() => { setShowExitModal(false); setPendingPath(null); }}
-                style={{ flex: 1, padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background-color 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+                style={{ flex: 1, padding: '14px', backgroundColor: '#f5f5f7', color: '#1d1d1f', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '600', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e8e8ed'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f5f5f7'}
               >
                 계속 작성하기
               </button>
@@ -391,9 +464,9 @@ function GraceWrite() {
                   setIsDirty(false); 
                   setTimeout(() => navigate(pendingPath), 0); 
                 }}
-                style={{ flex: 1, padding: '12px', backgroundColor: '#cc0000', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background-color 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b30000'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#cc0000'}
+                style={{ flex: 1, padding: '14px', backgroundColor: '#ff3b30', color: '#ffffff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '600', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#d70015'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff3b30'}
               >
                 나가기
               </button>
