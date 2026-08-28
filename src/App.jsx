@@ -596,8 +596,6 @@ function WorshipVideos() {
       className="text-white relative py-24 md:py-32 px-4 bg-fixed bg-center bg-cover bg-no-repeat"
       style={{ backgroundImage: 'url("/worship-bg.webp")' }}
     >
-      <div className="absolute inset-0 bg-black/70 z-0"></div>
-
       {/* High-end Subtle Divider */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent z-10"></div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent shadow-[0_0_20px_rgba(255,255,255,0.4)] z-10"></div>
