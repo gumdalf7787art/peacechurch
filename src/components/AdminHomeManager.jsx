@@ -1,25 +1,33 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchCMSData, saveToServer } from '../hooks/useCMS';
+import { fetchCMSData, saveToServer, invalidateCMSCache } from '../hooks/useCMS';
 import { Image as ImageIcon, Link as LinkIcon, Type, Plus, Trash2, Edit3, MoveUp, MoveDown, Save, MonitorPlay, MessageSquare, Megaphone, ToggleLeft, ToggleRight, Info, MapPin, Layout, AlignLeft, AlignCenter, AlignRight, ZoomIn, ZoomOut, MousePointer2, CheckCircle2, Loader2, Clock, FileText, PlayCircle } from 'lucide-react';
 
 export default function AdminHomeManager() {
   const [activeTab, setActiveTab] = useState('hero');
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const saveTimeoutRef = useRef(null);
 
   const pendingSaves = useRef({});
   const triggerAutoSave = (key, value) => {
     if (key) pendingSaves.current[key] = value;
     setIsSaving(true);
+    setSaveError(false);
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         if (Object.keys(pendingSaves.current).length > 0) {
           const payload = Object.keys(pendingSaves.current).map(k => ({ id: k, value: pendingSaves.current[k] }));
           pendingSaves.current = {};
-          await saveToServer(payload);
+          const success = await saveToServer(payload);
+          if (!success) {
+            setSaveError(true);
+          }
         }
+      } catch (e) {
+        console.error('[Admin] Save error:', e);
+        setSaveError(true);
       } finally {
         setIsSaving(false);
       }
@@ -27,6 +35,8 @@ export default function AdminHomeManager() {
   };
 
   React.useEffect(() => {
+    // Always fetch fresh data from server when admin page opens
+    invalidateCMSCache();
     fetchCMSData().then(serverData => {
       if (serverData) {
         if (serverData.cms_sections) setSections(serverData.cms_sections);
@@ -385,6 +395,8 @@ export default function AdminHomeManager() {
           <div className="flex items-center text-[14px] font-bold text-gray-500 bg-gray-100 px-5 py-2.5 rounded-xl border border-gray-200">
             {isSaving ? (
               <><Loader2 size={16} className="animate-spin text-blue-500 mr-2" /> <span className="text-blue-600">자동 저장 중...</span></>
+            ) : saveError ? (
+              <><span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] mr-2">!</span> <span className="text-red-600">저장 실패 — 서버 연결을 확인해주세요</span></>
             ) : (
               <><CheckCircle2 size={16} className="text-green-500 mr-2" /> 모든 변경사항 저장됨</>
             )}

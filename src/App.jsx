@@ -800,30 +800,17 @@ function WorshipSchedule() {
 }
 
 function PastorGreeting() {
-  const [section, setSection] = React.useState(() => {
-    const saved = localStorage.getItem('cms_pastorSection');
-    if (saved) {
-      try { return JSON.parse(saved); } catch(e) {}
-    }
-    return {
-      image: '/pastor-bg.png',
-      title: '평화 교회에 오신것을 환영합니다.',
-      subTitle: '하나님의 사랑과 은혜가 충만한 곳',
-      content: '어떠한 어려움 속에서도 믿음의 자리를 지키며 주님의 길을 걷는 교회\n점점 혼탁해져가는 이 시대에 진리를 전하며 거룩함을 세워가는 교회\n주님의 소유된 백성들을 거룩한 제사장으로 세워 이땅에 하나님의 나라를 이루어가는 교회',
-      name: '장 성 진'
-    };
+  const section = useCMSData('cms_pastorSection', {
+    image: '/pastor-bg.png',
+    title: '평화 교회에 오신것을 환영합니다.',
+    subTitle: '하나님의 사랑과 은혜가 충만한 곳',
+    content: '어떠한 어려움 속에서도 믿음의 자리를 지키며 주님의 길을 걷는 교회\n점점 혼탁해져가는 이 시대에 진리를 전하며 거룩함을 세워가는 교회\n주님의 소유된 백성들을 거룩한 제사장으로 세워 이땅에 하나님의 나라를 이루어가는 교회',
+    name: '장 성 진'
   });
+  const sections = useCMSData('cms_sections', { pastor: true });
+  const isVisible = sections.pastor !== false;
 
-  React.useEffect(() => {
-    const handleUpdate = () => {
-      const saved = localStorage.getItem('cms_pastorSection');
-      if (saved) {
-        try { setSection(JSON.parse(saved)); } catch(e) {}
-      }
-    };
-    window.addEventListener('cms_pastor_updated', handleUpdate);
-    return () => window.removeEventListener('cms_pastor_updated', handleUpdate);
-  }, []);
+  if (!isVisible) return null;
 
   return (
     <section 

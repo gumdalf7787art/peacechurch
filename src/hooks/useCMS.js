@@ -1,57 +1,91 @@
 import { useState, useEffect } from 'react';
 
+// Cache is only used within a single page load to avoid duplicate simultaneous fetches.
+// It is invalidated after every save so that subsequent reads always get fresh data.
 let cmsDataCache = null;
 let cmsDataPromise = null;
 
 export const fetchCMSData = async () => {
+  // Return in-flight promise if one exists (prevents parallel duplicate requests)
   if (cmsDataCache) return cmsDataCache;
   if (cmsDataPromise) return cmsDataPromise;
-  cmsDataPromise = fetch('/api/cms/data', { cache: 'no-store' }).then(res => res.json()).then(data => {
-    if (data.success) {
-      cmsDataCache = data.data;
-      return cmsDataCache;
-    }
-    return {};
-  }).catch(() => ({}));
+
+  cmsDataPromise = fetch('/api/cms/data', { cache: 'no-store' })
+    .then(res => {
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      if (data.success) {
+        cmsDataCache = data.data;
+        return cmsDataCache;
+      }
+      console.error('[CMS] Server returned success=false', data);
+      return {};
+    })
+    .catch(err => {
+      console.error('[CMS] Failed to fetch CMS data:', err);
+      cmsDataPromise = null; // Allow retry on next call
+      return {};
+    });
+
   return cmsDataPromise;
+};
+
+// Invalidate cache so that the next fetchCMSData call hits the server
+export const invalidateCMSCache = () => {
+  cmsDataCache = null;
+  cmsDataPromise = null;
 };
 
 export const saveToServer = async (payload) => {
   try {
-    await fetch('/api/cms/data', {
+    const res = await fetch('/api/cms/data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    // Update local cache to prevent stale data overriding new state
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[CMS] Save failed (${res.status}):`, errorText);
+      throw new Error(`Save failed: ${res.status}`);
+    }
+
+    const result = await res.json();
+    if (!result.success) {
+      console.error('[CMS] Server returned success=false on save:', result);
+      throw new Error('Server save returned success=false');
+    }
+
+    // Update local cache with new values so that in-app reads stay fresh
     if (cmsDataCache) {
       const items = Array.isArray(payload) ? payload : [payload];
       items.forEach(item => {
         cmsDataCache[item.id] = item.value;
       });
     }
+
+    console.log('[CMS] Saved successfully:', Array.isArray(payload) ? payload.map(p => p.id) : payload.id);
+    return true;
   } catch (e) {
-    console.error('Failed to save to CMS API', e);
+    console.error('[CMS] Failed to save to CMS API:', e);
+    return false;
   }
 };
 
 export function useCMSData(key, defaultData) {
-  const [data, setData] = useState(() => {
-    try {
-      const saved = localStorage.getItem(key);
-      if (saved) return JSON.parse(saved);
-    } catch(e) {}
-    return defaultData;
-  });
+  const [data, setData] = useState(defaultData);
 
   useEffect(() => {
+    // First, load from server (authoritative source)
     fetchCMSData().then(serverData => {
       if (serverData && serverData[key] !== undefined) {
         setData(serverData[key]);
-        localStorage.setItem(key, JSON.stringify(serverData[key]));
       }
     });
 
+    // Listen for real-time local updates (from admin page editing in same tab)
     const handleUpdate = () => {
       try {
         const saved = localStorage.getItem(key);
