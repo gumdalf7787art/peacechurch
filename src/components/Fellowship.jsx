@@ -368,7 +368,7 @@ function GalleryWrite() {
           uploadedUrls.push(data.url);
         }
       }
-      await fetch('/api/posts', {
+      const dbRes = await fetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -379,6 +379,9 @@ function GalleryWrite() {
           image_urls: uploadedUrls
         })
       });
+      if (!dbRes.ok) {
+        throw new Error('데이터베이스 저장 실패');
+      }
       alert(`성공적으로 사진이 업로드되었습니다!`);
       navigate('/fellowship/gallery');
     } catch (error) {
