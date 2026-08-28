@@ -871,16 +871,16 @@ function PastorGreeting() {
 }
 
 function PhotoGallery() {
-  const photos = [
-    { id: 1, title: "2026 전교인 여름 수련회", date: "2026. 08. 15", image: "https://images.unsplash.com/photo-1529070538774-1843cb1611bb?auto=format&fit=crop&w=600&q=80" },
-    { id: 2, title: "청년부 단기 선교 파송 예배", date: "2026. 07. 22", image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80" },
-    { id: 3, title: "부활절 이웃 초청 주일", date: "2026. 04. 12", image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?auto=format&fit=crop&w=600&q=80" },
-    { id: 4, title: "제1기 제자훈련 수료식", date: "2026. 03. 28", image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=600&q=80" },
-    { id: 5, title: "유치부 여름 성경학교", date: "2026. 02. 15", image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80" },
-    { id: 6, title: "신년 특별 새벽 기도회", date: "2026. 01. 05", image: "https://images.unsplash.com/photo-1437604537877-09d5dd70ed29?auto=format&fit=crop&w=600&q=80" },
-    { id: 7, title: "성탄절 축하 찬양제", date: "2025. 12. 25", image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=600&q=80" },
-    { id: 8, title: "추수감사주일 예배", date: "2025. 11. 15", image: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80" }
-  ];
+  const [photos, setPhotos] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch('/api/posts?type=gallery')
+      .then(res => res.json())
+      .then(data => {
+        setPhotos(data.slice(0, 4));
+      })
+      .catch(err => console.error('Failed to fetch gallery:', err));
+  }, []);
 
   return (
     <section id="photo-gallery" className="bg-white text-[#111] relative py-20 md:py-24 px-4 border-t border-black/5">
@@ -901,36 +901,46 @@ function PhotoGallery() {
         </motion.div>
 
         {/* 4x2 Cards Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-10">
-          {photos.slice(0, 4).map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
-              className="group cursor-pointer flex flex-col"
-            >
-              {/* Image Container */}
-              <div className="w-full aspect-[16/9] overflow-hidden relative rounded-xl bg-gray-100 mb-3">
-                <img 
-                  src={item.image} 
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/5"></div>
-              </div>
+        {photos.length === 0 ? (
+          <div className="py-20 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            아직 등록된 사진이 없습니다.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-10">
+            {photos.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
+                className="group flex flex-col h-full"
+              >
+                <Link to={`/fellowship/gallery/${item.id}`} className="flex flex-col h-full">
+                  {/* Image Container */}
+                  <div className="w-full aspect-[16/9] overflow-hidden relative rounded-xl bg-gray-100 mb-3">
+                    <img 
+                      src={item.image_urls?.[0] || 'https://via.placeholder.com/600x400?text=No+Image'} 
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/5"></div>
+                  </div>
 
-              {/* Text Info */}
-              <div className="px-1">
-                <h3 className="text-[16px] md:text-[17px] font-bold text-black mb-1.5 leading-snug group-hover:text-[#8DC63F] transition-colors truncate">
-                  {item.title}
-                </h3>
-                <div className="text-[13px] md:text-[14px] font-medium text-gray-500 tracking-wide">{item.date}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  {/* Text Info */}
+                  <div className="px-1 flex flex-col flex-grow">
+                    <h3 className="text-[16px] md:text-[17px] font-bold text-black mb-1.5 leading-snug group-hover:text-[#8DC63F] transition-colors truncate">
+                      {item.title}
+                    </h3>
+                    <div className="text-[13px] md:text-[14px] font-medium text-gray-500 tracking-wide mt-auto">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* View More Button */}
         <motion.div 
@@ -940,9 +950,9 @@ function PhotoGallery() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-12 text-center"
         >
-          <button className="bg-transparent border border-gray-300 text-black px-10 py-3 rounded-full text-[15px] font-bold hover:bg-gray-50 hover:border-gray-400 transition-colors duration-300">
+          <Link to="/fellowship/gallery" className="inline-block bg-transparent border border-gray-300 text-black px-10 py-3 rounded-full text-[15px] font-bold hover:bg-gray-50 hover:border-gray-400 transition-colors duration-300">
             게시판 바로가기
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>
