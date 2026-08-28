@@ -1548,7 +1548,7 @@ function BusinessList() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {businesses.map((biz) => (
           <Link to={`/fellowship/business/${biz.id}`} key={biz.id} className="flex flex-col border border-[#e2e8f0] rounded-[16px] overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 no-underline hover:-translate-y-1 hover:shadow-lg group">
             <div className="w-full h-[200px] shrink-0 bg-cover bg-center border-b border-[#e2e8f0]" style={{ backgroundImage: `url(${biz.img})` }}>
