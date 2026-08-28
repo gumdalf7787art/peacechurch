@@ -594,7 +594,7 @@ function WorshipVideos() {
     <section 
       id="worship-videos" 
       className="text-white relative py-24 md:py-32 px-4 bg-fixed bg-center bg-cover bg-no-repeat"
-      style={{ backgroundImage: 'url("/korean-bible-bg.webp")' }}
+      style={{ backgroundImage: 'url("/worship-bg.webp")' }}
     >
       <div className="absolute inset-0 bg-black/70 z-0"></div>
 
