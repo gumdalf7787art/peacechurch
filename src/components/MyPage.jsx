@@ -200,7 +200,7 @@ export default function MyPage({ setIsLoggedIn }) {
       </motion.aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-[260px] relative z-10 p-8 lg:p-10 min-h-screen overflow-y-auto">
+      <main className={`flex-1 ml-[260px] relative z-10 min-h-screen overflow-y-auto ${activeMenu === 'admin-pages' ? 'p-4 lg:p-4' : 'p-8 lg:p-10'}`}>
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-[24px] font-bold text-black tracking-tight mb-1">
