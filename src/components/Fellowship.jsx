@@ -1579,12 +1579,23 @@ function BusinessWrite() {
   const [name, setName] = React.useState('');
   const [owner, setOwner] = React.useState('');
   const [category, setCategory] = React.useState('');
+  const [customCategory, setCustomCategory] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [addr, setAddr] = React.useState('');
   const [desc, setDesc] = React.useState('');
   const [files, setFiles] = React.useState([]);
   const [previews, setPreviews] = React.useState([]);
   const [isUploading, setIsUploading] = React.useState(false);
+  
+  const [errors, setErrors] = React.useState({});
+  
+  const nameRef = React.useRef(null);
+  const ownerRef = React.useRef(null);
+  const categoryRef = React.useRef(null);
+  const customCategoryRef = React.useRef(null);
+  const phoneRef = React.useRef(null);
+  const addrRef = React.useRef(null);
+  const descRef = React.useRef(null);
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -1600,12 +1611,41 @@ function BusinessWrite() {
     setFiles(newFiles);
     setPreviews(newFiles.map(f => URL.createObjectURL(f)));
   };
+  
+  const moveFile = (index, direction) => {
+    if (index + direction < 0 || index + direction >= files.length) return;
+    const newFiles = [...files];
+    const temp = newFiles[index];
+    newFiles[index] = newFiles[index + direction];
+    newFiles[index + direction] = temp;
+    
+    setFiles(newFiles);
+    setPreviews(newFiles.map(f => URL.createObjectURL(f)));
+  };
 
   const handleSubmit = async () => {
-    if (!name || !owner || !category || !phone || !addr || !desc) {
-      alert('모든 항목을 입력해주세요.');
+    let newErrors = {};
+    if (!name) newErrors.name = true;
+    if (!owner) newErrors.owner = true;
+    if (!category) newErrors.category = true;
+    if (category === '직접 입력' && !customCategory) newErrors.customCategory = true;
+    if (!phone) newErrors.phone = true;
+    if (!addr) newErrors.addr = true;
+    if (!desc) newErrors.desc = true;
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      if (newErrors.name) { nameRef.current?.focus(); nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (newErrors.owner) { ownerRef.current?.focus(); ownerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (newErrors.category) { categoryRef.current?.focus(); categoryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (newErrors.customCategory) { customCategoryRef.current?.focus(); customCategoryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (newErrors.phone) { phoneRef.current?.focus(); phoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (newErrors.addr) { addrRef.current?.focus(); addrRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      if (newErrors.desc) { descRef.current?.focus(); descRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
       return;
     }
+
     setIsUploading(true);
     let imageUrls = [];
     for (const f of files) {
@@ -1620,7 +1660,8 @@ function BusinessWrite() {
       }
     }
     
-    const extraData = { desc, phone, addr, tag: category };
+    const finalCategory = category === '직접 입력' ? customCategory : category;
+    const extraData = { desc, phone, addr, tag: finalCategory };
     
     try {
       await fetch('/api/posts', {
@@ -1649,18 +1690,18 @@ function BusinessWrite() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>사업장 이름</label>
-          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="예: 평화 베이커리" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+          <input ref={nameRef} type="text" value={name} onChange={e => { setName(e.target.value); setErrors(prev => ({...prev, name: false})); }} placeholder="예: 평화 베이커리" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s', ...(errors.name ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.name) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.name) e.target.style.borderColor = '#cbd5e1'; }} />
         </div>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>대표 성도명 (직분)</label>
-          <input type="text" value={owner} onChange={e => setOwner(e.target.value)} placeholder="예: 김평화 집사" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+          <input ref={ownerRef} type="text" value={owner} onChange={e => { setOwner(e.target.value); setErrors(prev => ({...prev, owner: false})); }} placeholder="예: 김평화 집사" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s', ...(errors.owner ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.owner) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.owner) e.target.style.borderColor = '#cbd5e1'; }} />
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '24px', marginBottom: '24px' }}>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>업종 (카테고리)</label>
-          <select value={category} onChange={e => setCategory(e.target.value)} style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', appearance: 'none', backgroundColor: '#fff', cursor: 'pointer', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}>
+          <select ref={categoryRef} value={category} onChange={e => { setCategory(e.target.value); setErrors(prev => ({...prev, category: false})); }} style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', appearance: 'none', backgroundColor: '#fff', cursor: 'pointer', transition: 'border-color 0.2s', ...(errors.category ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.category) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.category) e.target.style.borderColor = '#cbd5e1'; }}>
             <option value="">카테고리 선택</option>
             <option value="음식점">음식점</option>
             <option value="카페/베이커리">카페/베이커리</option>
@@ -1670,22 +1711,26 @@ function BusinessWrite() {
             <option value="교육/학원">교육/학원</option>
             <option value="안경/렌즈">안경/렌즈</option>
             <option value="서비스/기타">서비스/기타</option>
+            <option value="직접 입력">직접 입력</option>
           </select>
+          {category === '직접 입력' && (
+            <input ref={customCategoryRef} type="text" value={customCategory} onChange={e => { setCustomCategory(e.target.value); setErrors(prev => ({...prev, customCategory: false})); }} placeholder="업종을 직접 입력해주세요" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s', marginTop: '12px', ...(errors.customCategory ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.customCategory) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.customCategory) e.target.style.borderColor = '#cbd5e1'; }} />
+          )}
         </div>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>전화번호</label>
-          <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="예: 02-123-4567" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+          <input ref={phoneRef} type="text" value={phone} onChange={e => { setPhone(e.target.value); setErrors(prev => ({...prev, phone: false})); }} placeholder="예: 02-123-4567" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s', ...(errors.phone ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.phone) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.phone) e.target.style.borderColor = '#cbd5e1'; }} />
         </div>
       </div>
 
       <div style={{ marginBottom: '24px' }}>
         <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>사업장 주소</label>
-        <input type="text" value={addr} onChange={e => setAddr(e.target.value)} placeholder="예: 서울시 구로구 평화로 1길 10" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        <input ref={addrRef} type="text" value={addr} onChange={e => { setAddr(e.target.value); setErrors(prev => ({...prev, addr: false})); }} placeholder="예: 서울시 구로구 평화로 1길 10" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s', ...(errors.addr ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.addr) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.addr) e.target.style.borderColor = '#cbd5e1'; }} />
       </div>
 
       <div style={{ marginBottom: '32px' }}>
         <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>간략 소개 및 영업 안내</label>
-        <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="사업장에 대한 간단한 소개, 특장점, 영업시간 등을 자유롭게 적어주세요." style={{ width: '100%', minHeight: '120px', padding: '16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', lineHeight: '1.6', color: '#334155', boxSizing: 'border-box', outline: 'none', resize: 'vertical', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        <textarea ref={descRef} value={desc} onChange={e => { setDesc(e.target.value); setErrors(prev => ({...prev, desc: false})); }} placeholder="사업장에 대한 간단한 소개, 특장점, 영업시간 등을 자유롭게 적어주세요." style={{ width: '100%', minHeight: '120px', padding: '16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', lineHeight: '1.6', color: '#334155', boxSizing: 'border-box', outline: 'none', resize: 'vertical', transition: 'border-color 0.2s', ...(errors.desc ? { borderColor: '#cc0000', backgroundColor: '#fff0f0' } : {}) }} onFocus={(e) => { if(!errors.desc) e.target.style.borderColor = '#cc0000'; }} onBlur={(e) => { if(!errors.desc) e.target.style.borderColor = '#cbd5e1'; }} />
       </div>
 
       <div style={{ marginBottom: '40px' }}>
@@ -1699,13 +1744,24 @@ function BusinessWrite() {
         <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
 
         {previews.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
             {previews.map((previewUrl, index) => (
-              <div key={index} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+              <div key={index} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '12px', overflow: 'hidden', border: index === 0 ? '2px solid #cc0000' : '1px solid #e2e8f0', boxShadow: index === 0 ? '0 4px 12px rgba(204,0,0,0.15)' : 'none' }}>
                 <img src={previewUrl} alt={`미리보기 ${index + 1}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                <button onClick={(e) => { e.stopPropagation(); removeFile(index); }} style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                {index === 0 && (
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: 'rgba(204,0,0,0.8)', color: 'white', fontSize: '11px', fontWeight: 'bold', textAlign: 'center', padding: '4px 0' }}>대표 이미지</div>
+                )}
+                <button onClick={(e) => { e.stopPropagation(); removeFile(index); }} style={{ position: 'absolute', top: index === 0 ? '28px' : '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                   <X size={14} />
                 </button>
+                <div style={{ position: 'absolute', bottom: '4px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
+                  <button onClick={(e) => { e.stopPropagation(); moveFile(index, -1); }} disabled={index === 0} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === 0 ? 'default' : 'pointer', opacity: index === 0 ? 0.3 : 1 }}>
+                    <ChevronLeft size={14} />
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); moveFile(index, 1); }} disabled={index === files.length - 1} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === files.length - 1 ? 'default' : 'pointer', opacity: index === files.length - 1 ? 0.3 : 1 }}>
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
