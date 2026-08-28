@@ -914,27 +914,17 @@ function PhotoGallery() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
-                className="group flex flex-col h-full"
+                className="h-full"
               >
-                <Link to={`/fellowship/gallery/${item.id}`} className="flex flex-col h-full">
-                  {/* Image Container */}
-                  <div className="w-full aspect-[16/9] overflow-hidden relative rounded-xl bg-gray-100 mb-3">
-                    <img 
-                      src={item.image_urls?.[0] || 'https://via.placeholder.com/600x400?text=No+Image'} 
-                      alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/5"></div>
+                <Link to={`/fellowship/gallery/${item.id}`} style={{ textDecoration: 'none', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'block', height: '100%' }} className="group">
+                  <div style={{ position: 'relative', width: '100%', paddingBottom: '70%', overflow: 'hidden' }}>
+                    <img src={item.image_urls?.[0] || 'https://via.placeholder.com/500x350?text=No+Image'} alt="갤러리 사진" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} className="group-hover:scale-110" />
                   </div>
-
-                  {/* Text Info */}
-                  <div className="px-1 flex flex-col flex-grow">
-                    <h3 className="text-[16px] md:text-[17px] font-bold text-black mb-1.5 leading-snug group-hover:text-[#8DC63F] transition-colors truncate">
+                  <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', height: 'calc(100% - 70%)' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold', color: '#1f2937', transition: 'color 0.2s' }} className="group-hover:text-[#cc0000] truncate">
                       {item.title}
-                    </h3>
-                    <div className="text-[13px] md:text-[14px] font-medium text-gray-500 tracking-wide mt-auto">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </div>
+                    </h4>
+                    <p style={{ margin: 'auto 0 0 0', fontSize: '13px', color: '#94a3b8' }}>{new Date(item.created_at).toLocaleDateString()}</p>
                   </div>
                 </Link>
               </motion.div>
