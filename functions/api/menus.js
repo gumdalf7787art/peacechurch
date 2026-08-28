@@ -57,10 +57,15 @@ export async function onRequestPut(context) {
     if (Array.isArray(data)) {
       // 대량 업데이트 (순서 변경 등)
       // D1 에서는 여러 쿼리를 batch 로 실행해야 함
-      const statements = data.map(item => 
-        env.DB.prepare(`UPDATE menus SET parent_id = ?, sort_order = ?, is_active = ? WHERE id = ?`)
-          .bind(item.parent_id || null, item.sort_order, item.is_active ? 1 : 0, item.id)
-      );
+      const statements = data.map(item => {
+        if (item.name !== undefined) {
+          return env.DB.prepare(`UPDATE menus SET parent_id = ?, sort_order = ?, is_active = ?, name = ? WHERE id = ?`)
+            .bind(item.parent_id || null, item.sort_order, item.is_active ? 1 : 0, item.name, item.id);
+        } else {
+          return env.DB.prepare(`UPDATE menus SET parent_id = ?, sort_order = ?, is_active = ? WHERE id = ?`)
+            .bind(item.parent_id || null, item.sort_order, item.is_active ? 1 : 0, item.id);
+        }
+      });
       await env.DB.batch(statements);
     } else {
       // 단일 업데이트

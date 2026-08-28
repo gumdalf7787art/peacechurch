@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, GripVertical, Eye, EyeOff, Save, FolderTree, X } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Eye, EyeOff, Save, FolderTree, X, Edit3 } from 'lucide-react';
 
 export default function AdminMenuManager() {
   const [menus, setMenus] = useState([]);
@@ -10,6 +10,10 @@ export default function AdminMenuManager() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ parentId: null, name: '', slug: '', error: '' });
+  
+  // Edit Name State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editData, setEditData] = useState({ id: null, parentId: null, name: '', error: '' });
 
   useEffect(() => {
     fetchMenus();
@@ -32,9 +36,9 @@ export default function AdminMenuManager() {
     try {
       const flattened = [];
       menusArray.forEach(m => {
-        flattened.push({ id: m.id, parent_id: null, sort_order: m.sort_order, is_active: m.is_active });
+        flattened.push({ id: m.id, parent_id: null, sort_order: m.sort_order, is_active: m.is_active, name: m.name });
         m.children.forEach(c => {
-          flattened.push({ id: c.id, parent_id: m.id, sort_order: c.sort_order, is_active: c.is_active });
+          flattened.push({ id: c.id, parent_id: m.id, sort_order: c.sort_order, is_active: c.is_active, name: c.name });
         });
       });
 
@@ -178,6 +182,35 @@ export default function AdminMenuManager() {
     }
   };
 
+  const handleEditMenuClick = (menu, parentId = null) => {
+    setEditData({ id: menu.id, parentId, name: menu.name, error: '' });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubmitEditMenu = async (e) => {
+    e.preventDefault();
+    if (!editData.name) {
+      setEditData(prev => ({ ...prev, error: '메뉴 이름을 입력해주세요.' }));
+      return;
+    }
+
+    const newMenus = JSON.parse(JSON.stringify(menus));
+    if (editData.parentId === null) {
+      const idx = newMenus.findIndex(m => m.id === editData.id);
+      if (idx !== -1) newMenus[idx].name = editData.name;
+    } else {
+      const parentIdx = newMenus.findIndex(m => m.id === editData.parentId);
+      if (parentIdx !== -1) {
+        const childIdx = newMenus[parentIdx].children.findIndex(m => m.id === editData.id);
+        if (childIdx !== -1) newMenus[parentIdx].children[childIdx].name = editData.name;
+      }
+    }
+    
+    setMenus(newMenus);
+    setIsEditModalOpen(false);
+    await saveMenusToDB(newMenus);
+  };
+
   if (isLoading) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
@@ -218,6 +251,7 @@ export default function AdminMenuManager() {
                   <button onClick={() => handleToggleVisibility(menu.id)} className={`p-2 rounded-lg ${menu.is_active ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
                     {menu.is_active ? <Eye size={18}/> : <EyeOff size={18}/>}
                   </button>
+                  <button onClick={() => handleEditMenuClick(menu)} className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"><Edit3 size={18}/></button>
                   <button onClick={() => handleAddMenuClick(menu.id)} className="p-2 text-[#5227FF] bg-[#5227FF]/10 rounded-lg hover:bg-[#5227FF]/20"><Plus size={18}/></button>
                   <button onClick={() => handleDelete(menu.id)} className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100"><Trash2 size={18}/></button>
                 </div>
@@ -241,6 +275,7 @@ export default function AdminMenuManager() {
                         <button onClick={() => handleToggleVisibility(child.id, menu.id)} className={`p-1.5 rounded-md ${child.is_active ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
                           {child.is_active ? <Eye size={16}/> : <EyeOff size={16}/>}
                         </button>
+                        <button onClick={() => handleEditMenuClick(child, menu.id)} className="p-1.5 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"><Edit3 size={16}/></button>
                         <button onClick={() => handleDelete(child.id)} className="p-1.5 text-red-500 bg-red-50 rounded-md hover:bg-red-100"><Trash2 size={16}/></button>
                       </div>
                     </div>
@@ -313,6 +348,52 @@ export default function AdminMenuManager() {
                 className="w-full bg-black text-white font-bold rounded-xl py-3.5 mt-2 hover:bg-gray-800 transition-colors text-[15px]"
               >
                 메뉴 생성하기
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Edit Name Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-[400px] shadow-2xl relative"
+          >
+            <button 
+              onClick={() => setIsEditModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-[20px] font-bold text-gray-900 mb-6">메뉴 이름 변경</h3>
+            
+            <form onSubmit={handleSubmitEditMenu} className="space-y-4">
+              <div>
+                <label className="block text-[14px] font-bold text-gray-700 mb-2">새로운 메뉴 이름</label>
+                <input 
+                  type="text" 
+                  value={editData.name}
+                  onChange={(e) => setEditData({...editData, name: e.target.value, error: ''})}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-black outline-none transition-all text-[15px]"
+                  autoFocus
+                />
+              </div>
+
+              {editData.error && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[13px] font-medium flex items-center">
+                  <span className="mr-2">⚠️</span>
+                  {editData.error}
+                </div>
+              )}
+
+              <button 
+                type="submit"
+                className="w-full bg-black text-white font-bold rounded-xl py-3.5 mt-2 hover:bg-gray-800 transition-colors text-[15px]"
+              >
+                변경 사항 저장
               </button>
             </form>
           </motion.div>
