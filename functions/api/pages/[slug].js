@@ -3,7 +3,7 @@ export async function onRequestGet(context) {
   const slug = params.slug;
 
   try {
-    const page = await env.DB.prepare("SELECT * FROM pages WHERE slug = ?").bind(slug).first();
+    const page = await env.DB.prepare("SELECT * FROM subpages WHERE slug = ?").bind(slug).first();
     if (!page) {
       return new Response(JSON.stringify({ success: false, message: 'Page not found' }), { status: 404 });
     }
@@ -21,15 +21,23 @@ export async function onRequestPut(context) {
 
   try {
     const data = await request.json();
-    const { title, content } = data;
+    const { menu_id, title, subtitle, banner_image, content, is_published } = data;
 
     if (!title) {
       return new Response(JSON.stringify({ success: false, message: 'Title is required' }), { status: 400 });
     }
 
     const result = await env.DB.prepare(
-      "UPDATE pages SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?"
-    ).bind(title, content || '', slug).run();
+      "UPDATE subpages SET menu_id = ?, title = ?, subtitle = ?, banner_image = ?, content = ?, is_published = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?"
+    ).bind(
+      menu_id || null, 
+      title, 
+      subtitle || '', 
+      banner_image || '', 
+      content || '', 
+      is_published === undefined ? 1 : is_published,
+      slug
+    ).run();
 
     if (result.meta.changes === 0) {
       return new Response(JSON.stringify({ success: false, message: 'Page not found' }), { status: 404 });
@@ -48,7 +56,7 @@ export async function onRequestDelete(context) {
   const slug = params.slug;
 
   try {
-    const result = await env.DB.prepare("DELETE FROM pages WHERE slug = ?").bind(slug).run();
+    const result = await env.DB.prepare("DELETE FROM subpages WHERE slug = ?").bind(slug).run();
     if (result.meta.changes === 0) {
       return new Response(JSON.stringify({ success: false, message: 'Page not found' }), { status: 404 });
     }
