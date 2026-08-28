@@ -298,9 +298,30 @@ function GraceWrite() {
       }
     } else if (command === 'insertQuote') {
       const selection = window.getSelection();
-      const text = selection.toString() || '인용구를 입력하세요...';
-      const quoteHtml = `<blockquote style="border-left: 4px solid #cc0000; padding: 16px; margin: 16px 0; color: #444; background-color: #f8fafc; font-size: 16px;">${text}</blockquote><p><br></p>`;
+      let text = selection.toString();
+      let isPlaceholder = false;
+      if (!text || text.trim() === '') {
+        text = '인용구를 입력하세요...';
+        isPlaceholder = true;
+      }
+      
+      const quoteId = 'quote-' + Date.now();
+      const quoteHtml = `<blockquote id="${quoteId}" style="border-left: 4px solid #cc0000; padding: 16px; margin: 16px 0; color: #444; background-color: #f8fafc; font-size: 16px;">${text}</blockquote><p><br></p>`;
       document.execCommand('insertHTML', false, quoteHtml);
+      
+      if (isPlaceholder) {
+        setTimeout(() => {
+          const el = document.getElementById(quoteId);
+          if (el) {
+            el.removeAttribute('id'); // Clean up
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }, 0);
+      }
     } else {
       document.execCommand(command, false, value);
     }
