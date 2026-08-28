@@ -245,6 +245,11 @@ function GraceWrite() {
       if (url) {
         document.execCommand(command, false, url);
       }
+    } else if (command === 'insertQuote') {
+      const selection = window.getSelection();
+      const text = selection.toString() || '인용구를 입력하세요...';
+      const quoteHtml = `<blockquote style="border-left: 4px solid #cc0000; padding: 16px; margin: 16px 0; color: #444; background-color: #f8fafc; font-size: 16px;">${text}</blockquote><p><br></p>`;
+      document.execCommand('insertHTML', false, quoteHtml);
     } else {
       document.execCommand(command, false, value);
     }
@@ -373,7 +378,7 @@ function GraceWrite() {
             <span style={{ fontSize: '12px' }}>사진</span>
           </TopToolbarButton>
 
-          <TopToolbarButton title="인용구" onClick={() => formatText('formatBlock', 'blockquote')}>
+          <TopToolbarButton title="인용구" onClick={() => formatText('insertQuote')}>
             <Quote size={22} color="#666" strokeWidth={1.5} />
             <span style={{ fontSize: '12px' }}>인용구</span>
           </TopToolbarButton>
