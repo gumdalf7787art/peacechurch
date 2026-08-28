@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import AdminMenuManager from './AdminMenuManager';
 import AdminHomeManager from './AdminHomeManager';
+import AdminPagesManager from './AdminPagesManager';
 
 export default function MyPage({ setIsLoggedIn }) {
   const navigate = useNavigate();
@@ -332,7 +333,9 @@ export default function MyPage({ setIsLoggedIn }) {
         {/* Admin Views */}
         {activeMenu === 'admin-menu' && <AdminMenuManager />}
         {activeMenu === 'admin-home' && <AdminHomeManager />}
-        {['admin-pages', 'admin-media'].includes(activeMenu) && (
+        {activeMenu === 'admin-pages' && <AdminPagesManager />}
+        
+        {activeMenu === 'admin-media' && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
