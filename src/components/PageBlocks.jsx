@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Flame, Users, Heart, Globe, Image as ImageIcon } from 'lucide-react';
+import { BookOpen, Flame, Users, Heart, Globe, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 
 // -------------------------------------------------------------
 // ICON MAP
@@ -387,6 +387,7 @@ export function WorshipScheduleBlock({ data, isEditMode, onChange }) {
               <th className="w-[15%] py-3.5 bg-gray-50 border-b border-gray-200 text-gray-600 font-bold">시간</th>
               <th className="w-[25%] py-3.5 bg-gray-50 border-b border-gray-200 text-gray-600 font-bold">장소</th>
               <th className="w-[45%] py-3.5 bg-gray-50 border-b border-gray-200 text-gray-600 font-bold">안내</th>
+              {isEditMode && <th className="w-[10%] py-3.5 bg-gray-50 border-b border-gray-200 text-gray-400 font-bold">관리</th>}
             </tr>
           </thead>
           <tbody>
@@ -441,11 +442,40 @@ export function WorshipScheduleBlock({ data, isEditMode, onChange }) {
                     placeholder="안내 내용"
                   />
                 </td>
+                {isEditMode && (
+                  <td className="py-3 border-b border-gray-200 text-center align-middle">
+                    <button 
+                      onClick={() => {
+                        const newSchedules = data.schedules.filter((_, i) => i !== idx);
+                        onChange({ schedules: newSchedules });
+                      }}
+                      className="text-red-400 hover:text-red-600 p-1 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+                      title="행 삭제"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      
+      {isEditMode && (
+        <div className="mt-4 flex justify-center">
+          <button 
+            onClick={() => {
+              const newSchedules = [...(data.schedules || []), { name: '', time: '', location: '', description: '' }];
+              onChange({ schedules: newSchedules });
+            }}
+            className="flex items-center text-[13px] text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-lg font-bold transition-colors"
+          >
+            <Plus size={16} className="mr-1" />
+            예배 일정 추가
+          </button>
+        </div>
+      )}
     </section>
   );
 }
