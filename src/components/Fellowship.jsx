@@ -17,6 +17,15 @@ function GraceDetail() {
   const isAdmin = userProfile && userProfile.role === 'admin';
 
   React.useEffect(() => {
+    if (id) {
+      // Increment view count
+      fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, increment_view: true })
+      });
+    }
+
     fetch(`/api/posts?type=grace${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
@@ -64,8 +73,12 @@ function GraceDetail() {
           <span>작성자: {post.author}</span>
           <span style={{ color: '#ccc' }}>|</span>
           <span>등록일: {new Date(post.created_at).toLocaleDateString()}</span>
-          <span style={{ color: '#ccc' }}>|</span>
-          <span>조회수: {post.views}</span>
+          {isAdmin && (
+            <>
+              <span style={{ color: '#ccc' }}>|</span>
+              <span>조회수: {post.views}</span>
+            </>
+          )}
         </div>
       </div>
       
@@ -150,7 +163,7 @@ function GraceList() {
               <th className="py-4 px-2 font-semibold text-[#475569]">제목</th>
               <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">작성자</th>
               <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">등록일</th>
-              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>
+              {isAdmin && <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>}
             </tr>
           </thead>
           <tbody>
@@ -174,13 +187,17 @@ function GraceList() {
                       <span>{post.author}</span>
                       <span className="text-[#e2e8f0]">|</span>
                       <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                      <span className="text-[#e2e8f0]">|</span>
-                      <span>조회 {post.views}</span>
+                      {isAdmin && (
+                        <>
+                          <span className="text-[#e2e8f0]">|</span>
+                          <span>조회 {post.views}</span>
+                        </>
+                      )}
                     </div>
                   </td>
                   <td className="hidden sm:table-cell py-4 px-2 text-[#64748b]">{post.author}</td>
                   <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{new Date(post.created_at).toLocaleDateString()}</td>
-                  <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.views}</td>
+                  {isAdmin && <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.views}</td>}
                 </tr>
               ))
             )}
@@ -735,6 +752,14 @@ function GalleryDetail() {
   const isAdmin = userProfile && userProfile.role === 'admin';
   
   React.useEffect(() => {
+    if (id) {
+      fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, increment_view: true })
+      });
+    }
+
     fetch(`/api/posts?type=gallery${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
@@ -782,8 +807,12 @@ function GalleryDetail() {
           <span>작성자: {album.author}</span>
           <span style={{ color: '#ccc' }}>|</span>
           <span>등록일: {new Date(album.created_at).toLocaleDateString()}</span>
-          <span style={{ color: '#ccc' }}>|</span>
-          <span>조회수: {album.views}</span>
+          {isAdmin && (
+            <>
+              <span style={{ color: '#ccc' }}>|</span>
+              <span>조회수: {album.views}</span>
+            </>
+          )}
         </div>
       </div>
       

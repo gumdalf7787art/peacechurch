@@ -106,8 +106,13 @@ export async function onRequestPut(context) {
   const { request, env } = context;
   try {
     const data = await request.json();
-    const { id, title, content, image_urls, is_private } = data;
+    const { id, title, content, image_urls, is_private, increment_view } = data;
     if (!id) return new Response("Missing id", { status: 400 });
+
+    if (increment_view) {
+      await env.DB.prepare(`UPDATE posts SET views = views + 1 WHERE id = ?`).bind(id).run();
+      return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
+    }
 
     const updates = [];
     const values = [];
