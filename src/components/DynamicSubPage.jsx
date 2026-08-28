@@ -7,25 +7,43 @@ export default function DynamicSubPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In the future (Phase 3), this will fetch actual HTML/JSON content from /api/pages?path=${location.pathname}
-    // For now, we simulate fetching content and show a generic placeholder if it's a new CMS page.
+    // Extract slug from pathname (e.g. /about/pastor -> pastor)
+    const slug = location.pathname.split('/').pop();
+    if (!slug) return;
+
     setLoading(true);
-    setTimeout(() => {
-      setContent({
-        title: '페이지 준비중',
-        body: `
-          <div style="text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd;">
-            <div style="font-size: 48px; margin-bottom: 20px;">🚧</div>
-            <h3 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 12px;">현재 페이지는 내용이 비어있습니다.</h3>
-            <p style="color: #666; font-size: 15px; line-height: 1.6;">
-              이 페이지는 관리자 메뉴에서 새롭게 생성된 페이지입니다.<br/>
-              향후 <strong>[서브 페이지 편집]</strong> 기능을 통해 내용을 작성하실 수 있습니다.
-            </p>
-          </div>
-        `
+    fetch(`/api/pages/${slug}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.page && data.page.is_published === 1) {
+          setContent({
+            title: data.page.title,
+            body: data.page.content
+          });
+        } else {
+          // If not found in DB, show a generic placeholder
+          setContent({
+            title: '페이지 준비중',
+            body: `
+              <div style="text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🚧</div>
+                <h3 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 12px;">현재 페이지는 내용이 비어있거나 생성되지 않았습니다.</h3>
+                <p style="color: #666; font-size: 15px; line-height: 1.6;">
+                  이 페이지는 관리자 메뉴에서 새롭게 생성된 페이지이거나 아직 작성되지 않은 페이지입니다.<br/>
+                  향후 <strong>[서브 페이지 편집]</strong> 기능을 통해 내용을 작성하실 수 있습니다.
+                </p>
+              </div>
+            `
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch page content:', err);
+        setContent(null);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      setLoading(false);
-    }, 300);
   }, [location.pathname]);
 
   if (loading) {
@@ -36,8 +54,10 @@ export default function DynamicSubPage() {
     );
   }
 
+  if (!content) return null;
+
   return (
-    <div className="w-full">
+    <div className="w-full prose max-w-none prose-lg prose-headings:font-bold prose-a:text-[#8DC63F]">
       <div dangerouslySetInnerHTML={{ __html: content.body }} />
     </div>
   );
