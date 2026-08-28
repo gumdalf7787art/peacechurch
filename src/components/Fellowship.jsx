@@ -1548,21 +1548,21 @@ function BusinessList() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {businesses.map((biz) => (
-          <Link to={`/fellowship/business/${biz.id}`} key={biz.id} className="flex flex-col sm:flex-row border border-[#e2e8f0] rounded-[16px] overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 no-underline hover:-translate-y-1 hover:shadow-lg group">
-            <div className="w-full sm:w-[160px] h-[200px] sm:h-auto shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${biz.img})` }}>
+          <Link to={`/fellowship/business/${biz.id}`} key={biz.id} className="flex flex-col border border-[#e2e8f0] rounded-[16px] overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 no-underline hover:-translate-y-1 hover:shadow-lg group">
+            <div className="w-full h-[200px] shrink-0 bg-cover bg-center border-b border-[#e2e8f0]" style={{ backgroundImage: `url(${biz.img})` }}>
             </div>
-            <div style={{ padding: '24px', flex: 1 }}>
+            <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#0f172a', transition: 'color 0.2s' }} className="group-hover:text-[#cc0000]">{biz.name}</h4>
-                <span style={{ fontSize: '12px', backgroundColor: '#cc0000', color: '#fff', padding: '4px 10px', borderRadius: '12px', fontWeight: '500' }}>{biz.tag}</span>
+                <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#0f172a', transition: 'color 0.2s', paddingRight: '8px' }} className="group-hover:text-[#cc0000]">{biz.name}</h4>
+                <span style={{ fontSize: '12px', backgroundColor: '#cc0000', color: '#fff', padding: '4px 10px', borderRadius: '12px', fontWeight: '500', whiteSpace: 'nowrap' }}>{biz.tag}</span>
               </div>
               <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#0f172a', fontWeight: '600' }}>대표: {biz.owner}</p>
-              <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#475569', lineHeight: '1.5', wordBreak: 'keep-all' }}>{biz.desc}</p>
-              <div style={{ fontSize: '13px', color: '#64748b', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: '#475569', lineHeight: '1.5', wordBreak: 'keep-all', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{biz.desc}</p>
+              <div style={{ marginTop: 'auto', fontSize: '13px', color: '#64748b', display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '16px', textAlign: 'center' }}>📞</span> {biz.phone}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '16px', textAlign: 'center' }}>📍</span> {biz.addr}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ display: 'inline-block', width: '16px', textAlign: 'center' }}>📍</span> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{biz.addr}</span></div>
               </div>
             </div>
           </Link>
