@@ -11,7 +11,10 @@ export default function AdminHomeManager() {
 
   const pendingSaves = useRef({});
   const triggerAutoSave = (key, value) => {
-    if (key) pendingSaves.current[key] = value;
+    // Only accept valid CMS keys (string starting with 'cms_')
+    if (key && typeof key === 'string' && key.startsWith('cms_')) {
+      pendingSaves.current[key] = value;
+    }
     setIsSaving(true);
     setSaveError(false);
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -376,7 +379,6 @@ export default function AdminHomeManager() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-5xl space-y-6 pb-20"
-      onChange={triggerAutoSave}
     >
       {/* Header */}
       <div className="flex justify-between items-end mb-8 border-b border-gray-200 pb-6">

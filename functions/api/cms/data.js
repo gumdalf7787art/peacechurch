@@ -35,8 +35,17 @@ export async function onRequestPost(context) {
     
     let items = Array.isArray(body) ? body : [body];
     
+    // Filter out invalid items (e.g., missing id or undefined value)
+    items = items.filter(item => item.id && typeof item.id === 'string' && item.id.startsWith('cms_') && item.value !== undefined);
+    
+    if (items.length === 0) {
+      return new Response(JSON.stringify({ success: true, message: 'No valid items to save' }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const statements = items.map(item => {
-      const val = typeof item.value === 'object' ? JSON.stringify(item.value) : item.value;
+      const val = typeof item.value === 'object' ? JSON.stringify(item.value) : String(item.value);
       return env.DB.prepare(
         'INSERT INTO cms_settings (id, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP'
       ).bind(item.id, val);
