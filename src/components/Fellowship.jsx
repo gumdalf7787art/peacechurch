@@ -196,6 +196,7 @@ function GraceWrite() {
   // Editor active styles
   const [currentColor, setCurrentColor] = React.useState('#1d1d1f');
   const [currentBgColor, setCurrentBgColor] = React.useState('transparent');
+  const [showColorPicker, setShowColorPicker] = React.useState(null);
   
   const fileInputRef = React.useRef(null);
   const photoInputRef = React.useRef(null);
@@ -224,10 +225,19 @@ function GraceWrite() {
         }
       }
     };
+    
+    const handleGlobalClick = (e) => {
+      if (!e.target.closest('.color-picker-container')) {
+        setShowColorPicker(null);
+      }
+    };
+
     document.addEventListener('click', handleAnchorClick, true);
+    document.addEventListener('mousedown', handleGlobalClick);
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('click', handleAnchorClick, true);
+      document.removeEventListener('mousedown', handleGlobalClick);
     };
   }, [isDirty]);
 
@@ -252,6 +262,31 @@ function GraceWrite() {
     } catch (e) {
       // ignore
     }
+  };
+  
+  const STANDARD_COLORS = ['#000000', '#555555', '#cc0000', '#ff8c00', '#facc15', '#22c55e', '#3b82f6', '#6366f1', '#a855f7', '#ffffff'];
+
+  const renderColorDropdown = (type) => {
+    if (showColorPicker !== type) return null;
+    const isText = type === 'text';
+    return (
+      <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: '#fff', border: '1px solid #d2d2d7', borderRadius: '8px', padding: '8px', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', width: '150px' }}>
+        {STANDARD_COLORS.map(c => (
+          <button 
+            key={c} 
+            title={c}
+            onClick={() => { formatText(isText ? 'foreColor' : 'hiliteColor', c); setShowColorPicker(null); }} 
+            style={{ width: '22px', height: '22px', backgroundColor: c, border: c === '#ffffff' ? '1px solid #d2d2d7' : 'none', borderRadius: '4px', cursor: 'pointer', transition: 'transform 0.1s' }} 
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          />
+        ))}
+        <div style={{ gridColumn: '1 / span 5', position: 'relative', marginTop: '4px', height: '28px', backgroundColor: '#f8fafc', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', color: '#475569', cursor: 'pointer', border: '1px solid #cbd5e1', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}>
+          <span style={{ pointerEvents: 'none', fontWeight: '500' }}>직접 선택...</span>
+          <input type="color" onChange={(e) => { formatText(isText ? 'foreColor' : 'hiliteColor', e.target.value); setShowColorPicker(null); }} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
+        </div>
+      </div>
+    );
   };
 
   // WYSIWYG Editor Commands
@@ -444,23 +479,23 @@ function GraceWrite() {
 
           <div style={{ width: '1px', height: '16px', backgroundColor: '#ddd', margin: '0 8px' }} />
 
-          <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-            <BottomToolbarButton title="글자색">
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="color-picker-container" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+            <BottomToolbarButton title="글자색" onClick={() => setShowColorPicker(prev => prev === 'text' ? null : 'text')}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
                 <Type size={14} color="#555" style={{ marginBottom: '2px' }} />
                 <div style={{ width: '12px', height: '3px', backgroundColor: currentColor, borderRadius: '2px', border: currentColor === '#ffffff' ? '1px solid #ddd' : 'none' }} />
               </div>
-              <input type="color" onChange={(e) => formatText('foreColor', e.target.value)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
             </BottomToolbarButton>
+            {renderColorDropdown('text')}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-            <BottomToolbarButton title="배경색">
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="color-picker-container" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+            <BottomToolbarButton title="배경색" onClick={() => setShowColorPicker(prev => prev === 'bg' ? null : 'bg')}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
                 <Highlighter size={14} color="#555" style={{ marginBottom: '2px' }} />
                 <div style={{ width: '12px', height: '3px', backgroundColor: currentBgColor === 'transparent' ? '#fff' : currentBgColor, borderRadius: '2px', border: '1px solid #ddd' }} />
               </div>
-              <input type="color" onChange={(e) => formatText('hiliteColor', e.target.value)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
             </BottomToolbarButton>
+            {renderColorDropdown('bg')}
           </div>
 
           <div style={{ width: '1px', height: '16px', backgroundColor: '#ddd', margin: '0 8px' }} />
