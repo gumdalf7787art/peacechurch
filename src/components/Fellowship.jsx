@@ -83,24 +83,26 @@ function GraceList() {
         <Link to="/fellowship/grace/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>글쓰기</Link>
       </div>
       
-      {posts.length === 0 ? (
-        <div className="py-20 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-          아직 등록된 게시물이 없습니다.
-        </div>
-      ) : (
-        <div className="w-full">
-          <table className="w-full border-t-[2px] border-[#333] border-collapse text-center text-[15px]">
-            <thead>
-              <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-                <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">번호</th>
-                <th className="py-4 px-2 font-semibold text-[#475569]">제목</th>
-                <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">작성자</th>
-                <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">등록일</th>
-                <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>
+      <div className="w-full">
+        <table className="w-full border-t-[2px] border-[#333] border-collapse text-center text-[15px]">
+          <thead>
+            <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">번호</th>
+              <th className="py-4 px-2 font-semibold text-[#475569]">제목</th>
+              <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">작성자</th>
+              <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">등록일</th>
+              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="py-20 text-center text-gray-500 bg-gray-50 border-b border-[#e2e8f0]">
+                  아직 등록된 게시물이 없습니다.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {posts.map((post, idx) => (
+            ) : (
+              posts.map((post, idx) => (
                 <tr key={post.id} className="border-b border-[#f1f5f9] group">
                   <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{posts.length - idx}</td>
                   <td className="py-4 px-2 text-left">
@@ -120,11 +122,11 @@ function GraceList() {
                   <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{new Date(post.created_at).toLocaleDateString()}</td>
                   <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.views}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       {posts.length > 0 && (
@@ -290,9 +292,20 @@ function GraceWrite() {
       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '12px 20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
           <ToolbarButton title="글꼴 설정"><Type size={18} /></ToolbarButton>
+          <ToolbarButton title="글자 크기"><span style={{ fontSize: '13px', fontWeight: 'bold' }}>15px</span></ToolbarButton>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
           <ToolbarButton title="굵게"><Bold size={18} /></ToolbarButton>
+          <ToolbarButton title="기울임"><Italic size={18} /></ToolbarButton>
+          <ToolbarButton title="밑줄"><Underline size={18} /></ToolbarButton>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
+          <ToolbarButton title="왼쪽 정렬"><AlignLeft size={18} /></ToolbarButton>
+          <ToolbarButton title="가운데 정렬"><AlignCenter size={18} /></ToolbarButton>
+          <ToolbarButton title="오른쪽 정렬"><AlignRight size={18} /></ToolbarButton>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <ToolbarButton title="링크 삽입"><Link2 size={18} /></ToolbarButton>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>

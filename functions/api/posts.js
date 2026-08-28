@@ -24,6 +24,7 @@ export async function onRequestGet(context) {
   const { request, env } = context;
   try {
     const url = new URL(request.url);
+    const type = url.searchParams.get('type') || 'gallery';
     const admin = url.searchParams.get('admin') === 'true';
     let query = `SELECT * FROM posts WHERE type = ?`;
     if (!admin) {
@@ -36,9 +37,11 @@ export async function onRequestGet(context) {
       const dbRes = await env.DB.prepare(query).bind(type).all();
       results = dbRes.results;
     } catch (e) {
-      if (e.message.includes('no such table')) {
+      if (e.message.includes('no such table') || e.message.includes('no such column')) {
         await ensureTable(env);
-        results = [];
+        // Retry once after ensuring table/columns exist
+        const retryRes = await env.DB.prepare(query).bind(type).all();
+        results = retryRes.results;
       } else {
         throw e;
       }
