@@ -3,7 +3,7 @@ import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
 import { Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Image as ImageIcon, Link2, List, ListOrdered, Settings2, Paperclip, UploadCloud, X, Smile, Quote, Minus, FileText, Table, Strikethrough, Highlighter } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Image as ImageIcon, Link2, List, ListOrdered, Settings2, Paperclip, UploadCloud, X, Smile, Quote, Minus, FileText, Table, Strikethrough, Highlighter, Share2 } from 'lucide-react';
 
 /* ─────────────────────────── Sub-page Components ─────────────────────────── */
 
@@ -68,6 +68,33 @@ function GraceDetail() {
     }
   };
 
+  const handleNativeShare = async () => {
+    const url = window.location.href;
+    const shareData = {
+      title: post.title,
+      text: '평화교회 게시물을 확인해보세요!',
+      url: url
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
+    } else {
+      alert('현재 브라우저에서는 기본 공유 기능을 지원하지 않습니다.\n아래 링크 복사하기를 이용해주세요.');
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      alert('링크가 복사되었습니다!');
+    } catch (err) {
+      alert('링크 복사에 실패했습니다.');
+    }
+  };
+
   if (!post) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
@@ -105,6 +132,17 @@ function GraceDetail() {
           style={{ marginTop: '20px', wordBreak: 'break-word' }} 
           dangerouslySetInnerHTML={{ __html: post.content }} 
         />
+        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '60px' }}>
+          <button onClick={handleNativeShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', maxWidth: '300px', padding: '14px 24px', backgroundColor: '#fef3c7', color: '#d97706', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fde68a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fef3c7'}>
+            <Share2 size={20} />
+            공유하기
+          </button>
+          <button onClick={handleCopyLink} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', maxWidth: '300px', padding: '14px 24px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
+            <Link2 size={20} />
+            링크 복사하기
+          </button>
+        </div>
       </div>
       
       <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -811,6 +849,33 @@ function GalleryDetail() {
     }
   };
 
+  const handleNativeShare = async () => {
+    const url = window.location.href;
+    const shareData = {
+      title: album.title,
+      text: '평화교회 게시물을 확인해보세요!',
+      url: url
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
+    } else {
+      alert('현재 브라우저에서는 기본 공유 기능을 지원하지 않습니다.\n아래 링크 복사하기를 이용해주세요.');
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      alert('링크가 복사되었습니다!');
+    } catch (err) {
+      alert('링크 복사에 실패했습니다.');
+    }
+  };
+
   if (!album) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
@@ -840,6 +905,17 @@ function GalleryDetail() {
           </div>
         ))}
         <p style={{ textAlign: 'left', padding: '0 16px', whiteSpace: 'pre-wrap' }}>{album.content}</p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '60px' }}>
+          <button onClick={handleNativeShare} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', maxWidth: '300px', padding: '14px 24px', backgroundColor: '#fef3c7', color: '#d97706', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fde68a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fef3c7'}>
+            <Share2 size={20} />
+            공유하기
+          </button>
+          <button onClick={handleCopyLink} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', maxWidth: '300px', padding: '14px 24px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
+            <Link2 size={20} />
+            링크 복사하기
+          </button>
+        </div>
       </div>
       
       <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
