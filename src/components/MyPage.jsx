@@ -15,6 +15,17 @@ export default function MyPage({ setIsLoggedIn }) {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
+  const handleNavigation = (action) => {
+    if (hasUnsavedChanges) {
+      if (!window.confirm("저장되지 않은 변경사항이 있습니다. 정말 이동하시겠습니까?\n이동하면 변경사항이 삭제됩니다.")) {
+        return;
+      }
+      setHasUnsavedChanges(false);
+    }
+    action();
+  };
   
   // 로그인 시 저장한 유저 정보 불러오기
   const [userProfile, setUserProfile] = useState(() => {
@@ -121,7 +132,7 @@ export default function MyPage({ setIsLoggedIn }) {
       >
         {/* Logo & Back */}
         <div className="h-[70px] flex items-center px-6 border-b border-black/5 justify-between">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+          <div className="flex items-center cursor-pointer" onClick={() => handleNavigation(() => navigate('/'))}>
             <img src="/logo.jpg" alt="평화교회 로고" className="w-7 h-7 object-cover rounded-lg mr-2 shadow-sm border border-black/5" />
             <span className="font-display font-bold text-[16px] text-black tracking-tight">평화교회</span>
           </div>
@@ -152,7 +163,7 @@ export default function MyPage({ setIsLoggedIn }) {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveMenu(item.id)}
+                onClick={() => handleNavigation(() => setActiveMenu(item.id))}
                 className={`w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-[14px] font-medium ${
                   isActive 
                     ? 'bg-black text-white shadow-md' 
@@ -171,14 +182,14 @@ export default function MyPage({ setIsLoggedIn }) {
         {/* Footer Actions */}
         <div className="p-4 border-t border-black/5">
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => handleNavigation(() => navigate('/'))}
             className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-[14px] font-medium text-gray-500 hover:bg-gray-100 hover:text-black"
           >
             <ArrowLeft size={18} className="mr-3 text-gray-400" />
             메인으로 돌아가기
           </button>
           <button 
-            onClick={async () => {
+            onClick={() => handleNavigation(async () => {
               if (window.confirm("로그아웃 하시겠습니까?")) {
                 try {
                   await fetch('/api/auth/logout', { method: 'POST' });
@@ -190,7 +201,7 @@ export default function MyPage({ setIsLoggedIn }) {
                 if (setIsLoggedIn) setIsLoggedIn(false);
                 navigate('/');
               }
-            }}
+            })}
             className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-[14px] font-medium text-red-500 hover:bg-red-50 mt-1"
           >
             <LogOut size={18} className="mr-3" />
@@ -333,7 +344,7 @@ export default function MyPage({ setIsLoggedIn }) {
         {/* Admin Views */}
         {activeMenu === 'admin-menu' && <AdminMenuManager />}
         {activeMenu === 'admin-home' && <AdminHomeManager />}
-        {activeMenu === 'admin-pages' && <AdminPagesManager />}
+        {activeMenu === 'admin-pages' && <AdminPagesManager setHasUnsavedChanges={setHasUnsavedChanges} />}
         
         {activeMenu === 'admin-media' && (
           <motion.div 

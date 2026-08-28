@@ -12,7 +12,7 @@ import BlockLibrary from './BlockLibrary';
 // Helper to generate IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export default function AdminPagesManager() {
+export default function AdminPagesManager({ setHasUnsavedChanges }) {
   const [pages, setPages] = useState([]);
   const [menus, setMenus] = useState([]);
   const [selectedMenu, setSelectedMenu] = useState(null);
@@ -59,6 +59,21 @@ export default function AdminPagesManager() {
       console.error('Failed to fetch data', error);
     }
   };
+
+  useEffect(() => {
+    if (setHasUnsavedChanges && initialFormData) {
+      const isDirty = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+      setHasUnsavedChanges(isDirty);
+    }
+    const handleBeforeUnload = (e) => {
+      if (initialFormData && JSON.stringify(formData) !== JSON.stringify(initialFormData)) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, initialFormData, setHasUnsavedChanges]);
 
   const confirmLeave = () => {
     if (initialFormData && JSON.stringify(formData) !== JSON.stringify(initialFormData)) {
@@ -167,6 +182,7 @@ export default function AdminPagesManager() {
       if (data.success) {
         alert(isUpdate ? '저장되었습니다.' : '새 페이지가 생성 및 저장되었습니다.');
         setInitialFormData(formData); // Update initial state to current saved state
+        if (setHasUnsavedChanges) setHasUnsavedChanges(false);
         await fetchData();
       } else {
         alert(data.message || '오류가 발생했습니다.');
