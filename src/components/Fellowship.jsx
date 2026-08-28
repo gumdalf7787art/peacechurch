@@ -373,11 +373,6 @@ function GraceWrite() {
             <span style={{ fontSize: '12px' }}>사진</span>
           </TopToolbarButton>
 
-          <TopToolbarButton title="스티커" onClick={() => alert('준비 중인 기능입니다.')}>
-            <Smile size={22} color="#666" strokeWidth={1.5} />
-            <span style={{ fontSize: '12px' }}>스티커</span>
-          </TopToolbarButton>
-
           <TopToolbarButton title="인용구" onClick={() => formatText('formatBlock', 'blockquote')}>
             <Quote size={22} color="#666" strokeWidth={1.5} />
             <span style={{ fontSize: '12px' }}>인용구</span>
@@ -397,11 +392,6 @@ function GraceWrite() {
           <TopToolbarButton title="파일" onClick={() => fileInputRef.current.click()}>
             <FileText size={22} color="#666" strokeWidth={1.5} />
             <span style={{ fontSize: '12px' }}>파일</span>
-          </TopToolbarButton>
-
-          <TopToolbarButton title="표" onClick={() => alert('준비 중인 기능입니다.')}>
-            <Table size={22} color="#666" strokeWidth={1.5} />
-            <span style={{ fontSize: '12px' }}>표</span>
           </TopToolbarButton>
         </div>
 
