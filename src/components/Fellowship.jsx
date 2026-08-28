@@ -151,11 +151,9 @@ function GraceDetail() {
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={() => navigate(`/fellowship/grace/edit/${post.id}`)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>수정</button>
               <button onClick={handleDelete} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#cc0000', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>삭제</button>
-              {isAdmin && (
-                <button onClick={handleTogglePrivate} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  {post.is_private ? '공개로 전환' : '비공개로 전환'}
-                </button>
-              )}
+              <button onClick={handleTogglePrivate} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>
+                {post.is_private ? '공개로 전환' : '비공개로 전환'}
+              </button>
             </div>
           )}
         </div>
@@ -920,7 +918,7 @@ function GalleryDetail() {
       
       <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          {isAdmin && (
+          {(isAdmin || (userProfile && album && userProfile.name === album.author)) && (
             <div style={{ display: 'flex', gap: '8px' }}>
               <Link to={`/fellowship/gallery/edit/${album.id}`} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none' }}>수정</Link>
               <button onClick={handleDelete} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#cc0000', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>삭제</button>
