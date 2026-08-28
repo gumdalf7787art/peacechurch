@@ -90,10 +90,10 @@ function GraceDetail() {
         <div>
           {(isAdmin || (userProfile && userProfile.name === post.author)) && (
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={() => navigate(`/fellowship/grace/edit/${post.id}`)} style={{ padding: '8px 16px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
-              <button onClick={handleDelete} style={{ padding: '8px 16px', backgroundColor: '#fee2e2', border: '1px solid #f87171', color: '#b91c1c', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
+              <button onClick={() => navigate(`/fellowship/grace/edit/${post.id}`)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>수정</button>
+              <button onClick={handleDelete} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#cc0000', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>삭제</button>
               {isAdmin && (
-                <button onClick={handleTogglePrivate} style={{ padding: '8px 16px', backgroundColor: post.is_private ? '#e2e8f0' : '#fef08a', border: '1px solid #cbd5e1', color: '#334155', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                <button onClick={handleTogglePrivate} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>
                   {post.is_private ? '공개로 전환' : '비공개로 전환'}
                 </button>
               )}
