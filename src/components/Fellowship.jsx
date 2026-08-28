@@ -193,6 +193,10 @@ function GraceWrite() {
   const [showExitModal, setShowExitModal] = React.useState(false);
   const [pendingPath, setPendingPath] = React.useState(null);
   
+  // Editor active styles
+  const [currentColor, setCurrentColor] = React.useState('#1d1d1f');
+  const [currentBgColor, setCurrentBgColor] = React.useState('transparent');
+  
   const fileInputRef = React.useRef(null);
   const photoInputRef = React.useRef(null);
   const editorRef = React.useRef(null);
@@ -238,6 +242,18 @@ function GraceWrite() {
     setFiles(prev => prev.filter((_, i) => i !== idx));
   };
 
+  const updateCurrentStyles = () => {
+    try {
+      const fg = document.queryCommandValue('foreColor');
+      const bg = document.queryCommandValue('hiliteColor') || document.queryCommandValue('backColor');
+      if (fg) setCurrentColor(fg);
+      if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') setCurrentBgColor(bg);
+      else setCurrentBgColor('transparent');
+    } catch (e) {
+      // ignore
+    }
+  };
+
   // WYSIWYG Editor Commands
   const formatText = (command, value = null) => {
     if (command === 'createLink') {
@@ -255,6 +271,7 @@ function GraceWrite() {
     }
     if (editorRef.current) editorRef.current.focus();
     setContent(editorRef.current.innerHTML);
+    updateCurrentStyles();
   };
 
   const handlePhotoUpload = async (e) => {
@@ -429,13 +446,19 @@ function GraceWrite() {
 
           <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
             <BottomToolbarButton title="글자색">
-              <Type size={16} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Type size={14} color="#555" style={{ marginBottom: '2px' }} />
+                <div style={{ width: '12px', height: '3px', backgroundColor: currentColor, borderRadius: '2px', border: currentColor === '#ffffff' ? '1px solid #ddd' : 'none' }} />
+              </div>
               <input type="color" onChange={(e) => formatText('foreColor', e.target.value)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
             </BottomToolbarButton>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
             <BottomToolbarButton title="배경색">
-              <Highlighter size={16} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Highlighter size={14} color="#555" style={{ marginBottom: '2px' }} />
+                <div style={{ width: '12px', height: '3px', backgroundColor: currentBgColor === 'transparent' ? '#fff' : currentBgColor, borderRadius: '2px', border: '1px solid #ddd' }} />
+              </div>
               <input type="color" onChange={(e) => formatText('hiliteColor', e.target.value)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
             </BottomToolbarButton>
           </div>
@@ -469,7 +492,12 @@ function GraceWrite() {
       <div 
         ref={editorRef}
         contentEditable
-        onInput={(e) => setContent(e.currentTarget.innerHTML)}
+        onInput={(e) => {
+          setContent(e.currentTarget.innerHTML);
+          updateCurrentStyles();
+        }}
+        onKeyUp={updateCurrentStyles}
+        onMouseUp={updateCurrentStyles}
         style={{ 
           width: '100%', 
           minHeight: '400px', 
