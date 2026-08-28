@@ -9,23 +9,55 @@ import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, Al
 
 function GraceDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = React.useState(null);
 
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+  const isAdmin = userProfile && userProfile.role === 'admin';
+
   React.useEffect(() => {
-    fetch(`/api/posts?type=grace`)
+    fetch(`/api/posts?type=grace${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
         const found = data.find(item => item.id.toString() === id);
         setPost(found);
       });
-  }, [id]);
+  }, [id, isAdmin]);
+
+  const handleDelete = async () => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      try {
+        await fetch(`/api/posts?id=${id}`, { method: 'DELETE' });
+        alert('삭제되었습니다.');
+        navigate('/fellowship/grace');
+      } catch (err) {
+        alert('삭제 실패');
+      }
+    }
+  };
+
+  const handleTogglePrivate = async () => {
+    const newStatus = post.is_private ? 0 : 1;
+    try {
+      await fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: post.id, is_private: newStatus })
+      });
+      setPost({ ...post, is_private: newStatus });
+    } catch (err) {
+      alert('상태 변경 실패');
+    }
+  };
 
   if (!post) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div>
       <div style={{ borderTop: '2px solid #333', borderBottom: '1px solid #eee', padding: '24px 16px' }}>
-        <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', margin: '0 0 16px 0' }}>
+        <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isAdmin && post.is_private === 1 && <span style={{ color: '#cc0000', fontSize: '18px' }}>[비공개]</span>}
           {post.title}
         </h3>
         <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#666' }}>
@@ -54,10 +86,25 @@ function GraceDetail() {
         />
       </div>
       
-      <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-        <Link to="/fellowship/grace" style={{ padding: '10px 24px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#334155', borderRadius: '6px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
-          목록으로
-        </Link>
+      <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          {(isAdmin || (userProfile && userProfile.name === post.author)) && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => navigate(`/fellowship/grace/edit/${post.id}`)} style={{ padding: '8px 16px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>수정</button>
+              <button onClick={handleDelete} style={{ padding: '8px 16px', backgroundColor: '#fee2e2', border: '1px solid #f87171', color: '#b91c1c', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>삭제</button>
+              {isAdmin && (
+                <button onClick={handleTogglePrivate} style={{ padding: '8px 16px', backgroundColor: post.is_private ? '#e2e8f0' : '#fef08a', border: '1px solid #cbd5e1', color: '#334155', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                  {post.is_private ? '공개로 전환' : '비공개로 전환'}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Link to="/fellowship/grace" style={{ padding: '10px 24px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#334155', borderRadius: '6px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
+            목록으로
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -67,8 +114,12 @@ function GraceList() {
   const [posts, setPosts] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+  const isAdmin = userProfile && userProfile.role === 'admin';
+
   React.useEffect(() => {
-    fetch('/api/posts?type=grace')
+    fetch(`/api/posts?type=grace${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
         setPosts(data);
@@ -78,7 +129,7 @@ function GraceList() {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [isAdmin]);
 
   if (loading) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
@@ -86,7 +137,9 @@ function GraceList() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>{posts.length}</span>건의 게시물이 있습니다.</p>
-        <Link to="/fellowship/grace/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>글쓰기</Link>
+        {userProfile && (
+          <Link to="/fellowship/grace/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>글쓰기</Link>
+        )}
       </div>
       
       <div className="w-full">
@@ -113,6 +166,7 @@ function GraceList() {
                   <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{posts.length - idx}</td>
                   <td className="py-4 px-2 text-left">
                     <Link to={`/fellowship/grace/${post.id}`} className="block no-underline text-inherit group-hover:text-[#cc0000] transition-colors mb-1 sm:mb-0">
+                      {isAdmin && post.is_private === 1 && <span className="text-[#cc0000] mr-1 font-bold">[비공개]</span>}
                       {post.title}
                     </Link>
                     {/* Mobile only info stack */}
@@ -185,13 +239,45 @@ function BottomToolbarButton({ children, title, onClick }) {
 }
 
 function GraceWrite() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
   const [files, setFiles] = React.useState([]);
+  const [existingUrls, setExistingUrls] = React.useState([]);
   const [isUploading, setIsUploading] = React.useState(false);
   const [isDirty, setIsDirty] = React.useState(false);
   const [showExitModal, setShowExitModal] = React.useState(false);
   const [pendingPath, setPendingPath] = React.useState(null);
+
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+
+  React.useEffect(() => {
+    if (!userProfile) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+    }
+  }, [userProfile, navigate]);
+  
+  React.useEffect(() => {
+    if (id) {
+      const isAdmin = userProfile && userProfile.role === 'admin';
+      fetch(`/api/posts?type=grace${isAdmin ? '&admin=true' : ''}`)
+        .then(res => res.json())
+        .then(data => {
+          const found = data.find(item => item.id.toString() === id);
+          if (found) {
+            setTitle(found.title);
+            setContent(found.content);
+            setExistingUrls(found.image_urls || []);
+            if (editorRef.current) {
+              editorRef.current.innerHTML = found.content;
+            }
+          }
+        });
+    }
+  }, [id, userProfile]);
   
   // Editor active styles
   const [currentColor, setCurrentColor] = React.useState('#1d1d1f');
@@ -389,20 +475,21 @@ function GraceWrite() {
       }
 
       const dbRes = await fetch('/api/posts', {
-        method: 'POST',
+        method: id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: id ? parseInt(id) : undefined,
           type: 'grace',
           title: title,
           content: content,
           author: author,
-          image_urls: uploadedUrls
+          image_urls: [...existingUrls, ...uploadedUrls]
         })
       });
 
       if (!dbRes.ok) throw new Error('업로드 실패');
       
-      alert('성공적으로 등록되었습니다.');
+      alert(id ? '성공적으로 수정되었습니다.' : '성공적으로 등록되었습니다.');
       setIsDirty(false);
       navigate('/fellowship/grace');
     } catch (e) {
@@ -590,7 +677,7 @@ function GraceWrite() {
           onMouseEnter={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.backgroundColor = '#0061cc'; } }} 
           onMouseLeave={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.backgroundColor = '#007aff'; } }}
         >
-          {isUploading ? '업로드 중...' : '글 등록하기'}
+          {isUploading ? '업로드 중...' : id ? '글 수정하기' : '글 등록하기'}
         </button>
       </div>
 
@@ -634,9 +721,9 @@ function Grace() {
     <Routes>
       <Route path="/" element={<GraceList />} />
       <Route path="write" element={<GraceWrite />} />
+      <Route path="edit/:id" element={<GraceWrite />} />
       <Route path=":id" element={<GraceDetail />} />
-      <Route path="*" element={<DynamicSubPage />} />
-              </Routes>
+    </Routes>
   );
 }
 
