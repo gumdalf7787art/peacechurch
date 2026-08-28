@@ -9,29 +9,43 @@ import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, Al
 
 function GraceDetail() {
   const { id } = useParams();
-  
+  const [post, setPost] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch(`/api/posts?type=grace`)
+      .then(res => res.json())
+      .then(data => {
+        const found = data.find(item => item.id.toString() === id);
+        setPost(found);
+      });
+  }, [id]);
+
+  if (!post) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
+
   return (
     <div>
       <div style={{ borderTop: '2px solid #333', borderBottom: '1px solid #eee', padding: '24px 16px' }}>
         <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', margin: '0 0 16px 0' }}>
-          [나눔] 이번 주일 말씀을 듣고 받은 은혜를 나눕니다
+          {post.title}
         </h3>
         <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#666' }}>
-          <span>작성자: 김평화</span>
+          <span>작성자: {post.author}</span>
           <span style={{ color: '#ccc' }}>|</span>
-          <span>등록일: 2026.08.25</span>
+          <span>등록일: {new Date(post.created_at).toLocaleDateString()}</span>
           <span style={{ color: '#ccc' }}>|</span>
-          <span>조회수: 45</span>
+          <span>조회수: {post.views}</span>
         </div>
       </div>
       
       <div style={{ padding: '40px 16px', minHeight: '300px', fontSize: '16px', color: '#333', lineHeight: '1.8', borderBottom: '1px solid #eee' }}>
-        <p>할렐루야, 평화교회 성도 여러분.</p>
-        <p>이번 주일 목사님의 말씀을 듣고 제 삶을 다시 돌아보게 되었습니다.</p>
-        <p>우리가 일상 속에서 무심코 지나쳤던 작은 은혜들이 얼마나 소중한지 깨닫는 귀한 시간이었습니다.</p>
-        <br />
-        <p>주님께서 언제나 우리와 함께 하심을 믿으며, 이번 한 주간도 주님 안에서 평안하시길 기도합니다.</p>
-        <p>감사합니다.</p>
+        {post.image_urls && post.image_urls.map((url, i) => {
+           if (url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+             return <div key={i} style={{ marginBottom: '24px' }}><img src={url} alt={`첨부이미지 ${i+1}`} style={{ maxWidth: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} /></div>;
+           } else {
+             return <div key={i} style={{ marginBottom: '24px' }}><a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 16px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#0f172a', textDecoration: 'none', fontWeight: '500' }}><Paperclip size={16} /> 첨부파일 다운로드 ({i+1})</a></div>;
+           }
+        })}
+        <p style={{ whiteSpace: 'pre-wrap', marginTop: '20px' }}>{post.content}</p>
       </div>
       
       <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
@@ -44,66 +58,82 @@ function GraceDetail() {
 }
 
 function GraceList() {
-  const dummyPosts = Array.from({ length: 8 }).map((_, i) => ({
-    id: 108 - i,
-    title: `[나눔] 이번 주일 말씀을 듣고 받은 은혜를 나눕니다 ${i > 0 ? `(${i})` : ''}`,
-    author: ['김평화', '이믿음', '박소망', '최사랑'][i % 4],
-    date: `2026.08.${String(25 - i).padStart(2, '0')}`,
-    views: Math.floor(Math.random() * 50) + 10
-  }));
+  const [posts, setPosts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/posts?type=grace')
+      .then(res => res.json())
+      .then(data => {
+        setPosts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>108</span>건의 게시물이 있습니다.</p>
+        <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>{posts.length}</span>건의 게시물이 있습니다.</p>
         <Link to="/fellowship/grace/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>글쓰기</Link>
       </div>
       
-      <div className="w-full">
-        <table className="w-full border-t-[2px] border-[#333] border-collapse text-center text-[15px]">
-          <thead>
-            <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">번호</th>
-              <th className="py-4 px-2 font-semibold text-[#475569]">제목</th>
-              <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">작성자</th>
-              <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">등록일</th>
-              <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dummyPosts.map(post => (
-              <tr key={post.id} className="border-b border-[#f1f5f9] group">
-                <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.id}</td>
-                <td className="py-4 px-2 text-left">
-                  <Link to={`/fellowship/grace/${post.id}`} className="block no-underline text-inherit group-hover:text-[#cc0000] transition-colors mb-1 sm:mb-0">
-                    {post.title}
-                  </Link>
-                  {/* Mobile only info stack */}
-                  <div className="flex sm:hidden items-center gap-2 text-[13px] text-[#94a3b8] mt-2">
-                    <span>{post.author}</span>
-                    <span className="text-[#e2e8f0]">|</span>
-                    <span>{post.date}</span>
-                    <span className="text-[#e2e8f0]">|</span>
-                    <span>조회 {post.views}</span>
-                  </div>
-                </td>
-                <td className="hidden sm:table-cell py-4 px-2 text-[#64748b]">{post.author}</td>
-                <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.date}</td>
-                <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.views}</td>
+      {posts.length === 0 ? (
+        <div className="py-20 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+          아직 등록된 게시물이 없습니다.
+        </div>
+      ) : (
+        <div className="w-full">
+          <table className="w-full border-t-[2px] border-[#333] border-collapse text-center text-[15px]">
+            <thead>
+              <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+                <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">번호</th>
+                <th className="py-4 px-2 font-semibold text-[#475569]">제목</th>
+                <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">작성자</th>
+                <th className="hidden sm:table-cell py-4 px-2 w-[120px] font-semibold text-[#475569]">등록일</th>
+                <th className="hidden sm:table-cell py-4 px-2 w-[80px] font-semibold text-[#475569]">조회</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {posts.map((post, idx) => (
+                <tr key={post.id} className="border-b border-[#f1f5f9] group">
+                  <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{posts.length - idx}</td>
+                  <td className="py-4 px-2 text-left">
+                    <Link to={`/fellowship/grace/${post.id}`} className="block no-underline text-inherit group-hover:text-[#cc0000] transition-colors mb-1 sm:mb-0">
+                      {post.title}
+                    </Link>
+                    {/* Mobile only info stack */}
+                    <div className="flex sm:hidden items-center gap-2 text-[13px] text-[#94a3b8] mt-2">
+                      <span>{post.author}</span>
+                      <span className="text-[#e2e8f0]">|</span>
+                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                      <span className="text-[#e2e8f0]">|</span>
+                      <span>조회 {post.views}</span>
+                    </div>
+                  </td>
+                  <td className="hidden sm:table-cell py-4 px-2 text-[#64748b]">{post.author}</td>
+                  <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{new Date(post.created_at).toLocaleDateString()}</td>
+                  <td className="hidden sm:table-cell py-4 px-2 text-[#94a3b8]">{post.views}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&lt;</button>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', borderRadius: '6px', cursor: 'pointer', color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>1</button>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>2</button>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>3</button>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&gt;</button>
-      </div>
+      {posts.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
+          <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&lt;</button>
+          <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', borderRadius: '6px', cursor: 'pointer', color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>1</button>
+          <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&gt;</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -127,6 +157,108 @@ function ToolbarButton({ children, title }) {
 }
 
 function GraceWrite() {
+  const [title, setTitle] = React.useState('');
+  const [content, setContent] = React.useState('');
+  const [files, setFiles] = React.useState([]);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [showExitModal, setShowExitModal] = React.useState(false);
+  const [pendingPath, setPendingPath] = React.useState(null);
+  
+  const fileInputRef = React.useRef(null);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    setIsDirty(title !== '' || content !== '' || files.length > 0);
+  }, [title, content, files]);
+
+  React.useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    const handleAnchorClick = (e) => {
+      if (!isDirty) return;
+      const anchor = e.target.closest('a');
+      if (anchor && anchor.href) {
+        const isInternal = anchor.origin === window.location.origin;
+        if (isInternal) {
+          e.preventDefault(); e.stopPropagation();
+          setPendingPath(anchor.href.replace(window.location.origin, ''));
+          setShowExitModal(true);
+        }
+      }
+    };
+    document.addEventListener('click', handleAnchorClick, true);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('click', handleAnchorClick, true);
+    };
+  }, [isDirty]);
+
+  const handleFileClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(prev => [...prev, ...Array.from(e.target.files)]);
+    }
+  };
+
+  const removeFile = (idx) => {
+    setFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const savedProfile = localStorage.getItem('userProfile');
+      const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+      const author = userProfile?.name || '평화교인';
+
+      const uploadedUrls = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          uploadedUrls.push(data.url);
+        }
+      }
+
+      const dbRes = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'grace',
+          title: title,
+          content: content,
+          author: author,
+          image_urls: uploadedUrls
+        })
+      });
+
+      if (!dbRes.ok) throw new Error('업로드 실패');
+      
+      alert('성공적으로 등록되었습니다.');
+      setIsDirty(false);
+      navigate('/fellowship/grace');
+    } catch (e) {
+      alert('오류가 발생했습니다.');
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', padding: '48px', border: '1px solid #f8fafc' }}>
       
@@ -134,6 +266,8 @@ function GraceWrite() {
       <div style={{ marginBottom: '32px' }}>
         <input 
           type="text" 
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="제목을 입력하세요..." 
           style={{ 
             width: '100%', 
@@ -153,74 +287,41 @@ function GraceWrite() {
         />
       </div>
 
-      {/* Editor Toolbar (Mockup) */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        flexWrap: 'wrap',
-        gap: '8px', 
-        padding: '12px 20px', 
-        backgroundColor: '#f8fafc', 
-        borderRadius: '16px', 
-        border: '1px solid #e2e8f0',
-        marginBottom: '24px' 
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '12px 20px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
           <ToolbarButton title="글꼴 설정"><Type size={18} /></ToolbarButton>
-          <select style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '14px', color: '#475569', cursor: 'pointer', padding: '0 8px', fontWeight: '500' }}>
-            <option>본문 고딕</option>
-            <option>본문 명조</option>
-            <option>나눔스퀘어</option>
-          </select>
-          <select style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '14px', color: '#475569', cursor: 'pointer', padding: '0 8px', fontWeight: '500' }}>
-            <option>11pt</option>
-            <option>12pt</option>
-            <option>14pt</option>
-            <option>16pt</option>
-            <option>20pt</option>
-          </select>
         </div>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
           <ToolbarButton title="굵게"><Bold size={18} /></ToolbarButton>
-          <ToolbarButton title="기울임"><Italic size={18} /></ToolbarButton>
-          <ToolbarButton title="밑줄"><Underline size={18} /></ToolbarButton>
-          <ToolbarButton title="글자 색상"><Palette size={18} /></ToolbarButton>
         </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
-          <ToolbarButton title="왼쪽 정렬"><AlignLeft size={18} /></ToolbarButton>
-          <ToolbarButton title="가운데 정렬"><AlignCenter size={18} /></ToolbarButton>
-          <ToolbarButton title="오른쪽 정렬"><AlignRight size={18} /></ToolbarButton>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
-          <ToolbarButton title="글머리 기호"><List size={18} /></ToolbarButton>
-          <ToolbarButton title="번호 매기기"><ListOrdered size={18} /></ToolbarButton>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '16px', borderRight: '1px solid #cbd5e1' }}>
-          <ToolbarButton title="자간 및 줄간격 설정"><Settings2 size={18} /></ToolbarButton>
-          <ToolbarButton title="링크 삽입"><Link2 size={18} /></ToolbarButton>
-        </div>
-
+        
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.borderColor = '#94a3b8'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#cbd5e1'; }}>
-            <ImageIcon size={16} /> 사진 첨부
-          </button>
-          <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.borderColor = '#94a3b8'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#cbd5e1'; }}>
-            <Paperclip size={16} /> 파일 첨부
+          <input type="file" ref={fileInputRef} multiple onChange={handleFileChange} style={{ display: 'none' }} />
+          <button onClick={handleFileClick} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#475569', fontSize: '14px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.borderColor = '#94a3b8'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#cbd5e1'; }}>
+            <Paperclip size={16} /> 첨부파일 / 사진
           </button>
         </div>
       </div>
 
-      {/* Content Editable Area for Rich Text Feel */}
-      <div 
-        contentEditable={true}
-        suppressContentEditableWarning={true}
+      {files.length > 0 && (
+        <div style={{ marginBottom: '24px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+          {files.map((f, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#f1f5f9', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '14px', color: '#475569', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+              <button onClick={() => removeFile(idx)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#cc0000', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Content Area */}
+      <textarea 
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="내용을 입력하세요..."
         style={{ 
           width: '100%', 
-          minHeight: '500px', 
+          minHeight: '400px', 
           padding: '32px', 
           border: '1px solid #e2e8f0', 
           borderRadius: '16px', 
@@ -231,7 +332,7 @@ function GraceWrite() {
           backgroundColor: '#fff',
           transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
           boxSizing: 'border-box',
-          position: 'relative'
+          resize: 'vertical'
         }} 
         onFocus={(e) => { e.target.style.borderColor = '#cc0000'; e.target.style.boxShadow = '0 0 0 4px rgba(204,0,0,0.05)'; }} 
         onBlur={(e) => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
@@ -242,10 +343,51 @@ function GraceWrite() {
         <Link to="/fellowship/grace" style={{ padding: '16px 48px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '12px', fontSize: '16px', fontWeight: '600', textDecoration: 'none', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}>
           작성 취소
         </Link>
-        <Link to="/fellowship/grace" style={{ padding: '16px 64px', background: 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 10px 20px -5px rgba(204,0,0,0.4)' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; }}>
-          글 등록하기
-        </Link>
+        <button 
+          onClick={handleSubmit} 
+          disabled={isUploading} 
+          style={{ padding: '16px 64px', background: isUploading ? '#cbd5e1' : 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: isUploading ? 'not-allowed' : 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: isUploading ? 'none' : '0 10px 20px -5px rgba(204,0,0,0.4)' }} 
+          onMouseEnter={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; } }} 
+          onMouseLeave={(e) => { if (!isUploading) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; } }}
+        >
+          {isUploading ? '등록 중...' : '글 등록하기'}
+        </button>
       </div>
+
+      {showExitModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+            <div style={{ width: '48px', height: '48px', backgroundColor: '#fee2e2', color: '#cc0000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <span style={{ fontSize: '24px', fontWeight: 'bold' }}>!</span>
+            </div>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>정말 나가시겠습니까?</h3>
+            <p style={{ margin: '0 0 24px 0', fontSize: '15px', color: '#64748b', lineHeight: '1.5' }}>
+              현재 작성 중인 게시물이 있습니다.<br/>페이지를 나가시면 작성 중인 내용은<br/>모두 사라지며 업로드되지 않습니다.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => { setShowExitModal(false); setPendingPath(null); }}
+                style={{ flex: 1, padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+              >
+                계속 작성하기
+              </button>
+              <button 
+                onClick={() => { 
+                  setIsDirty(false); 
+                  setTimeout(() => navigate(pendingPath), 0); 
+                }}
+                style={{ flex: 1, padding: '12px', backgroundColor: '#cc0000', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b30000'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#cc0000'}
+              >
+                나가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
