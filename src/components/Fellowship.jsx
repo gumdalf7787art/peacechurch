@@ -1469,16 +1469,14 @@ function BusinessDetail() {
           )}
 
           <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0f172a', marginBottom: '24px', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px' }}>사업장 소개</h3>
-          <p style={{ fontSize: '16px', lineHeight: '1.8', color: '#475569', marginBottom: '32px' }}>
+          <p style={{ fontSize: '16px', lineHeight: '1.8', color: '#475569', marginBottom: '32px', whiteSpace: 'pre-wrap' }}>
             {biz.desc}
-            <br/><br/>
-            언제나 정성을 다해 섬기겠습니다. 평화교회 교우 여러분들의 많은 사랑과 관심 부탁드립니다.
           </p>
         </div>
         
         <div>
           <div style={{ backgroundColor: '#f8fafc', padding: '32px', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', marginBottom: '24px', borderBottom: '1px solid #cbd5e1', paddingBottom: '12px' }}>오시는 길 및 문의</h4>
+            <h4 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', marginBottom: '24px', borderBottom: '1px solid #cbd5e1', paddingBottom: '12px' }}>주소 및 문의</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <span style={{ fontSize: '22px' }}>📞</span>
@@ -1490,15 +1488,8 @@ function BusinessDetail() {
               <div style={{ display: 'flex', gap: '16px' }}>
                 <span style={{ fontSize: '22px' }}>📍</span>
                 <div>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#64748b', fontWeight: 'bold' }}>오시는 길</p>
+                  <p style={{ margin: 0, fontSize: '13px', color: '#64748b', fontWeight: 'bold' }}>주소</p>
                   <p style={{ margin: '4px 0 0 0', fontSize: '15px', color: '#334155', fontWeight: '500' }}>{biz.addr}</p>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <span style={{ fontSize: '22px' }}>⏰</span>
-                <div>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#64748b', fontWeight: 'bold' }}>영업시간 안내</p>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', color: '#334155', fontWeight: '500', lineHeight: '1.6' }}>평일 09:00 ~ 20:00<br/>(주일은 예배로 휴무합니다)</p>
                 </div>
               </div>
             </div>
