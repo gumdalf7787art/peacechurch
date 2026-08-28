@@ -200,6 +200,17 @@ export default function AdminPagesManager() {
     setIsAddingBlock(false);
   };
 
+  const handleUpdateBlock = (id, newData) => {
+    let currentBlocks = [];
+    try { currentBlocks = JSON.parse(formData.content || '[]'); } catch (e) { currentBlocks = []; }
+    
+    const newBlocks = currentBlocks.map(block => 
+      block.id === id ? { ...block, data: { ...block.data, ...newData } } : block
+    );
+    
+    setFormData(prev => ({ ...prev, content: JSON.stringify(newBlocks) }));
+  };
+
   // Build menu tree
   const parentMenus = menus;
 
@@ -320,8 +331,12 @@ export default function AdminPagesManager() {
                   <AddBlockLine index={0} />
                   {parsedBlocks.map((block, i) => (
                     <div key={block.id} className="relative group/preview-block my-2">
-                      <div className="border border-transparent hover:border-gray-200 rounded-lg p-2 transition-colors pointer-events-none">
-                        <BlockRenderer blocks={[block]} />
+                      <div className="border border-transparent hover:border-gray-200 rounded-lg p-2 transition-colors relative">
+                        <BlockRenderer 
+                          blocks={[block]} 
+                          isEditMode={true} 
+                          onChange={(id, newData) => handleUpdateBlock(id, newData)} 
+                        />
                       </div>
                       <AddBlockLine index={i + 1} />
                     </div>

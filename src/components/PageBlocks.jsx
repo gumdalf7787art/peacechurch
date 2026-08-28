@@ -15,9 +15,94 @@ export const IconMap = {
 };
 
 // -------------------------------------------------------------
+// INLINE EDITING COMPONENTS
+// -------------------------------------------------------------
+export const EditableText = ({ tag: Tag = 'div', value, onChange, className, isEditMode, placeholder, multiline, ...props }) => {
+  if (!isEditMode) {
+    return <Tag className={className} {...props}>{value}</Tag>;
+  }
+
+  const handleBlur = (e) => {
+    if (onChange && e.target.innerText !== value) {
+      onChange(e.target.innerText);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !multiline) {
+      e.preventDefault();
+      e.target.blur();
+    }
+  };
+
+  return (
+    <Tag
+      contentEditable
+      suppressContentEditableWarning
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className={`${className} outline-none ring-2 ring-transparent focus:ring-[#8DC63F]/50 hover:bg-black/5 rounded transition-colors empty:before:content-[attr(placeholder)] empty:before:text-gray-400 cursor-text min-h-[1em]`}
+      placeholder={placeholder}
+      {...props}
+    >
+      {value}
+    </Tag>
+  );
+};
+
+export const EditableImage = ({ src, onChange, className, isEditMode, placeholder, imageClassName }) => {
+  if (!isEditMode) {
+    return src ? <img src={src} className={imageClassName} alt="" /> : (placeholder || null);
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64Data = event.target.result;
+      const extension = file.name.split('.').pop() || 'webp';
+      try {
+        const res = await fetch('/api/cms/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ base64Data, extension })
+        });
+        const data = await res.json();
+        if (data.success) {
+          onChange(data.url);
+        } else {
+          alert('업로드 실패: ' + data.error);
+        }
+      } catch (err) {
+        alert('업로드 오류 발생');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className={`relative group ${className}`}>
+      {src ? (
+        <img src={src} className={imageClassName} alt="" />
+      ) : (
+        placeholder || <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 text-sm">이미지 추가</div>
+      )}
+      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer rounded-[inherit]">
+        <label className="text-white text-[12px] font-bold bg-black/50 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-black/70 flex items-center">
+          <ImageIcon size={14} className="mr-1" /> 사진 변경
+          <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+        </label>
+      </div>
+    </div>
+  );
+};
+
+// -------------------------------------------------------------
 // 1. HeadingText Block
 // -------------------------------------------------------------
-export function HeadingTextBlock({ data }) {
+export function HeadingTextBlock({ data, isEditMode, onChange }) {
   return (
     <section className="text-center py-8">
       <motion.div 
@@ -26,12 +111,34 @@ export function HeadingTextBlock({ data }) {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        {data.badge && <span className="text-[#8DC63F] font-bold tracking-widest text-[12px] md:text-sm mb-3 md:mb-4 block">{data.badge}</span>}
-        <h2 className="text-[28px] md:text-4xl font-extrabold text-black mb-8 tracking-tight">{data.title}</h2>
-        {data.description && (
-          <p className="text-[16px] text-gray-600 max-w-2xl mx-auto whitespace-pre-wrap leading-relaxed">
-            {data.description}
-          </p>
+        {(data.badge || isEditMode) && (
+          <EditableText
+            tag="span"
+            value={data.badge || ''}
+            onChange={(val) => onChange({ badge: val })}
+            isEditMode={isEditMode}
+            placeholder="배지 입력 (예: OUR VISION)"
+            className="text-[#8DC63F] font-bold tracking-widest text-[12px] md:text-sm mb-3 md:mb-4 block"
+          />
+        )}
+        <EditableText
+          tag="h2"
+          value={data.title || ''}
+          onChange={(val) => onChange({ title: val })}
+          isEditMode={isEditMode}
+          placeholder="큰 제목을 입력하세요"
+          className="text-[28px] md:text-4xl font-extrabold text-black mb-8 tracking-tight"
+        />
+        {(data.description || isEditMode) && (
+          <EditableText
+            tag="p"
+            multiline={true}
+            value={data.description || ''}
+            onChange={(val) => onChange({ description: val })}
+            isEditMode={isEditMode}
+            placeholder="상세 설명을 입력하세요"
+            className="text-[16px] text-gray-600 max-w-2xl mx-auto whitespace-pre-wrap leading-relaxed"
+          />
         )}
       </motion.div>
     </section>
@@ -41,7 +148,7 @@ export function HeadingTextBlock({ data }) {
 // -------------------------------------------------------------
 // 2. VisionHighlight Block
 // -------------------------------------------------------------
-export function VisionHighlightBlock({ data }) {
+export function VisionHighlightBlock({ data, isEditMode, onChange }) {
   return (
     <section className="py-8">
       <motion.div 
@@ -51,16 +158,39 @@ export function VisionHighlightBlock({ data }) {
         transition={{ duration: 0.8 }}
         className="bg-[#f8f9fa] border-l-[4px] md:border-l-[6px] border-[#cc0000] p-6 md:p-14 rounded-r-2xl md:rounded-r-3xl shadow-sm text-left md:text-center relative"
       >
-        <h3 className="text-[20px] md:text-[32px] font-bold text-gray-900 mb-6 md:mb-8 leading-[1.5] tracking-tight whitespace-pre-wrap">
-          {data.title}
-        </h3>
+        <EditableText
+          tag="h3"
+          multiline={true}
+          value={data.title || ''}
+          onChange={(val) => onChange({ title: val })}
+          isEditMode={isEditMode}
+          placeholder="핵심 비전 문장을 입력하세요"
+          className="text-[20px] md:text-[32px] font-bold text-gray-900 mb-6 md:mb-8 leading-[1.5] tracking-tight whitespace-pre-wrap"
+        />
         <div className="text-[15px] md:text-lg text-gray-700 leading-relaxed md:leading-loose break-keep max-w-4xl mx-auto space-y-4 md:space-y-5">
-          {data.paragraphs?.map((p, idx) => (
-            <p key={idx}>{p}</p>
-          ))}
-          {data.highlightText && (
+          {isEditMode ? (
+            <EditableText
+              tag="div"
+              multiline={true}
+              value={(data.paragraphs || []).join('\n')}
+              onChange={(val) => onChange({ paragraphs: val.split('\n') })}
+              isEditMode={true}
+              placeholder="설명 단락을 입력하세요"
+            />
+          ) : (
+            data.paragraphs?.map((p, idx) => <p key={idx}>{p}</p>)
+          )}
+          {(data.highlightText || isEditMode) && (
             <p className="font-semibold text-black mt-6 md:mt-8 text-[16px] md:text-[19px]">
-              <strong className="text-[#cc0000] font-extrabold">{data.highlightText}</strong>
+              <strong className="text-[#cc0000] font-extrabold">
+                <EditableText
+                  tag="span"
+                  value={data.highlightText || ''}
+                  onChange={(val) => onChange({ highlightText: val })}
+                  isEditMode={isEditMode}
+                  placeholder="강조할 텍스트 입력"
+                />
+              </strong>
             </p>
           )}
         </div>
@@ -72,10 +202,10 @@ export function VisionHighlightBlock({ data }) {
 // -------------------------------------------------------------
 // 3. CoreValues Block
 // -------------------------------------------------------------
-export function CoreValuesBlock({ data }) {
+export function CoreValuesBlock({ data, isEditMode, onChange }) {
   return (
     <section className="py-8">
-      {data.title && (
+      {(data.title || isEditMode) && (
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -83,7 +213,14 @@ export function CoreValuesBlock({ data }) {
           transition={{ duration: 0.8 }}
           className="text-center mb-8 md:mb-12"
         >
-          <h2 className="text-[26px] md:text-4xl font-extrabold text-black tracking-tight">{data.title}</h2>
+          <EditableText
+            tag="h2"
+            value={data.title || ''}
+            onChange={(val) => onChange({ title: val })}
+            isEditMode={isEditMode}
+            placeholder="핵심 가치 제목"
+            className="text-[26px] md:text-4xl font-extrabold text-black tracking-tight"
+          />
         </motion.div>
       )}
       
@@ -101,10 +238,44 @@ export function CoreValuesBlock({ data }) {
               <div className="text-[#cc0000] bg-[#cc0000]/10 p-3 md:p-4 rounded-xl group-hover:scale-110 group-hover:bg-[#cc0000] group-hover:text-white transition-all duration-300">
                 {IconMap[value.icon] || IconMap.BookOpen}
               </div>
-              <span className="text-3xl md:text-4xl font-black text-gray-100 group-hover:text-[#cc0000]/20 transition-colors duration-300">{value.num}</span>
+              <EditableText
+                tag="span"
+                value={value.num || ''}
+                onChange={(val) => {
+                  const newVals = [...data.values];
+                  newVals[idx] = { ...value, num: val };
+                  onChange({ values: newVals });
+                }}
+                isEditMode={isEditMode}
+                placeholder="01"
+                className="text-3xl md:text-4xl font-black text-gray-100 group-hover:text-[#cc0000]/20 transition-colors duration-300"
+              />
             </div>
-            <h3 className="text-[18px] md:text-xl font-bold text-gray-900 mb-3 md:mb-4 tracking-tight">{value.title}</h3>
-            <p className="text-[14px] md:text-[15px] text-gray-600 leading-relaxed break-keep">{value.desc}</p>
+            <EditableText
+              tag="h3"
+              value={value.title || ''}
+              onChange={(val) => {
+                const newVals = [...data.values];
+                newVals[idx] = { ...value, title: val };
+                onChange({ values: newVals });
+              }}
+              isEditMode={isEditMode}
+              placeholder="가치 제목"
+              className="text-[18px] md:text-xl font-bold text-gray-900 mb-3 md:mb-4 tracking-tight"
+            />
+            <EditableText
+              tag="p"
+              multiline={true}
+              value={value.desc || ''}
+              onChange={(val) => {
+                const newVals = [...data.values];
+                newVals[idx] = { ...value, desc: val };
+                onChange({ values: newVals });
+              }}
+              isEditMode={isEditMode}
+              placeholder="가치 설명을 입력하세요"
+              className="text-[14px] md:text-[15px] text-gray-600 leading-relaxed break-keep"
+            />
           </motion.div>
         ))}
       </div>
@@ -115,28 +286,75 @@ export function CoreValuesBlock({ data }) {
 // -------------------------------------------------------------
 // 4. StaffGrid Block
 // -------------------------------------------------------------
-export function StaffGridBlock({ data }) {
+export function StaffGridBlock({ data, isEditMode, onChange }) {
   return (
     <section className="py-8">
-      {data.title && (
-        <h3 className="text-[22px] font-bold text-[#222] border-l-[4px] border-[#cc0000] pl-3 mb-6">
-          {data.title}
-        </h3>
+      {(data.title || isEditMode) && (
+        <EditableText
+          tag="h3"
+          value={data.title || ''}
+          onChange={(val) => onChange({ title: val })}
+          isEditMode={isEditMode}
+          placeholder="스태프 섹션 제목"
+          className="text-[22px] font-bold text-[#222] border-l-[4px] border-[#cc0000] pl-3 mb-6 block"
+        />
       )}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
         {data.staff?.map((person, idx) => (
           <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex flex-col">
             <div className="w-full h-[190px] bg-gray-100 flex items-center justify-center text-gray-400 text-sm overflow-hidden relative group">
-              {person.image ? (
-                <img src={person.image} alt={person.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              ) : (
-                <ImageIcon size={32} className="opacity-50" />
-              )}
+              <EditableImage
+                src={person.image}
+                onChange={(url) => {
+                  const newStaff = [...data.staff];
+                  newStaff[idx] = { ...person, image: url };
+                  onChange({ staff: newStaff });
+                }}
+                isEditMode={isEditMode}
+                className="w-full h-full"
+                imageClassName="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                placeholder={<ImageIcon size={32} className="opacity-50" />}
+              />
             </div>
             <div className="p-5 text-center">
-              <div className="text-[13px] text-[#cc0000] font-semibold mb-1.5">{person.role}</div>
-              <div className="text-[18px] font-bold text-[#111] mb-1">{person.name}</div>
-              {person.department && <div className="text-[13px] text-gray-500">{person.department}</div>}
+              <EditableText
+                tag="div"
+                value={person.role || ''}
+                onChange={(val) => {
+                  const newStaff = [...data.staff];
+                  newStaff[idx] = { ...person, role: val };
+                  onChange({ staff: newStaff });
+                }}
+                isEditMode={isEditMode}
+                placeholder="직책"
+                className="text-[13px] text-[#cc0000] font-semibold mb-1.5"
+              />
+              <EditableText
+                tag="div"
+                value={person.name || ''}
+                onChange={(val) => {
+                  const newStaff = [...data.staff];
+                  newStaff[idx] = { ...person, name: val };
+                  onChange({ staff: newStaff });
+                }}
+                isEditMode={isEditMode}
+                placeholder="이름"
+                className="text-[18px] font-bold text-[#111] mb-1"
+              />
+              {(person.department || isEditMode) && (
+                <EditableText
+                  tag="div"
+                  value={person.department || ''}
+                  onChange={(val) => {
+                    const newStaff = [...data.staff];
+                    newStaff[idx] = { ...person, department: val };
+                    onChange({ staff: newStaff });
+                  }}
+                  isEditMode={isEditMode}
+                  placeholder="부서 (선택)"
+                  className="text-[13px] text-gray-500"
+                />
+              )}
             </div>
           </div>
         ))}
@@ -148,13 +366,18 @@ export function StaffGridBlock({ data }) {
 // -------------------------------------------------------------
 // 5. WorshipSchedule Block
 // -------------------------------------------------------------
-export function WorshipScheduleBlock({ data }) {
+export function WorshipScheduleBlock({ data, isEditMode, onChange }) {
   return (
     <section className="py-8">
-      {data.title && (
-        <h3 className="text-[22px] font-bold text-[#cc0000] mb-4">
-          {data.title}
-        </h3>
+      {(data.title || isEditMode) && (
+        <EditableText
+          tag="h3"
+          value={data.title || ''}
+          onChange={(val) => onChange({ title: val })}
+          isEditMode={isEditMode}
+          placeholder="예배 시간표 제목"
+          className="text-[22px] font-bold text-[#cc0000] mb-4 block"
+        />
       )}
       <div className="overflow-x-auto">
         <table className="w-full border-t-2 border-[#cc0000] border-b border-gray-300 border-collapse text-center text-[14px] min-w-[600px]">
@@ -169,10 +392,55 @@ export function WorshipScheduleBlock({ data }) {
           <tbody>
             {data.schedules?.map((item, idx) => (
               <tr key={idx}>
-                <td className="py-3 border-b border-gray-200 text-[#111] font-medium">{item.name}</td>
-                <td className="py-3 border-b border-gray-200 text-gray-800">{item.time}</td>
-                <td className="py-3 border-b border-gray-200 text-gray-500 whitespace-pre-wrap">{item.location}</td>
-                <td className="py-3 px-4 border-b border-gray-200 text-gray-500 text-left leading-relaxed">{item.description}</td>
+                <td className="py-3 border-b border-gray-200 text-[#111] font-medium">
+                  <EditableText
+                    value={item.name || ''}
+                    onChange={(val) => {
+                      const newSchedules = [...data.schedules];
+                      newSchedules[idx] = { ...item, name: val };
+                      onChange({ schedules: newSchedules });
+                    }}
+                    isEditMode={isEditMode}
+                    placeholder="예배명"
+                  />
+                </td>
+                <td className="py-3 border-b border-gray-200 text-gray-800">
+                  <EditableText
+                    value={item.time || ''}
+                    onChange={(val) => {
+                      const newSchedules = [...data.schedules];
+                      newSchedules[idx] = { ...item, time: val };
+                      onChange({ schedules: newSchedules });
+                    }}
+                    isEditMode={isEditMode}
+                    placeholder="시간"
+                  />
+                </td>
+                <td className="py-3 border-b border-gray-200 text-gray-500 whitespace-pre-wrap">
+                  <EditableText
+                    value={item.location || ''}
+                    onChange={(val) => {
+                      const newSchedules = [...data.schedules];
+                      newSchedules[idx] = { ...item, location: val };
+                      onChange({ schedules: newSchedules });
+                    }}
+                    isEditMode={isEditMode}
+                    placeholder="장소"
+                  />
+                </td>
+                <td className="py-3 px-4 border-b border-gray-200 text-gray-500 text-left leading-relaxed">
+                  <EditableText
+                    multiline={true}
+                    value={item.description || ''}
+                    onChange={(val) => {
+                      const newSchedules = [...data.schedules];
+                      newSchedules[idx] = { ...item, description: val };
+                      onChange({ schedules: newSchedules });
+                    }}
+                    isEditMode={isEditMode}
+                    placeholder="안내 내용"
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -185,16 +453,38 @@ export function WorshipScheduleBlock({ data }) {
 // -------------------------------------------------------------
 // 6. ImageWithTextBlock
 // -------------------------------------------------------------
-export function ImageWithTextBlock({ data }) {
+export function ImageWithTextBlock({ data, isEditMode, onChange }) {
   return (
     <section className="py-8">
       <div className="flex flex-col md:flex-row bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="w-full md:w-2/5 min-h-[250px] md:min-h-auto relative bg-gray-100">
-          {data.image && <img src={data.image} alt={data.title} className="absolute inset-0 w-full h-full object-cover" />}
+          <EditableImage
+            src={data.image}
+            onChange={(url) => onChange({ image: url })}
+            isEditMode={isEditMode}
+            className="absolute inset-0 w-full h-full"
+            imageClassName="w-full h-full object-cover absolute inset-0"
+            placeholder={<div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-400 bg-gray-200">사진 추가</div>}
+          />
         </div>
         <div className="p-8 md:p-10 flex-1 flex flex-col justify-center">
-          <h4 className="text-[#cc0000] font-bold text-[20px] mb-4">{data.title}</h4>
-          <p className="leading-[1.8] text-gray-600 whitespace-pre-wrap">{data.description}</p>
+          <EditableText
+            tag="h4"
+            value={data.title || ''}
+            onChange={(val) => onChange({ title: val })}
+            isEditMode={isEditMode}
+            placeholder="제목을 입력하세요"
+            className="text-[#cc0000] font-bold text-[20px] mb-4"
+          />
+          <EditableText
+            tag="p"
+            multiline={true}
+            value={data.description || ''}
+            onChange={(val) => onChange({ description: val })}
+            isEditMode={isEditMode}
+            placeholder="상세 설명을 입력하세요"
+            className="leading-[1.8] text-gray-600 whitespace-pre-wrap"
+          />
         </div>
       </div>
     </section>
@@ -204,11 +494,16 @@ export function ImageWithTextBlock({ data }) {
 // -------------------------------------------------------------
 // 7. RichTextBlock (Fallback for generic HTML or simple text)
 // -------------------------------------------------------------
-export function RichTextBlock({ data }) {
+export function RichTextBlock({ data, isEditMode }) {
   return (
-    <section className="py-8">
+    <section className="py-8 relative group">
+      {isEditMode && (
+        <div className="absolute top-0 right-0 bg-yellow-100 text-yellow-800 text-[10px] px-2 py-1 rounded font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+          자유양식은 우측 편집창에서 HTML로 수정하세요.
+        </div>
+      )}
       <div 
-        className="prose max-w-none prose-lg prose-headings:font-bold prose-a:text-[#8DC63F]"
+        className={`prose max-w-none prose-lg prose-headings:font-bold prose-a:text-[#8DC63F] ${isEditMode ? 'pointer-events-none' : ''}`}
         dangerouslySetInnerHTML={{ __html: data.html }} 
       />
     </section>
@@ -218,58 +513,96 @@ export function RichTextBlock({ data }) {
 // -------------------------------------------------------------
 // 8. PastorGreeting Block
 // -------------------------------------------------------------
-export function PastorGreetingBlock({ data }) {
+export function PastorGreetingBlock({ data, isEditMode, onChange }) {
   return (
     <section className="py-8">
       <div className="flex flex-col md:flex-row gap-10 items-start">
         {/* Left Profile Section */}
         <div className="w-full md:w-[32%] lg:w-[35%] shrink-0">
           <div className="rounded-2xl overflow-hidden mb-6 bg-gray-100 shadow-sm border border-gray-100">
-            {data.image ? (
-              <img src={data.image} alt={data.name} className="w-full h-auto object-cover" />
-            ) : (
-              <div className="w-full aspect-[3/4] flex items-center justify-center text-gray-300 bg-gray-200">
-                <ImageIcon size={48} className="opacity-50" />
-              </div>
-            )}
+            <EditableImage
+              src={data.image}
+              onChange={(url) => onChange({ image: url })}
+              isEditMode={isEditMode}
+              className="w-full aspect-[3/4]"
+              imageClassName="w-full h-full object-cover"
+              placeholder={
+                <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-200">
+                  <ImageIcon size={48} className="opacity-50" />
+                </div>
+              }
+            />
           </div>
           
           <div className="bg-[#f9f9f9] rounded-2xl p-6 md:p-8 shadow-sm">
-            <h3 className="text-[20px] font-bold text-gray-900 mb-4 inline-block relative pb-3">
-              {data.name} <span className="font-medium text-[16px] ml-1">{data.title}</span>
+            <h3 className="text-[20px] font-bold text-gray-900 mb-4 inline-block relative pb-3 flex items-center gap-1">
+              <EditableText tag="span" value={data.name || ''} onChange={(val) => onChange({ name: val })} isEditMode={isEditMode} placeholder="이름" />
+              <EditableText tag="span" className="font-medium text-[16px]" value={data.title || ''} onChange={(val) => onChange({ title: val })} isEditMode={isEditMode} placeholder="직책" />
               <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#cc0000]"></div>
             </h3>
-            <ul className="space-y-3">
-              {data.history?.map((item, idx) => (
-                <li key={idx} className="flex items-start text-[14px] text-gray-600">
-                  <span className="text-gray-300 mr-2 mt-0.5 text-[10px]">●</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-3">
+              {isEditMode ? (
+                <EditableText
+                  tag="div"
+                  multiline={true}
+                  value={(data.history || []).join('\n')}
+                  onChange={(val) => onChange({ history: val.split('\n') })}
+                  isEditMode={true}
+                  placeholder="약력을 엔터로 구분하여 입력"
+                  className="text-[14px] text-gray-600 leading-relaxed whitespace-pre-wrap"
+                />
+              ) : (
+                <ul className="space-y-3">
+                  {data.history?.map((item, idx) => (
+                    <li key={idx} className="flex items-start text-[14px] text-gray-600">
+                      <span className="text-gray-300 mr-2 mt-0.5 text-[10px]">●</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Right Content Section */}
         <div className="flex-1 space-y-6 md:space-y-10 mt-4 md:mt-0">
-          {data.greetingPart1 && (
-            <div className="text-[16px] md:text-[17px] leading-[1.8] text-gray-700 whitespace-pre-wrap break-keep">
-              {data.greetingPart1}
-            </div>
+          {(data.greetingPart1 || isEditMode) && (
+            <EditableText
+              tag="div"
+              multiline={true}
+              value={data.greetingPart1 || ''}
+              onChange={(val) => onChange({ greetingPart1: val })}
+              isEditMode={isEditMode}
+              placeholder="인사말 1부를 입력하세요"
+              className="text-[16px] md:text-[17px] leading-[1.8] text-gray-700 whitespace-pre-wrap break-keep"
+            />
           )}
           
-          {data.quoteText && (
+          {(data.quoteText || isEditMode) && (
             <div className="border-l-[4px] border-[#cc0000] pl-6 py-2 bg-white rounded-r-xl shadow-sm my-8 relative">
-              <p className="font-bold text-[18px] md:text-[20px] text-gray-800 leading-[1.6] break-keep">
-                {data.quoteText}
-              </p>
+              <EditableText
+                tag="p"
+                multiline={true}
+                value={data.quoteText || ''}
+                onChange={(val) => onChange({ quoteText: val })}
+                isEditMode={isEditMode}
+                placeholder="인용구를 입력하세요"
+                className="font-bold text-[18px] md:text-[20px] text-gray-800 leading-[1.6] break-keep"
+              />
             </div>
           )}
 
-          {data.greetingPart2 && (
-            <div className="text-[16px] md:text-[17px] leading-[1.8] text-gray-700 whitespace-pre-wrap break-keep">
-              {data.greetingPart2}
-            </div>
+          {(data.greetingPart2 || isEditMode) && (
+            <EditableText
+              tag="div"
+              multiline={true}
+              value={data.greetingPart2 || ''}
+              onChange={(val) => onChange({ greetingPart2: val })}
+              isEditMode={isEditMode}
+              placeholder="인사말 2부를 입력하세요"
+              className="text-[16px] md:text-[17px] leading-[1.8] text-gray-700 whitespace-pre-wrap break-keep"
+            />
           )}
         </div>
       </div>
@@ -291,7 +624,7 @@ const BLOCK_REGISTRY = {
   PastorGreeting: PastorGreetingBlock
 };
 
-export function BlockRenderer({ blocks }) {
+export function BlockRenderer({ blocks, isEditMode = false, onChange }) {
   if (!blocks || !Array.isArray(blocks) || blocks.length === 0) {
     return null;
   }
@@ -301,7 +634,14 @@ export function BlockRenderer({ blocks }) {
       {blocks.map((block) => {
         const Component = BLOCK_REGISTRY[block.type];
         if (!Component) return <div key={block.id} className="text-red-500 p-4">Unknown block type: {block.type}</div>;
-        return <Component key={block.id} data={block.data} />;
+        return (
+          <Component 
+            key={block.id} 
+            data={block.data} 
+            isEditMode={isEditMode}
+            onChange={isEditMode && onChange ? (newData) => onChange(block.id, newData) : undefined}
+          />
+        );
       })}
     </div>
   );
