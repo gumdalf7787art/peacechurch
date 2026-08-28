@@ -316,8 +316,47 @@ function GalleryWrite() {
   const [primaryIndex, setPrimaryIndex] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
+  const [isDirty, setIsDirty] = React.useState(false);
+  const [showExitModal, setShowExitModal] = React.useState(false);
+  const [pendingPath, setPendingPath] = React.useState(null);
   const fileInputRef = React.useRef(null);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    setIsDirty(title !== '' || desc !== '' || files.length > 0);
+  }, [title, desc, files]);
+
+  React.useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    const handleAnchorClick = (e) => {
+      if (!isDirty) return;
+      const anchor = e.target.closest('a');
+      if (anchor && anchor.href) {
+        const isInternal = anchor.origin === window.location.origin;
+        if (isInternal) {
+          e.preventDefault();
+          e.stopPropagation();
+          const path = anchor.href.replace(window.location.origin, '');
+          setPendingPath(path);
+          setShowExitModal(true);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleAnchorClick, true);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('click', handleAnchorClick, true);
+    };
+  }, [isDirty]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -395,6 +434,7 @@ function GalleryWrite() {
         throw new Error('데이터베이스 저장 실패');
       }
       alert(`성공적으로 사진이 업로드되었습니다!`);
+      setIsDirty(false);
       navigate('/fellowship/gallery');
     } catch (error) {
       console.error(error);
@@ -547,6 +587,41 @@ function GalleryWrite() {
           {isUploading ? '업로드 중...' : '사진 올리기'}
         </button>
       </div>
+
+      {showExitModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+            <div style={{ width: '48px', height: '48px', backgroundColor: '#fee2e2', color: '#cc0000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <span style={{ fontSize: '24px', fontWeight: 'bold' }}>!</span>
+            </div>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>정말 나가시겠습니까?</h3>
+            <p style={{ margin: '0 0 24px 0', fontSize: '15px', color: '#64748b', lineHeight: '1.5' }}>
+              현재 작성 중인 게시물이 있습니다.<br/>페이지를 나가시면 작성 중인 내용은<br/>모두 사라지며 업로드되지 않습니다.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => { setShowExitModal(false); setPendingPath(null); }}
+                style={{ flex: 1, padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+              >
+                계속 작성하기
+              </button>
+              <button 
+                onClick={() => { 
+                  setIsDirty(false); 
+                  setTimeout(() => navigate(pendingPath), 0); 
+                }}
+                style={{ flex: 1, padding: '12px', backgroundColor: '#cc0000', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b30000'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#cc0000'}
+              >
+                나가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
