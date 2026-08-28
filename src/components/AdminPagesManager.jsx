@@ -323,14 +323,14 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
       {/* ---------------------------------------------------------
           MIDDLE PANE: Live Preview (flex-1)
       --------------------------------------------------------- */}
-      <div className="flex-1 bg-gray-100 overflow-y-auto relative flex flex-col border-r border-gray-200 shadow-inner">
+      <div className="flex-1 bg-white overflow-y-auto relative flex flex-col border-r border-gray-200 shadow-inner">
         {!selectedMenu ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 h-full">
             <LayoutTemplate size={48} className="mb-4 opacity-20" />
             <p className="text-[14px] font-medium text-gray-500">왼쪽 구조도에서 서브메뉴를 선택해주세요.</p>
           </div>
         ) : (
-          <div className="w-full max-w-4xl mx-auto bg-white min-h-full shadow-sm my-0 transition-all duration-300 px-10 py-12">
+          <div className="w-full max-w-4xl mx-auto min-h-full my-0 transition-all duration-300 px-10 py-12">
             
             {/* New Clean Header Layout */}
             <div className="mb-10">
