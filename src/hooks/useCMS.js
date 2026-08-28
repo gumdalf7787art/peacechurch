@@ -6,7 +6,7 @@ let cmsDataPromise = null;
 export const fetchCMSData = async () => {
   if (cmsDataCache) return cmsDataCache;
   if (cmsDataPromise) return cmsDataPromise;
-  cmsDataPromise = fetch('/api/cms/data').then(res => res.json()).then(data => {
+  cmsDataPromise = fetch('/api/cms/data', { cache: 'no-store' }).then(res => res.json()).then(data => {
     if (data.success) {
       cmsDataCache = data.data;
       return cmsDataCache;
@@ -23,6 +23,13 @@ export const saveToServer = async (payload) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+    // Update local cache to prevent stale data overriding new state
+    if (cmsDataCache) {
+      const items = Array.isArray(payload) ? payload : [payload];
+      items.forEach(item => {
+        cmsDataCache[item.id] = item.value;
+      });
+    }
   } catch (e) {
     console.error('Failed to save to CMS API', e);
   }

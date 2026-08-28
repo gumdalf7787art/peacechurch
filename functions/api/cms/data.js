@@ -11,12 +11,18 @@ export async function onRequestGet(context) {
       }
     }
     return new Response(JSON.stringify({ success: true, data }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+      }
     });
   } catch (error) {
     return new Response(JSON.stringify({ success: false, error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store'
+      }
     });
   }
 }
