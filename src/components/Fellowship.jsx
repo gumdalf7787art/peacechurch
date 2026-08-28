@@ -263,39 +263,41 @@ function Grace() {
 
 function GalleryDetail() {
   const { id } = useParams();
+  const [album, setAlbum] = React.useState(null);
   
-  const imageIdx = parseInt(id) || 0;
-  const images = [
-    'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=1200&q=80',
-    'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80',
-    'https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=1200&q=80',
-    'https://images.unsplash.com/photo-1529390079861-591de354faf5?w=1200&q=80',
-    'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1200&q=80',
-    'https://images.unsplash.com/photo-1519340333755-56e9c1d04079?w=1200&q=80'
-  ];
-  const imgSrc = images[imageIdx % images.length];
+  React.useEffect(() => {
+    fetch('/api/posts?type=gallery')
+      .then(res => res.json())
+      .then(data => {
+        const found = data.find(item => item.id.toString() === id);
+        setAlbum(found);
+      });
+  }, [id]);
+
+  if (!album) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div>
       <div style={{ borderTop: '2px solid #333', borderBottom: '1px solid #eee', padding: '24px 16px' }}>
         <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', margin: '0 0 16px 0' }}>
-          2026년 평화교회 행사 스케치
+          {album.title}
         </h3>
         <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#666' }}>
-          <span>작성자: 미디어팀</span>
+          <span>작성자: {album.author}</span>
           <span style={{ color: '#ccc' }}>|</span>
-          <span>등록일: 2026.08.20</span>
+          <span>등록일: {new Date(album.created_at).toLocaleDateString()}</span>
           <span style={{ color: '#ccc' }}>|</span>
-          <span>조회수: 124</span>
+          <span>조회수: {album.views}</span>
         </div>
       </div>
       
       <div style={{ padding: '40px 0', minHeight: '300px', fontSize: '16px', color: '#333', lineHeight: '1.8', borderBottom: '1px solid #eee', textAlign: 'center' }}>
-        <div style={{ marginBottom: '32px' }}>
-          <img src={imgSrc} alt="행사 사진" style={{ maxWidth: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-        </div>
-        <p style={{ textAlign: 'left', padding: '0 16px' }}>이번 주일에 있었던 특별 행사 및 예배 스케치입니다.</p>
-        <p style={{ textAlign: 'left', padding: '0 16px' }}>함께 웃고 은혜 나누는 성도님들의 모습 속에서 참된 기쁨을 발견합니다.</p>
+        {album.image_urls && album.image_urls.map((img, idx) => (
+          <div key={idx} style={{ marginBottom: '32px' }}>
+            <img src={img} alt={`사진 ${idx+1}`} style={{ maxWidth: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+          </div>
+        ))}
+        <p style={{ textAlign: 'left', padding: '0 16px', whiteSpace: 'pre-wrap' }}>{album.content}</p>
       </div>
       
       <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
@@ -366,7 +368,18 @@ function GalleryWrite() {
           uploadedUrls.push(data.url);
         }
       }
-      alert(`성공적으로 ${uploadedUrls.length}장의 사진이 업로드되었습니다!`);
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'gallery',
+          title: title || '새 갤러리 앨범',
+          content: desc,
+          author: '관리자',
+          image_urls: uploadedUrls
+        })
+      });
+      alert(`성공적으로 사진이 업로드되었습니다!`);
       navigate('/fellowship/gallery');
     } catch (error) {
       console.error(error);
@@ -501,42 +514,61 @@ function GalleryWrite() {
 }
 
 function GalleryList() {
-  const images = [
-    'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=500&q=80',
-    'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80',
-    'https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=500&q=80',
-    'https://images.unsplash.com/photo-1529390079861-591de354faf5?w=500&q=80',
-    'https://images.unsplash.com/photo-1438032005730-c779502df39b?w=500&q=80',
-    'https://images.unsplash.com/photo-1519340333755-56e9c1d04079?w=500&q=80'
-  ];
+  const [albums, setAlbums] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/posts?type=gallery')
+      .then(res => res.json())
+      .then(data => {
+        setAlbums(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>24</span>개의 앨범이 있습니다.</p>
+        <p style={{ color: '#666', margin: 0 }}>총 <span style={{ color: '#cc0000', fontWeight: 'bold' }}>{albums.length}</span>개의 앨범이 있습니다.</p>
         <Link to="/fellowship/gallery/write" style={{ padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>사진 올리기</Link>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-        {images.map((img, i) => (
-          <Link to={`/fellowship/gallery/${i}`} key={i} style={{ textDecoration: 'none', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'block' }} className="group">
-            <div style={{ position: 'relative', width: '100%', paddingBottom: '70%', overflow: 'hidden' }}>
-              <img src={img} alt="갤러리 사진" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} className="group-hover:scale-110" />
-            </div>
-            <div style={{ padding: '20px' }}>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold', color: '#1f2937', transition: 'color 0.2s' }} className="group-hover:text-[#cc0000]">
-                2026년 평화교회 행사 스케치 {images.length - i}
-              </h4>
-              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>2026.08.{20-i}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      
+      {albums.length === 0 ? (
+        <div className="py-20 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+          아직 등록된 갤러리 앨범이 없습니다.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+          {albums.map((album) => (
+            <Link to={`/fellowship/gallery/${album.id}`} key={album.id} style={{ textDecoration: 'none', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'block' }} className="group">
+              <div style={{ position: 'relative', width: '100%', paddingBottom: '70%', overflow: 'hidden' }}>
+                <img src={album.image_urls?.[0] || 'https://via.placeholder.com/500x350?text=No+Image'} alt="갤러리 사진" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} className="group-hover:scale-110" />
+              </div>
+              <div style={{ padding: '20px' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold', color: '#1f2937', transition: 'color 0.2s' }} className="group-hover:text-[#cc0000]">
+                  {album.title}
+                </h4>
+                <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>{new Date(album.created_at).toLocaleDateString()}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+      
       {/* Pagination */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '48px' }}>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&lt;</button>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', borderRadius: '6px', cursor: 'pointer', color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>1</button>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&gt;</button>
-      </div>
+      {albums.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '48px' }}>
+          <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&lt;</button>
+          <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', borderRadius: '6px', cursor: 'pointer', color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>1</button>
+          <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', color: '#666', fontSize: '14px', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>&gt;</button>
+        </div>
+      )}
     </div>
   );
 }
