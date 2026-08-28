@@ -313,6 +313,7 @@ function GalleryWrite() {
   const [title, setTitle] = React.useState('');
   const [desc, setDesc] = React.useState('');
   const [files, setFiles] = React.useState([]);
+  const [primaryIndex, setPrimaryIndex] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
   const fileInputRef = React.useRef(null);
@@ -346,6 +347,11 @@ function GalleryWrite() {
 
   const removeFile = (idx) => {
     setFiles(prev => prev.filter((_, i) => i !== idx));
+    if (idx === primaryIndex) {
+      setPrimaryIndex(0);
+    } else if (idx < primaryIndex) {
+      setPrimaryIndex(prev => prev - 1);
+    }
   };
 
   const handleSubmit = async () => {
@@ -355,8 +361,14 @@ function GalleryWrite() {
     }
     setIsUploading(true);
     try {
+      const filesToUpload = [...files];
+      if (primaryIndex > 0 && primaryIndex < filesToUpload.length) {
+        const primaryFile = filesToUpload.splice(primaryIndex, 1)[0];
+        filesToUpload.unshift(primaryFile);
+      }
+
       const uploadedUrls = [];
-      for (const file of files) {
+      for (const file of filesToUpload) {
         const formData = new FormData();
         formData.append('file', file);
         const res = await fetch('/api/upload', {
@@ -460,12 +472,35 @@ function GalleryWrite() {
         
         {files.length > 0 && (
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '24px', width: '100%' }} onClick={e => e.stopPropagation()}>
+            <div style={{ width: '100%', fontSize: '13px', color: '#64748b', marginBottom: '-4px' }}>
+              * 사진을 클릭하여 <strong>대표 사진</strong>을 변경할 수 있습니다.
+            </div>
             {files.map((f, idx) => (
-              <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+              <div 
+                key={idx} 
+                onClick={(e) => { e.stopPropagation(); setPrimaryIndex(idx); }}
+                style={{ 
+                  position: 'relative', 
+                  width: '100px', 
+                  height: '100px', 
+                  borderRadius: '8px', 
+                  overflow: 'hidden', 
+                  border: idx === primaryIndex ? '3px solid #cc0000' : '1px solid #e2e8f0',
+                  cursor: 'pointer',
+                  transition: 'border 0.2s'
+                }}
+              >
                 <img src={URL.createObjectURL(f)} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                
+                {idx === primaryIndex && (
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', background: 'rgba(204,0,0,0.85)', color: '#fff', fontSize: '12px', textAlign: 'center', padding: '4px 0', fontWeight: 'bold' }}>
+                    대표 사진
+                  </div>
+                )}
+
                 <button 
                   onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
-                  style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '12px' }}
+                  style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '12px' }}
                 >
                   <X size={14} />
                 </button>
