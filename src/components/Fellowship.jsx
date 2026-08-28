@@ -263,23 +263,54 @@ function Grace() {
 
 function GalleryDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [album, setAlbum] = React.useState(null);
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+  const isAdmin = userProfile && userProfile.role === 'admin';
   
   React.useEffect(() => {
-    fetch('/api/posts?type=gallery')
+    fetch(`/api/posts?type=gallery${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
         const found = data.find(item => item.id.toString() === id);
         setAlbum(found);
       });
-  }, [id]);
+  }, [id, isAdmin]);
+
+  const handleDelete = async () => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      try {
+        await fetch(`/api/posts?id=${id}`, { method: 'DELETE' });
+        alert('삭제되었습니다.');
+        navigate('/fellowship/gallery');
+      } catch (err) {
+        alert('삭제 실패');
+      }
+    }
+  };
+
+  const handleTogglePrivate = async () => {
+    const newStatus = album.is_private ? 0 : 1;
+    try {
+      await fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: album.id, is_private: newStatus })
+      });
+      setAlbum({ ...album, is_private: newStatus });
+    } catch (err) {
+      alert('상태 변경 실패');
+    }
+  };
 
   if (!album) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
     <div>
       <div style={{ borderTop: '2px solid #333', borderBottom: '1px solid #eee', padding: '24px 16px' }}>
-        <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', margin: '0 0 16px 0' }}>
+        <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isAdmin && album.is_private === 1 && <span style={{ color: '#cc0000', fontSize: '18px' }}>[비공개]</span>}
           {album.title}
         </h3>
         <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#666' }}>
@@ -300,7 +331,18 @@ function GalleryDetail() {
         <p style={{ textAlign: 'left', padding: '0 16px', whiteSpace: 'pre-wrap' }}>{album.content}</p>
       </div>
       
-      <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+      <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          {isAdmin && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link to={`/fellowship/gallery/edit/${album.id}`} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', textDecoration: 'none' }}>수정</Link>
+              <button onClick={handleDelete} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#cc0000', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>삭제</button>
+              <button onClick={handleTogglePrivate} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '6px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer' }}>
+                {album.is_private ? '공개로 전환' : '비공개로 전환'}
+              </button>
+            </div>
+          )}
+        </div>
         <Link to="/fellowship/gallery" style={{ padding: '10px 24px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#334155', borderRadius: '6px', fontSize: '14px', fontWeight: '600', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
           목록으로
         </Link>
@@ -310,9 +352,11 @@ function GalleryDetail() {
 }
 
 function GalleryWrite() {
+  const { id } = useParams();
   const [title, setTitle] = React.useState('');
   const [desc, setDesc] = React.useState('');
   const [files, setFiles] = React.useState([]);
+  const [existingUrls, setExistingUrls] = React.useState([]);
   const [primaryIndex, setPrimaryIndex] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -321,6 +365,21 @@ function GalleryWrite() {
   const [pendingPath, setPendingPath] = React.useState(null);
   const fileInputRef = React.useRef(null);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (id) {
+      fetch(`/api/posts?type=gallery&admin=true`)
+        .then(res => res.json())
+        .then(data => {
+          const found = data.find(item => item.id.toString() === id);
+          if (found) {
+            setTitle(found.title);
+            setDesc(found.content);
+            setExistingUrls(found.image_urls || []);
+          }
+        });
+    }
+  }, [id]);
 
   React.useEffect(() => {
     setIsDirty(title !== '' || desc !== '' || files.length > 0);
@@ -394,7 +453,7 @@ function GalleryWrite() {
   };
 
   const handleSubmit = async () => {
-    if (files.length === 0) {
+    if (files.length === 0 && existingUrls.length === 0) {
       alert("사진을 최소 1장 이상 등록해주세요.");
       return;
     }
@@ -419,21 +478,25 @@ function GalleryWrite() {
           uploadedUrls.push(data.url);
         }
       }
+      
+      const finalUrls = uploadedUrls.length > 0 ? uploadedUrls : existingUrls;
+
       const dbRes = await fetch('/api/posts', {
-        method: 'POST',
+        method: id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: id ? parseInt(id) : undefined,
           type: 'gallery',
           title: title || '새 갤러리 앨범',
           content: desc,
           author: '관리자',
-          image_urls: uploadedUrls
+          image_urls: finalUrls
         })
       });
       if (!dbRes.ok) {
         throw new Error('데이터베이스 저장 실패');
       }
-      alert(`성공적으로 사진이 업로드되었습니다!`);
+      alert(`성공적으로 사진이 ${id ? '수정' : '업로드'}되었습니다!`);
       setIsDirty(false);
       navigate('/fellowship/gallery');
     } catch (error) {
@@ -630,8 +693,12 @@ function GalleryList() {
   const [albums, setAlbums] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+  const isAdmin = userProfile && userProfile.role === 'admin';
+
   React.useEffect(() => {
-    fetch('/api/posts?type=gallery')
+    fetch(`/api/posts?type=gallery${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
         setAlbums(data);
@@ -641,7 +708,7 @@ function GalleryList() {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [isAdmin]);
 
   if (loading) return <div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
 
@@ -662,6 +729,9 @@ function GalleryList() {
             <Link to={`/fellowship/gallery/${album.id}`} key={album.id} style={{ textDecoration: 'none', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'block' }} className="group">
               <div style={{ position: 'relative', width: '100%', paddingBottom: '70%', overflow: 'hidden' }}>
                 <img src={album.image_urls?.[0] || 'https://via.placeholder.com/500x350?text=No+Image'} alt="갤러리 사진" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} className="group-hover:scale-110" />
+                {isAdmin && album.is_private === 1 && (
+                  <div style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'rgba(0,0,0,0.7)', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>비공개</div>
+                )}
               </div>
               <div style={{ padding: '20px' }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 'bold', color: '#1f2937', transition: 'color 0.2s' }} className="group-hover:text-[#cc0000]">
@@ -691,6 +761,7 @@ function Gallery() {
     <Routes>
       <Route path="/" element={<GalleryList />} />
       <Route path="write" element={<GalleryWrite />} />
+      <Route path="edit/:id" element={<GalleryWrite />} />
       <Route path=":id" element={<GalleryDetail />} />
     </Routes>
   );
