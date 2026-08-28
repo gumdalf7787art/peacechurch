@@ -3,7 +3,7 @@ import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
 import { Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Image as ImageIcon, Link2, List, ListOrdered, Settings2, Paperclip, UploadCloud, X } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Image as ImageIcon, Link2, List, ListOrdered, Settings2, Paperclip, UploadCloud, X, Smile, Quote, Minus, FileText, Table, Strikethrough, Highlighter } from 'lucide-react';
 
 /* ─────────────────────────── Sub-page Components ─────────────────────────── */
 
@@ -146,18 +146,38 @@ function GraceList() {
   );
 }
 
-function ToolbarButton({ children, title }) {
+function TopToolbarButton({ children, title, onClick }) {
   return (
     <button 
       title={title}
+      onClick={onClick}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        minWidth: '56px', height: '64px', background: 'transparent', gap: '6px',
+        border: 'none', borderRadius: '4px', color: '#555', cursor: 'pointer',
+        transition: 'background-color 0.15s ease'
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f4f4f4'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BottomToolbarButton({ children, title, onClick }) {
+  return (
+    <button 
+      title={title}
+      onClick={onClick}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         width: '32px', height: '32px', background: 'transparent',
-        border: 'none', borderRadius: '6px', color: '#64748b', cursor: 'pointer',
-        transition: 'all 0.2s ease'
+        border: 'none', borderRadius: '4px', color: '#555', cursor: 'pointer',
+        transition: 'background-color 0.15s ease'
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e2e8f0'; e.currentTarget.style.color = '#0f172a'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
+      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f4f4f4'; e.currentTarget.style.color = '#111'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#555'; }}
     >
       {children}
     </button>
@@ -220,7 +240,14 @@ function GraceWrite() {
 
   // WYSIWYG Editor Commands
   const formatText = (command, value = null) => {
-    document.execCommand(command, false, value);
+    if (command === 'createLink') {
+      const url = prompt('링크 주소를 입력하세요 (예: https://...)');
+      if (url) {
+        document.execCommand(command, false, url);
+      }
+    } else {
+      document.execCommand(command, false, value);
+    }
     if (editorRef.current) editorRef.current.focus();
     setContent(editorRef.current.innerHTML);
   };
@@ -334,55 +361,100 @@ function GraceWrite() {
         />
       </div>
 
-      {/* Apple-style Editor Toolbar */}
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(245, 245, 247, 0.8)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: '18px', border: '1px solid #d2d2d7', marginBottom: '24px' }}>
+      {/* Naver-style Editor Toolbar */}
+      <div style={{ border: '1px solid #e5e5ea', borderRadius: '8px', overflow: 'hidden', marginBottom: '24px', backgroundColor: '#fff' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '12px', borderRight: '1px solid #d2d2d7' }}>
-          <ToolbarButton title="굵게" onClick={() => formatText('bold')}><Bold size={16} /></ToolbarButton>
-          <ToolbarButton title="기울임" onClick={() => formatText('italic')}><Italic size={16} /></ToolbarButton>
-          <ToolbarButton title="밑줄" onClick={() => formatText('underline')}><Underline size={16} /></ToolbarButton>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingRight: '12px', borderRight: '1px solid #d2d2d7' }}>
-          <ToolbarButton title="왼쪽 정렬" onClick={() => formatText('justifyLeft')}><AlignLeft size={16} /></ToolbarButton>
-          <ToolbarButton title="가운데 정렬" onClick={() => formatText('justifyCenter')}><AlignCenter size={16} /></ToolbarButton>
-          <ToolbarButton title="오른쪽 정렬" onClick={() => formatText('justifyRight')}><AlignRight size={16} /></ToolbarButton>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '12px', borderRight: '1px solid #d2d2d7' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Palette size={16} color="#86868b" />
-            <input 
-              type="color" 
-              title="글자 색상"
-              onChange={(e) => formatText('foreColor', e.target.value)} 
-              style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', cursor: 'pointer', padding: 0, backgroundColor: 'transparent' }} 
-            />
-          </div>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+        {/* Top Row */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid #f0f0f0', backgroundColor: '#fff', gap: '4px' }}>
+          
           <input type="file" ref={photoInputRef} multiple accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
-          <button 
-            onClick={() => photoInputRef.current.click()} 
-            title="본문에 사진을 바로 삽입합니다"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: '#ffffff', border: '1px solid #d2d2d7', borderRadius: '12px', color: '#1d1d1f', fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} 
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f5f5f7'; }} 
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
-          >
-            <ImageIcon size={16} color="#007aff" /> 사진 첨부
-          </button>
+          <TopToolbarButton title="사진" onClick={() => photoInputRef.current.click()}>
+            <ImageIcon size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>사진</span>
+          </TopToolbarButton>
+
+          <TopToolbarButton title="스티커" onClick={() => alert('준비 중인 기능입니다.')}>
+            <Smile size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>스티커</span>
+          </TopToolbarButton>
+
+          <TopToolbarButton title="인용구" onClick={() => formatText('formatBlock', 'blockquote')}>
+            <Quote size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>인용구</span>
+          </TopToolbarButton>
+
+          <TopToolbarButton title="구분선" onClick={() => formatText('insertHorizontalRule')}>
+            <Minus size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>구분선</span>
+          </TopToolbarButton>
+
+          <TopToolbarButton title="링크" onClick={() => formatText('createLink')}>
+            <Link2 size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>링크</span>
+          </TopToolbarButton>
 
           <input type="file" ref={fileInputRef} multiple onChange={handleFileChange} style={{ display: 'none' }} />
-          <button 
-            onClick={() => fileInputRef.current.click()} 
-            title="문서 등 일반 파일을 첨부합니다"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: '#ffffff', border: '1px solid #d2d2d7', borderRadius: '12px', color: '#1d1d1f', fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} 
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f5f5f7'; }} 
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
-          >
-            <Paperclip size={16} color="#86868b" /> 일반 파일
-          </button>
+          <TopToolbarButton title="파일" onClick={() => fileInputRef.current.click()}>
+            <FileText size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>파일</span>
+          </TopToolbarButton>
+
+          <TopToolbarButton title="표" onClick={() => alert('준비 중인 기능입니다.')}>
+            <Table size={22} color="#666" strokeWidth={1.5} />
+            <span style={{ fontSize: '12px' }}>표</span>
+          </TopToolbarButton>
+        </div>
+
+        {/* Bottom Row */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', backgroundColor: '#fafafa', gap: '4px', flexWrap: 'wrap' }}>
+          
+          <select onChange={(e) => formatText('fontName', e.target.value)} style={{ padding: '6px', border: '1px solid transparent', backgroundColor: 'transparent', fontSize: '13px', color: '#555', outline: 'none', cursor: 'pointer' }}>
+            <option value="맑은 고딕">본문 (맑은 고딕)</option>
+            <option value="돋움">돋움</option>
+            <option value="바탕">바탕</option>
+            <option value="나눔고딕">나눔고딕</option>
+          </select>
+
+          <select onChange={(e) => formatText('fontSize', e.target.value)} style={{ padding: '6px', border: '1px solid transparent', backgroundColor: 'transparent', fontSize: '13px', color: '#555', outline: 'none', cursor: 'pointer' }}>
+            <option value="3">15</option>
+            <option value="1">11</option>
+            <option value="2">13</option>
+            <option value="4">18</option>
+            <option value="5">24</option>
+          </select>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#ddd', margin: '0 8px' }} />
+
+          <BottomToolbarButton title="굵게" onClick={() => formatText('bold')}><Bold size={16} /></BottomToolbarButton>
+          <BottomToolbarButton title="이탤릭" onClick={() => formatText('italic')}><Italic size={16} /></BottomToolbarButton>
+          <BottomToolbarButton title="밑줄" onClick={() => formatText('underline')}><Underline size={16} /></BottomToolbarButton>
+          <BottomToolbarButton title="중간바" onClick={() => formatText('strikeThrough')}><Strikethrough size={16} /></BottomToolbarButton>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#ddd', margin: '0 8px' }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+            <BottomToolbarButton title="글자색">
+              <Type size={16} />
+              <input type="color" onChange={(e) => formatText('foreColor', e.target.value)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
+            </BottomToolbarButton>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+            <BottomToolbarButton title="배경색">
+              <Highlighter size={16} />
+              <input type="color" onChange={(e) => formatText('hiliteColor', e.target.value)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', left: 0, top: 0 }} />
+            </BottomToolbarButton>
+          </div>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#ddd', margin: '0 8px' }} />
+
+          <BottomToolbarButton title="왼쪽정렬" onClick={() => formatText('justifyLeft')}><AlignLeft size={16} /></BottomToolbarButton>
+          <BottomToolbarButton title="중간정렬" onClick={() => formatText('justifyCenter')}><AlignCenter size={16} /></BottomToolbarButton>
+          <BottomToolbarButton title="오른쪽정렬" onClick={() => formatText('justifyRight')}><AlignRight size={16} /></BottomToolbarButton>
+
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#ddd', margin: '0 8px' }} />
+
+          <BottomToolbarButton title="블릿달기" onClick={() => formatText('insertUnorderedList')}><List size={16} /></BottomToolbarButton>
+
         </div>
       </div>
 
