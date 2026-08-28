@@ -287,7 +287,6 @@ function GraceWrite() {
   const fileInputRef = React.useRef(null);
   const photoInputRef = React.useRef(null);
   const editorRef = React.useRef(null);
-  const navigate = useNavigate();
 
   React.useEffect(() => {
     setIsDirty(title !== '' || content !== '' || files.length > 0);
