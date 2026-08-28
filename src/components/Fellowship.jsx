@@ -1,9 +1,9 @@
 import useSubMenus from '../hooks/useSubMenus';
 import DynamicSubPage from './DynamicSubPage';
 import React from 'react';
-import { Routes, Route, Link, useLocation, useParams } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Image as ImageIcon, Link2, List, ListOrdered, Settings2, Paperclip, UploadCloud } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Image as ImageIcon, Link2, List, ListOrdered, Settings2, Paperclip, UploadCloud, X } from 'lucide-react';
 
 /* ─────────────────────────── Sub-page Components ─────────────────────────── */
 
@@ -308,6 +308,74 @@ function GalleryDetail() {
 }
 
 function GalleryWrite() {
+  const [title, setTitle] = React.useState('');
+  const [desc, setDesc] = React.useState('');
+  const [files, setFiles] = React.useState([]);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const fileInputRef = React.useRef(null);
+  const navigate = useNavigate();
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      setFiles(prev => [...prev, ...newFiles].slice(0, 20)); // Max 20
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+      setFiles(prev => [...prev, ...newFiles].slice(0, 20));
+    }
+  };
+
+  const removeFile = (idx) => {
+    setFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = async () => {
+    if (files.length === 0) {
+      alert("사진을 최소 1장 이상 등록해주세요.");
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const uploadedUrls = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          uploadedUrls.push(data.url);
+        }
+      }
+      alert(`성공적으로 ${uploadedUrls.length}장의 사진이 업로드되었습니다!`);
+      navigate('/fellowship/gallery');
+    } catch (error) {
+      console.error(error);
+      alert("업로드 중 오류가 발생했습니다.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', padding: '48px', border: '1px solid #f8fafc' }}>
       
@@ -315,6 +383,8 @@ function GalleryWrite() {
         <input 
           type="text" 
           placeholder="앨범 제목을 입력하세요..." 
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           style={{ 
             width: '100%', 
             padding: '16px 0', 
@@ -333,13 +403,26 @@ function GalleryWrite() {
         />
       </div>
 
+      <input 
+        type="file" 
+        multiple 
+        accept="image/png, image/jpeg, image/webp"
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        style={{ display: 'none' }} 
+      />
+
       <div 
+        onClick={() => fileInputRef.current.click()}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         style={{ 
           width: '100%', 
-          height: '250px', 
-          border: '2px dashed #cbd5e1', 
+          minHeight: '250px', 
+          border: isDragging ? '2px dashed #cc0000' : '2px dashed #cbd5e1', 
           borderRadius: '16px', 
-          backgroundColor: '#f8fafc',
+          backgroundColor: isDragging ? '#fff0f0' : '#f8fafc',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -347,20 +430,39 @@ function GalleryWrite() {
           gap: '12px',
           cursor: 'pointer',
           transition: 'all 0.3s ease',
-          marginBottom: '32px'
+          marginBottom: '32px',
+          padding: '24px'
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}
+        onMouseEnter={(e) => { if(!isDragging) { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; } }}
+        onMouseLeave={(e) => { if(!isDragging) { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; } }}
       >
-        <UploadCloud size={48} color="#94a3b8" />
+        <UploadCloud size={48} color={isDragging ? '#cc0000' : '#94a3b8'} />
         <div style={{ textAlign: 'center' }}>
           <p style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 'bold', color: '#334155' }}>사진을 이곳에 드래그하거나 클릭하여 추가하세요</p>
           <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>최대 20장, 장당 10MB 이하의 JPG, PNG 파일</p>
         </div>
+        
+        {files.length > 0 && (
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '24px', width: '100%' }} onClick={e => e.stopPropagation()}>
+            {files.map((f, idx) => (
+              <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                <img src={URL.createObjectURL(f)} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button 
+                  onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
+                  style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '12px' }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <textarea 
         placeholder="사진에 대한 설명이나 행사 내용을 간단히 적어주세요 (선택사항)" 
+        value={desc}
+        onChange={(e) => setDesc(e.target.value)}
         style={{ 
           width: '100%', 
           minHeight: '200px', 
@@ -384,9 +486,15 @@ function GalleryWrite() {
         <Link to="/fellowship/gallery" style={{ padding: '16px 48px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '12px', fontSize: '16px', fontWeight: '600', textDecoration: 'none', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}>
           취소
         </Link>
-        <Link to="/fellowship/gallery" style={{ padding: '16px 64px', background: 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 10px 20px -5px rgba(204,0,0,0.4)' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; }}>
-          사진 올리기
-        </Link>
+        <button 
+          onClick={handleSubmit}
+          disabled={isUploading}
+          style={{ padding: '16px 64px', background: isUploading ? '#cbd5e1' : 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: isUploading ? 'not-allowed' : 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: isUploading ? 'none' : '0 10px 20px -5px rgba(204,0,0,0.4)' }} 
+          onMouseEnter={(e) => { if(!isUploading){ e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; } }} 
+          onMouseLeave={(e) => { if(!isUploading){ e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; } }}
+        >
+          {isUploading ? '업로드 중...' : '사진 올리기'}
+        </button>
       </div>
     </div>
   );
