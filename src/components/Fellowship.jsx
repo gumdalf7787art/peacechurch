@@ -345,12 +345,12 @@ function GraceWrite() {
           placeholder="제목을 입력하세요" 
           style={{ 
             width: '100%', 
-            padding: '16px 0', 
+            padding: '12px 0', 
             border: 'none', 
             borderBottom: '2px solid #e5e5ea', 
-            fontSize: '40px', 
-            fontWeight: '700', 
-            letterSpacing: '-1.5px',
+            fontSize: '24px', 
+            fontWeight: '600', 
+            letterSpacing: '-0.5px',
             color: '#1d1d1f', 
             outline: 'none', 
             background: 'transparent',
