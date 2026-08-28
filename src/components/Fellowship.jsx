@@ -808,12 +808,12 @@ function GalleryWrite() {
           onChange={(e) => setTitle(e.target.value)}
           style={{ 
             width: '100%', 
-            padding: '16px 0', 
+            padding: '12px 0', 
             border: 'none', 
             borderBottom: '2px solid #e2e8f0', 
-            fontSize: '36px', 
-            fontWeight: '800', 
-            letterSpacing: '-1px',
+            fontSize: '24px', 
+            fontWeight: '600', 
+            letterSpacing: '-0.5px',
             color: '#0f172a', 
             outline: 'none', 
             background: 'transparent',
