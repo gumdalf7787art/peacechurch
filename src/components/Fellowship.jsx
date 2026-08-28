@@ -1358,13 +1358,19 @@ function BusinessDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [biz, setBiz] = React.useState(null);
+  const [post, setPost] = React.useState(null);
+
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+  const isAdmin = userProfile && userProfile.role === 'admin';
 
   React.useEffect(() => {
-    fetch('/api/posts?type=business')
+    fetch(`/api/posts?type=business${isAdmin ? '&admin=true' : ''}`)
       .then(res => res.json())
       .then(data => {
         const found = data.find(item => item.id.toString() === id);
         if (found) {
+          setPost(found);
           let extra = {};
           try { extra = JSON.parse(found.content); } catch (e) {}
           setBiz({
@@ -1375,11 +1381,43 @@ function BusinessDetail() {
             phone: extra.phone || '',
             addr: extra.addr || '',
             tag: extra.tag || '',
+            creator_email: extra.creator_email || '',
             gallery: found.image_urls?.length ? found.image_urls : ['https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80'],
           });
         }
       });
-  }, [id]);
+  }, [id, isAdmin]);
+
+  const isAuthor = userProfile && biz && (biz.creator_email === userProfile.email || biz.owner === userProfile.name);
+  const canEdit = isAdmin || isAuthor;
+
+  const handleDelete = async () => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      try {
+        await fetch(`/api/posts?id=${id}`, { method: 'DELETE' });
+        alert('삭제되었습니다.');
+        navigate('/fellowship/business');
+      } catch (err) {
+        alert('삭제 실패');
+      }
+    }
+  };
+
+  const handleTogglePrivate = async () => {
+    if (!post) return;
+    const newStatus = post.is_private ? 0 : 1;
+    try {
+      await fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, is_private: newStatus })
+      });
+      setPost({ ...post, is_private: newStatus });
+      alert(newStatus ? '비공개로 전환되었습니다.' : '공개로 전환되었습니다.');
+    } catch (err) {
+      alert('변경 실패');
+    }
+  };
 
   const images = biz ? biz.gallery : [];
   const [activeImage, setActiveImage] = React.useState('');
@@ -1497,7 +1535,16 @@ function BusinessDetail() {
         </div>
       </div>
       
-      <div style={{ padding: '24px 48px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ padding: '24px 48px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          {canEdit && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link to={`/fellowship/business/edit/${biz.id}`} style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', textDecoration: 'none' }}>수정</Link>
+              <button onClick={handleDelete} style={{ padding: '10px 20px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>삭제</button>
+              <button onClick={handleTogglePrivate} style={{ padding: '10px 20px', backgroundColor: '#64748b', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>{post?.is_private ? '공개로 전환' : '비공개로 전환'}</button>
+            </div>
+          )}
+        </div>
         <Link to="/fellowship/business" style={{ padding: '14px 32px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', color: '#334155', borderRadius: '8px', fontSize: '15px', fontWeight: '600', textDecoration: 'none', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
           목록으로 돌아가기
         </Link>
@@ -1508,6 +1555,17 @@ function BusinessDetail() {
 
 function BusinessList() {
   const [businesses, setBusinesses] = React.useState([]);
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+  const navigate = useNavigate();
+
+  const handleWriteClick = (e) => {
+    if (!userProfile) {
+      e.preventDefault();
+      alert('로그인한 성도만 등록할 수 있습니다.');
+      navigate('/login');
+    }
+  };
 
   React.useEffect(() => {
     fetch('/api/posts?type=business')
@@ -1542,7 +1600,7 @@ function BusinessList() {
               많은 이용과 기도를 부탁드리며, 사업장 등록을 원하시는 성도님은 우측 버튼을 통해 등록해 주시기 바랍니다.
             </p>
           </div>
-          <Link to="/fellowship/business/write" style={{ padding: '12px 24px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s', whiteSpace: 'nowrap' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>
+          <Link to="/fellowship/business/write" onClick={handleWriteClick} style={{ padding: '12px 24px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold', textDecoration: 'none', transition: 'background-color 0.2s', whiteSpace: 'nowrap' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d2f3d'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a4358'}>
             사업장 등록하기
           </Link>
         </div>
@@ -1573,7 +1631,18 @@ function BusinessList() {
 }
 
 function BusinessWrite() {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const savedProfile = localStorage.getItem('userProfile');
+  const userProfile = savedProfile ? JSON.parse(savedProfile) : null;
+
+  React.useEffect(() => {
+    if (!userProfile) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+    }
+  }, [userProfile, navigate]);
+
   const fileInputRef = React.useRef(null);
   
   const [name, setName] = React.useState('');
@@ -1584,10 +1653,37 @@ function BusinessWrite() {
   const [addr, setAddr] = React.useState('');
   const [desc, setDesc] = React.useState('');
   const [files, setFiles] = React.useState([]);
+  const [existingUrls, setExistingUrls] = React.useState([]);
   const [previews, setPreviews] = React.useState([]);
   const [isUploading, setIsUploading] = React.useState(false);
   
   const [errors, setErrors] = React.useState({});
+
+  React.useEffect(() => {
+    if (id) {
+      fetch(`/api/posts?type=business&admin=true`)
+        .then(res => res.json())
+        .then(data => {
+          const found = data.find(item => item.id.toString() === id);
+          if (found) {
+            setName(found.title);
+            setOwner(found.author);
+            let extra = {};
+            try { extra = JSON.parse(found.content); } catch (e) {}
+            if (["음식점", "카페/베이커리", "꽃/식물", "인테리어/건축", "의료/건강", "교육/학원", "안경/렌즈", "서비스/기타"].includes(extra.tag)) {
+              setCategory(extra.tag);
+            } else {
+              setCategory('직접 입력');
+              setCustomCategory(extra.tag || '');
+            }
+            setPhone(extra.phone || '');
+            setAddr(extra.addr || '');
+            setDesc(extra.desc || '');
+            setExistingUrls(found.image_urls || []);
+          }
+        });
+    }
+  }, [id]);
   
   const nameRef = React.useRef(null);
   const ownerRef = React.useRef(null);
@@ -1612,6 +1708,10 @@ function BusinessWrite() {
     setPreviews(newFiles.map(f => URL.createObjectURL(f)));
   };
   
+  const removeExisting = (index) => {
+    setExistingUrls(existingUrls.filter((_, i) => i !== index));
+  };
+  
   const moveFile = (index, direction) => {
     if (index + direction < 0 || index + direction >= files.length) return;
     const newFiles = [...files];
@@ -1621,6 +1721,15 @@ function BusinessWrite() {
     
     setFiles(newFiles);
     setPreviews(newFiles.map(f => URL.createObjectURL(f)));
+  };
+
+  const moveExisting = (index, direction) => {
+    if (index + direction < 0 || index + direction >= existingUrls.length) return;
+    const newUrls = [...existingUrls];
+    const temp = newUrls[index];
+    newUrls[index] = newUrls[index + direction];
+    newUrls[index + direction] = temp;
+    setExistingUrls(newUrls);
   };
 
   const handleSubmit = async () => {
@@ -1647,7 +1756,7 @@ function BusinessWrite() {
     }
 
     setIsUploading(true);
-    let imageUrls = [];
+    let imageUrls = [...existingUrls];
     for (const f of files) {
       const formData = new FormData();
       formData.append('file', f);
@@ -1661,21 +1770,21 @@ function BusinessWrite() {
     }
     
     const finalCategory = category === '직접 입력' ? customCategory : category;
-    const extraData = { desc, phone, addr, tag: finalCategory };
+    const extraData = { desc, phone, addr, tag: finalCategory, creator_email: userProfile?.email };
     
     try {
       await fetch('/api/posts', {
-        method: 'POST',
+        method: id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'business',
+          ...(id ? { id } : { type: 'business' }),
           title: name,
           author: owner,
           content: JSON.stringify(extraData),
           image_urls: imageUrls
         })
       });
-      alert('사업장이 성공적으로 등록되었습니다.');
+      alert(id ? '사업장 정보가 수정되었습니다.' : '사업장이 성공적으로 등록되었습니다.');
       navigate('/fellowship/business');
     } catch (err) {
       alert('등록에 실패했습니다.');
@@ -1685,7 +1794,7 @@ function BusinessWrite() {
 
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', padding: '48px', border: '1px solid #f8fafc' }}>
-      <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#0f172a', marginBottom: '32px', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px' }}>사업장 등록하기</h2>
+      <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#0f172a', marginBottom: '32px', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px' }}>{id ? '사업장 수정하기' : '사업장 등록하기'}</h2>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div>
@@ -1738,32 +1847,54 @@ function BusinessWrite() {
         
         <div onClick={() => fileInputRef.current && fileInputRef.current.click()} style={{ width: '100%', height: '120px', border: '2px dashed #cbd5e1', borderRadius: '16px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.3s ease', marginBottom: '16px' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}>
           <UploadCloud size={32} color="#94a3b8" />
-          <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold', color: '#334155' }}>사진 추가하기 ({files.length}/10)</p>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold', color: '#334155' }}>사진 추가하기 ({existingUrls.length + files.length}/10)</p>
           <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>이곳을 클릭하세요</p>
         </div>
         <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
 
-        {previews.length > 0 && (
+        {(existingUrls.length > 0 || previews.length > 0) && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
-            {previews.map((previewUrl, index) => (
-              <div key={index} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '12px', overflow: 'hidden', border: index === 0 ? '2px solid #cc0000' : '1px solid #e2e8f0', boxShadow: index === 0 ? '0 4px 12px rgba(204,0,0,0.15)' : 'none' }}>
-                <img src={previewUrl} alt={`미리보기 ${index + 1}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            {existingUrls.map((url, index) => (
+              <div key={`exist-${index}`} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '12px', overflow: 'hidden', border: index === 0 ? '2px solid #cc0000' : '1px solid #e2e8f0', boxShadow: index === 0 ? '0 4px 12px rgba(204,0,0,0.15)' : 'none' }}>
+                <img src={url} alt={`기존사진 ${index + 1}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 {index === 0 && (
                   <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: 'rgba(204,0,0,0.8)', color: 'white', fontSize: '11px', fontWeight: 'bold', textAlign: 'center', padding: '4px 0' }}>대표 이미지</div>
                 )}
-                <button onClick={(e) => { e.stopPropagation(); removeFile(index); }} style={{ position: 'absolute', top: index === 0 ? '28px' : '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <button onClick={(e) => { e.stopPropagation(); removeExisting(index); }} style={{ position: 'absolute', top: index === 0 ? '28px' : '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                   <X size={14} />
                 </button>
                 <div style={{ position: 'absolute', bottom: '4px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
-                  <button onClick={(e) => { e.stopPropagation(); moveFile(index, -1); }} disabled={index === 0} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === 0 ? 'default' : 'pointer', opacity: index === 0 ? 0.3 : 1 }}>
+                  <button onClick={(e) => { e.stopPropagation(); moveExisting(index, -1); }} disabled={index === 0} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === 0 ? 'default' : 'pointer', opacity: index === 0 ? 0.3 : 1 }}>
                     <ChevronLeft size={14} />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); moveFile(index, 1); }} disabled={index === files.length - 1} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === files.length - 1 ? 'default' : 'pointer', opacity: index === files.length - 1 ? 0.3 : 1 }}>
+                  <button onClick={(e) => { e.stopPropagation(); moveExisting(index, 1); }} disabled={index === existingUrls.length - 1} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === existingUrls.length - 1 ? 'default' : 'pointer', opacity: index === existingUrls.length - 1 ? 0.3 : 1 }}>
                     <ChevronRight size={14} />
                   </button>
                 </div>
               </div>
             ))}
+            {previews.map((previewUrl, index) => {
+              const globalIndex = existingUrls.length + index;
+              return (
+                <div key={`new-${index}`} style={{ position: 'relative', width: '100%', paddingTop: '100%', borderRadius: '12px', overflow: 'hidden', border: globalIndex === 0 ? '2px solid #cc0000' : '1px solid #e2e8f0', boxShadow: globalIndex === 0 ? '0 4px 12px rgba(204,0,0,0.15)' : 'none' }}>
+                  <img src={previewUrl} alt={`미리보기 ${index + 1}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {globalIndex === 0 && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: 'rgba(204,0,0,0.8)', color: 'white', fontSize: '11px', fontWeight: 'bold', textAlign: 'center', padding: '4px 0' }}>대표 이미지</div>
+                  )}
+                  <button onClick={(e) => { e.stopPropagation(); removeFile(index); }} style={{ position: 'absolute', top: globalIndex === 0 ? '28px' : '4px', right: '4px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                    <X size={14} />
+                  </button>
+                  <div style={{ position: 'absolute', bottom: '4px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
+                    <button onClick={(e) => { e.stopPropagation(); moveFile(index, -1); }} disabled={index === 0} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === 0 ? 'default' : 'pointer', opacity: index === 0 ? 0.3 : 1 }}>
+                      <ChevronLeft size={14} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); moveFile(index, 1); }} disabled={index === files.length - 1} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '4px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: index === files.length - 1 ? 'default' : 'pointer', opacity: index === files.length - 1 ? 0.3 : 1 }}>
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -1785,6 +1916,7 @@ function Business() {
     <Routes>
       <Route path="/" element={<BusinessList />} />
       <Route path="write" element={<BusinessWrite />} />
+      <Route path="edit/:id" element={<BusinessWrite />} />
       <Route path=":id" element={<BusinessDetail />} />
     </Routes>
   );
