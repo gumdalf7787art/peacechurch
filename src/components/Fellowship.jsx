@@ -1509,12 +1509,29 @@ function BusinessDetail() {
 }
 
 function BusinessList() {
-  const businesses = [
-    { name: '평화 베이커리', owner: '김평화 집사', desc: '유기농 밀가루로 당일 구워내는 건강한 빵집입니다. 단체 주문 환영합니다.', phone: '02-123-4567', addr: '서울시 구로구 평화로 1길 10', tag: '음식점', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80' },
-    { name: '믿음 플라워', owner: '이믿음 권사', desc: '각종 기념일 꽃바구니, 화환, 실내 공기정화 식물 전문 꽃집입니다.', phone: '02-987-6543', addr: '서울시 구로구 평화로 2길 15', tag: '꽃/식물', img: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=400&q=80' },
-    { name: '소망 인테리어', owner: '박소망 장로', desc: '주거공간 및 상업공간 맞춤형 인테리어 전문. 성실하게 시공해 드립니다.', phone: '010-1111-2222', addr: '서울시 구로구 평화로 3길 20', tag: '인테리어', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80' },
-    { name: '사랑 안경원', owner: '최사랑 안수집사', desc: '정확한 시력검사와 트렌디한 안경테를 다수 보유하고 있습니다.', phone: '02-555-7777', addr: '서울시 구로구 평화로 4길 25', tag: '안경/렌즈', img: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=400&q=80' },
-  ];
+  const [businesses, setBusinesses] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch('/api/posts?type=business')
+      .then(res => res.json())
+      .then(data => {
+        const parsed = data.map(post => {
+          let extra = {};
+          try { extra = JSON.parse(post.content); } catch (e) {}
+          return {
+            id: post.id,
+            name: post.title,
+            owner: post.author,
+            desc: extra.desc || '',
+            phone: extra.phone || '',
+            addr: extra.addr || '',
+            tag: extra.tag || '',
+            img: post.image_urls?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80',
+          };
+        });
+        setBusinesses(parsed);
+      });
+  }, []);
 
   return (
     <div>
@@ -1534,8 +1551,8 @@ function BusinessList() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {businesses.map((biz, idx) => (
-          <Link to={`/fellowship/business/${idx}`} key={idx} className="flex flex-col sm:flex-row border border-[#e2e8f0] rounded-[16px] overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 no-underline hover:-translate-y-1 hover:shadow-lg group">
+        {businesses.map((biz) => (
+          <Link to={`/fellowship/business/${biz.id}`} key={biz.id} className="flex flex-col sm:flex-row border border-[#e2e8f0] rounded-[16px] overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 no-underline hover:-translate-y-1 hover:shadow-lg group">
             <div className="w-full sm:w-[160px] h-[200px] sm:h-auto shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${biz.img})` }}>
             </div>
             <div style={{ padding: '24px', flex: 1 }}>
@@ -1558,6 +1575,70 @@ function BusinessList() {
 }
 
 function BusinessWrite() {
+  const navigate = useNavigate();
+  const fileInputRef = React.useRef(null);
+  
+  const [name, setName] = React.useState('');
+  const [owner, setOwner] = React.useState('');
+  const [category, setCategory] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const [addr, setAddr] = React.useState('');
+  const [desc, setDesc] = React.useState('');
+  const [file, setFile] = React.useState(null);
+  const [preview, setPreview] = React.useState('');
+  const [isUploading, setIsUploading] = React.useState(false);
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const f = e.target.files[0];
+      setFile(f);
+      setPreview(URL.createObjectURL(f));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!name || !owner || !category || !phone || !addr || !desc) {
+      alert('모든 항목을 입력해주세요.');
+      return;
+    }
+    setIsUploading(true);
+    let imageUrls = [];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        if (uploadData.url) imageUrls.push(uploadData.url);
+      } catch (err) {
+        alert('이미지 업로드에 실패했습니다.');
+        setIsUploading(false);
+        return;
+      }
+    }
+    
+    const extraData = { desc, phone, addr, tag: category };
+    
+    try {
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'business',
+          title: name,
+          author: owner,
+          content: JSON.stringify(extraData),
+          image_urls: imageUrls
+        })
+      });
+      alert('사업장이 성공적으로 등록되었습니다.');
+      navigate('/fellowship/business');
+    } catch (err) {
+      alert('등록에 실패했습니다.');
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px -15px rgba(0,0,0,0.08)', padding: '48px', border: '1px solid #f8fafc' }}>
       <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#0f172a', marginBottom: '32px', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px' }}>사업장 등록하기</h2>
@@ -1565,18 +1646,18 @@ function BusinessWrite() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>사업장 이름</label>
-          <input type="text" placeholder="예: 평화 베이커리" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="예: 평화 베이커리" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
         </div>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>대표 성도명 (직분)</label>
-          <input type="text" placeholder="예: 김평화 집사" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+          <input type="text" value={owner} onChange={e => setOwner(e.target.value)} placeholder="예: 김평화 집사" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '24px', marginBottom: '24px' }}>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>업종 (카테고리)</label>
-          <select style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', appearance: 'none', backgroundColor: '#fff', cursor: 'pointer', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}>
+          <select value={category} onChange={e => setCategory(e.target.value)} style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', appearance: 'none', backgroundColor: '#fff', cursor: 'pointer', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}>
             <option value="">카테고리 선택</option>
             <option value="음식점">음식점</option>
             <option value="카페/베이커리">카페/베이커리</option>
@@ -1590,38 +1671,45 @@ function BusinessWrite() {
         </div>
         <div>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>전화번호</label>
-          <input type="text" placeholder="예: 02-123-4567" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+          <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="예: 02-123-4567" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
         </div>
       </div>
 
       <div style={{ marginBottom: '24px' }}>
         <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>사업장 주소</label>
-        <input type="text" placeholder="예: 서울시 구로구 평화로 1길 10" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        <input type="text" value={addr} onChange={e => setAddr(e.target.value)} placeholder="예: 서울시 구로구 평화로 1길 10" style={{ width: '100%', padding: '14px 16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', color: '#334155', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
       </div>
 
       <div style={{ marginBottom: '32px' }}>
         <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>간략 소개 및 영업 안내</label>
-        <textarea placeholder="사업장에 대한 간단한 소개, 특장점, 영업시간 등을 자유롭게 적어주세요." style={{ width: '100%', minHeight: '120px', padding: '16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', lineHeight: '1.6', color: '#334155', boxSizing: 'border-box', outline: 'none', resize: 'vertical', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
+        <textarea value={desc} onChange={e => setDesc(e.target.value)} placeholder="사업장에 대한 간단한 소개, 특장점, 영업시간 등을 자유롭게 적어주세요." style={{ width: '100%', minHeight: '120px', padding: '16px', border: '1px solid #cbd5e1', borderRadius: '12px', fontSize: '15px', lineHeight: '1.6', color: '#334155', boxSizing: 'border-box', outline: 'none', resize: 'vertical', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = '#cc0000'} onBlur={(e) => e.target.style.borderColor = '#cbd5e1'} />
       </div>
 
       <div style={{ marginBottom: '40px' }}>
         <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', color: '#475569', marginBottom: '8px' }}>매장 사진 등록</label>
-        <div style={{ width: '100%', height: '200px', border: '2px dashed #cbd5e1', borderRadius: '16px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}>
-          <UploadCloud size={40} color="#94a3b8" />
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold', color: '#334155' }}>첫 번째 사진이 대표 이미지로 설정됩니다</p>
-            <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>이곳을 클릭하거나 사진을 드래그하여 업로드하세요</p>
-          </div>
+        <div onClick={() => fileInputRef.current && fileInputRef.current.click()} style={{ width: '100%', height: preview ? 'auto' : '200px', border: '2px dashed #cbd5e1', borderRadius: '16px', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.3s ease', overflow: 'hidden' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.backgroundColor = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.backgroundColor = '#f8fafc'; }}>
+          {preview ? (
+            <img src={preview} alt="미리보기" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          ) : (
+            <>
+              <UploadCloud size={40} color="#94a3b8" />
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold', color: '#334155' }}>첫 번째 사진이 대표 이미지로 설정됩니다</p>
+                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>이곳을 클릭하여 사진을 업로드하세요</p>
+              </div>
+            </>
+          )}
         </div>
+        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
       </div>
       
       <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
         <Link to="/fellowship/business" style={{ padding: '16px 48px', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '12px', fontSize: '16px', fontWeight: '600', textDecoration: 'none', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}>
           취소
         </Link>
-        <Link to="/fellowship/business" style={{ padding: '16px 64px', background: 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 10px 20px -5px rgba(204,0,0,0.4)' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; }}>
-          등록 신청하기
-        </Link>
+        <button disabled={isUploading} onClick={handleSubmit} style={{ padding: '16px 64px', background: 'linear-gradient(135deg, #cc0000 0%, #a30000 100%)', color: '#fff', border: 'none', borderRadius: '12px', cursor: isUploading ? 'not-allowed' : 'pointer', fontSize: '16px', fontWeight: 'bold', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 10px 20px -5px rgba(204,0,0,0.4)', opacity: isUploading ? 0.7 : 1 }} onMouseEnter={(e) => { if(!isUploading) { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 25px -5px rgba(204,0,0,0.5)'; } }} onMouseLeave={(e) => { if(!isUploading) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(204,0,0,0.4)'; } }}>
+          {isUploading ? '등록 중...' : '등록 신청하기'}
+        </button>
       </div>
     </div>
   );
@@ -1647,7 +1735,7 @@ export default function Fellowship() {
 
   const location = useLocation();
   const currentPath = location.pathname === '/fellowship' ? '/fellowship/grace' : location.pathname;
-  const currentMenu = currentMenuItems.find(item => item.path === currentPath) || currentMenuItems[0];
+  const currentMenu = [...currentMenuItems].sort((a, b) => b.path.length - a.path.length).find(item => currentPath.startsWith(item.path)) || currentMenuItems[0];
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff' }}>
