@@ -150,5 +150,24 @@ export const PAGE_TEMPLATES = {
         ]
       }
     }
+  ],
+  'about/bulletin': [
+    {
+      "id": "blk_bulletin_1",
+      "type": "HeadingText",
+      "data": {
+        "badge": "WEEKLY BULLETIN",
+        "title": "교회 주보",
+        "description": "평화교회의 매주 소식과 예배 순서를 확인하실 수 있습니다."
+      }
+    },
+    {
+      "id": "blk_bulletin_2",
+      "type": "BulletinBoard",
+      "data": {
+        "title": "최신 주보",
+        "bulletins": []
+      }
+    }
   ]
 };

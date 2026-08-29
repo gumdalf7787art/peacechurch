@@ -10,7 +10,7 @@ const BLOCK_CATEGORIES = [
   { id: 'pastor', label: '담임목사 소개', blocks: ['PastorGreeting'] },
   { id: 'people', label: '섬기는분', blocks: ['StaffGrid'] },
   { id: 'worship', label: '예배안내', blocks: ['WorshipSchedule'] },
-  { id: 'bulletin', label: '교회주보', blocks: [] },
+  { id: 'bulletin', label: '교회주보', blocks: ['BulletinBoard'] },
   { id: 'offering', label: '온라인헌금', blocks: [] },
   { id: 'map', label: '찾아오시는길', blocks: [] },
   { id: 'facility', label: '시설안내', blocks: [] },

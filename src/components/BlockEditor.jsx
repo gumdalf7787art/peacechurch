@@ -256,6 +256,14 @@ function BlockEditorItem({ block, index, total, onUpdate, onRemove, onMoveUp, on
               ))}
               <button onClick={() => addArrayItem('schedules', { name:'', time:'', location:'', description:'' })} className="w-full py-2 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-[13px] font-bold text-gray-600 hover:bg-gray-100">+ 일정 추가</button>
             </div>
+        );
+      case 'BulletinBoard':
+        return (
+          <div className="space-y-4">
+            <Input label="섹션 제목" value={data.title} onChange={(v) => handleChange('title', v)} />
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-[13px] text-gray-500 text-center">
+              주보 등록 및 삭제는 실제 페이지 화면에 있는 '새 주보 등록' 및 삭제 버튼을 이용해주세요.
+            </div>
           </div>
         );
       case 'ImageWithText':
