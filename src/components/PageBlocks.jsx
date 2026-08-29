@@ -645,8 +645,10 @@ export function PastorGreetingBlock({ data, isEditMode, onChange }) {
 // -------------------------------------------------------------
 export function VisionHeroBlock({ data, isEditMode, onChange }) {
   return (
-    <section className="py-16 md:py-24 bg-white text-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-50 via-white to-white pointer-events-none"></div>
+    <section className="py-20 md:py-32 bg-white text-center relative overflow-hidden">
+      {/* Subtle background decoration */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#8DC63F]/5 rounded-full blur-[100px] pointer-events-none"></div>
+      
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -669,23 +671,31 @@ export function VisionHeroBlock({ data, isEditMode, onChange }) {
           onChange={(val) => onChange({ slogan: val })}
           isEditMode={isEditMode}
           placeholder="비전 슬로건을 입력하세요"
-          className="text-2xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-10 leading-[1.4] tracking-tight break-keep"
+          className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-16 leading-[1.3] tracking-tight break-keep"
         />
-        <div className="text-[16px] md:text-lg text-gray-600 leading-[1.8] md:leading-[2] space-y-6 break-keep mx-auto font-medium">
-          {isEditMode ? (
-            <EditableText
-              tag="div"
-              multiline={true}
-              value={(data.paragraphs || []).join('\n\n')}
-              onChange={(val) => onChange({ paragraphs: val.split('\n\n') })}
-              isEditMode={true}
-              placeholder="단락을 두 번 엔터로 구분하여 입력하세요"
-            />
-          ) : (
-            data.paragraphs?.map((p, idx) => (
-              <p key={idx} dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold">$1</strong>') }} />
-            ))
-          )}
+        
+        {/* Modern Blockquote Design */}
+        <div className="relative max-w-3xl mx-auto">
+          {/* Decorative Large Quote Marks */}
+          <div className="absolute -top-12 -left-8 text-8xl text-gray-100 font-serif leading-none select-none pointer-events-none">"</div>
+          <div className="absolute -bottom-16 -right-8 text-8xl text-gray-100 font-serif leading-none select-none pointer-events-none rotate-180">"</div>
+          
+          <div className="relative z-10 text-[17px] md:text-[20px] text-gray-600 leading-[2] md:leading-[2.2] space-y-6 md:space-y-8 break-keep text-left md:text-center font-medium italic border-l-4 md:border-l-0 border-[#8DC63F] pl-6 md:pl-0">
+            {isEditMode ? (
+              <EditableText
+                tag="div"
+                multiline={true}
+                value={(data.paragraphs || []).join('\n\n')}
+                onChange={(val) => onChange({ paragraphs: val.split('\n\n') })}
+                isEditMode={true}
+                placeholder="단락을 두 번 엔터로 구분하여 입력하세요"
+              />
+            ) : (
+              data.paragraphs?.map((p, idx) => (
+                <p key={idx} dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold not-italic">$1</strong>') }} />
+              ))
+            )}
+          </div>
         </div>
       </motion.div>
     </section>
@@ -697,37 +707,45 @@ export function VisionHeroBlock({ data, isEditMode, onChange }) {
 // -------------------------------------------------------------
 export function VisionGoalsBlock({ data, isEditMode, onChange }) {
   return (
-    <section className="py-12 md:py-20 bg-gray-50 border-y border-gray-100">
-      <div className="max-w-5xl mx-auto px-6">
+    <section className="py-20 md:py-32 bg-[#fafafa]">
+      <div className="max-w-[1200px] mx-auto px-6">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-16 md:mb-24"
         >
+          <div className="w-16 h-1 bg-[#8DC63F] mx-auto mb-8 rounded-full"></div>
           <EditableText
             tag="h2"
             value={data.title || ''}
             onChange={(val) => onChange({ title: val })}
             isEditMode={isEditMode}
             placeholder="목표 섹션 제목"
-            className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight"
+            className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight"
           />
         </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
+        
+        {/* Sleek, Modern Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {data.goals?.map((goal, idx) => (
             <motion.div 
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-5 hover:shadow-md transition-shadow"
+              transition={{ delay: idx * 0.1, duration: 0.6 }}
+              className="group relative bg-white p-10 rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_60px_-15px_rgba(141,198,63,0.15)] transition-all duration-500 hover:-translate-y-2 border border-gray-100"
             >
-              <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
-                <span className="text-indigo-600 font-bold text-lg">{idx + 1}</span>
+              {/* Large, subtle background number */}
+              <div className="absolute top-4 right-6 text-[80px] font-black text-gray-50 group-hover:text-[#8DC63F]/10 transition-colors duration-500 select-none pointer-events-none">
+                0{idx + 1}
               </div>
-              <div className="flex-1">
+              
+              <div className="relative z-10 flex flex-col h-full">
+                {/* Accent dot */}
+                <div className="w-3 h-3 rounded-full bg-[#8DC63F] mb-8 group-hover:scale-150 transition-transform duration-500"></div>
+                
                 <EditableText
                   tag="h3"
                   value={goal.title || ''}
@@ -738,7 +756,7 @@ export function VisionGoalsBlock({ data, isEditMode, onChange }) {
                   }}
                   isEditMode={isEditMode}
                   placeholder="목표 제목"
-                  className="text-xl font-bold text-gray-900 mb-2"
+                  className="text-[22px] md:text-[24px] font-bold text-gray-900 mb-4 tracking-tight"
                 />
                 <EditableText
                   tag="p"
@@ -751,7 +769,7 @@ export function VisionGoalsBlock({ data, isEditMode, onChange }) {
                   }}
                   isEditMode={isEditMode}
                   placeholder="목표 상세 설명"
-                  className="text-gray-600 leading-relaxed text-[15px] break-keep"
+                  className="text-gray-500 leading-[1.8] text-[16px] break-keep"
                 />
               </div>
             </motion.div>
