@@ -332,7 +332,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                 />
               </div>
               
-              <div className="px-4 py-6 w-full">
+              <div className="px-4 py-4 w-full">
                 <EditableText
                   tag="div"
                   value={person.role || ''}
@@ -343,7 +343,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                   }}
                   isEditMode={isEditMode}
                   placeholder="직책 (예: 부목사)"
-                  className="text-[13px] text-[#cc0000] font-bold tracking-wider uppercase mb-1.5"
+                  className="text-[13px] text-[#cc0000] font-bold tracking-wider uppercase mb-1"
                 />
                 <EditableText
                   tag="div"
@@ -355,7 +355,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                   }}
                   isEditMode={isEditMode}
                   placeholder="이름"
-                  className="text-[20px] font-bold text-gray-900 mb-1"
+                  className="text-[19px] font-bold text-gray-900 mb-0.5"
                 />
                 {(person.department || isEditMode) && (
                   <EditableText
@@ -368,7 +368,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                     }}
                     isEditMode={isEditMode}
                     placeholder="사역 부서 (선택)"
-                    className="text-[14px] text-gray-500 font-medium mt-1"
+                    className="text-[13px] text-gray-500 font-medium mt-0.5"
                   />
                 )}
               </div>
