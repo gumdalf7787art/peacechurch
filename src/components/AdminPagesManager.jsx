@@ -91,37 +91,55 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
     
     // Find if there's an existing page for this menu
     const page = pages.find(p => p.menu_id === menu.id || (p.slug && p.slug === (menu.path || '').replace('/', '')));
+    const defaultSlug = menu.path ? menu.path.replace('/', '') : `page-${menu.id}`;
     
     if (page) {
+      let content = page.content || '[]';
+      let isBlock = false;
+      
+      try {
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          isBlock = true;
+        } else if (Array.isArray(parsed) && parsed.length === 0 && PAGE_TEMPLATES[defaultSlug]) {
+          // If empty array, auto-load template
+          content = JSON.stringify(PAGE_TEMPLATES[defaultSlug]);
+          isBlock = true;
+        } else if (Array.isArray(parsed)) {
+          isBlock = true;
+        }
+      } catch {
+        // If it's invalid JSON (e.g. old HTML dummy data), auto-load template if available
+        if (PAGE_TEMPLATES[defaultSlug]) {
+          content = JSON.stringify(PAGE_TEMPLATES[defaultSlug]);
+          isBlock = true;
+        } else {
+          isBlock = false;
+        }
+      }
+
       const pageData = {
         slug: page.slug,
         menu_id: menu.id,
         title: page.title || menu.name, // Fallback to menu name if title is empty
         subtitle: page.subtitle || '',
         banner_image: page.banner_image || '',
-        content: page.content || '[]',
+        content: content,
         is_published: page.is_published
       };
       setFormData(pageData);
       setInitialFormData(pageData);
-      
-      // Check if content is valid JSON for Block Mode
-      try {
-        const parsed = JSON.parse(page.content || '[]');
-        setIsBlockMode(Array.isArray(parsed));
-      } catch {
-        setIsBlockMode(false);
-      }
+      setIsBlockMode(isBlock);
     } else {
       // Initialize new blank page state for this menu
-      const defaultSlug = menu.path ? menu.path.replace('/', '') : `page-${menu.id}`;
+      const defaultContent = PAGE_TEMPLATES[defaultSlug] ? JSON.stringify(PAGE_TEMPLATES[defaultSlug]) : '[]';
       const defaultData = {
         slug: defaultSlug,
         menu_id: menu.id,
         title: menu.name,
         subtitle: '',
         banner_image: '',
-        content: '[]',
+        content: defaultContent,
         is_published: 1
       };
       setFormData(defaultData);
@@ -451,18 +469,6 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
                     블록 내용 수정
                   </h4>
                   <div className="flex items-center gap-2">
-                    {isBlockMode && PAGE_TEMPLATES[formData.slug] && (
-                      <button
-                        onClick={() => {
-                          if (window.confirm('AI가 생성한 아름다운 기본 템플릿을 불러오시겠습니까? 기존 작업 내역은 덮어씌워집니다.')) {
-                            setFormData(prev => ({ ...prev, content: JSON.stringify(PAGE_TEMPLATES[formData.slug]) }));
-                          }
-                        }}
-                        className="text-[10px] font-bold px-2 py-1 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-colors"
-                      >
-                        ✨ 템플릿 불러오기
-                      </button>
-                    )}
                     {!isBlockMode && (
                       <button 
                         onClick={() => {
