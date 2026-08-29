@@ -1,18 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, Type, Highlighter, X } from 'lucide-react';
+import { Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, Type, Highlighter, X, ChevronDown } from 'lucide-react';
 
 export default function FloatingToolbar() {
   const [position, setPosition] = useState({ top: 0, left: 0, visible: false });
   const [activeFormats, setActiveFormats] = useState({});
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showBgColorPicker, setShowBgColorPicker] = useState(false);
+  const [showFontFamily, setShowFontFamily] = useState(false);
+  const [showFontSize, setShowFontSize] = useState(false);
   const toolbarRef = useRef(null);
 
   useEffect(() => {
     const handleSelectionChange = () => {
       const selection = window.getSelection();
       if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-        if (!showColorPicker && !showBgColorPicker) {
+        if (!showColorPicker && !showBgColorPicker && !showFontFamily && !showFontSize) {
           setPosition(prev => ({ ...prev, visible: false }));
         }
         return;
@@ -57,6 +59,8 @@ export default function FloatingToolbar() {
         setPosition(prev => ({ ...prev, visible: false }));
         setShowColorPicker(false);
         setShowBgColorPicker(false);
+        setShowFontFamily(false);
+        setShowFontSize(false);
       }
     };
     document.addEventListener('mousedown', handleMouseDown);
@@ -65,7 +69,7 @@ export default function FloatingToolbar() {
       document.removeEventListener('selectionchange', handleSelectionChange);
       document.removeEventListener('mousedown', handleMouseDown);
     };
-  }, [showColorPicker, showBgColorPicker]);
+  }, [showColorPicker, showBgColorPicker, showFontFamily, showFontSize]);
 
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value);
@@ -81,9 +85,39 @@ export default function FloatingToolbar() {
     });
   };
 
+  const closeAllMenus = () => {
+    setShowColorPicker(false);
+    setShowBgColorPicker(false);
+    setShowFontFamily(false);
+    setShowFontSize(false);
+  };
+
+  const toggleMenu = (setter, currentValue) => {
+    closeAllMenus();
+    setter(!currentValue);
+  };
+
   if (!position.visible) return null;
 
   const colors = ['#000000', '#555555', '#888888', '#cc0000', '#e64835', '#8DC63F', '#0066cc', '#ffffff'];
+  
+  const fonts = [
+    { label: '기본 폰트', value: 'Inter, sans-serif' },
+    { label: '나눔명조', value: 'Nanum Myeongjo, serif' },
+    { label: '본고딕 바탕', value: 'Noto Serif KR, serif' },
+    { label: '고운돋움', value: 'Gowun Dodum, sans-serif' },
+    { label: '시스템 폰트', value: 'system-ui, sans-serif' },
+  ];
+
+  const sizes = [
+    { label: '가장 작게', value: '1' },
+    { label: '작게', value: '2' },
+    { label: '보통', value: '3' },
+    { label: '조금 크게', value: '4' },
+    { label: '크게', value: '5' },
+    { label: '매우 크게', value: '6' },
+    { label: '가장 크게', value: '7' },
+  ];
 
   return (
     <div 
@@ -123,7 +157,7 @@ export default function FloatingToolbar() {
         <ToolbarButton 
           icon={<Type size={16} />} 
           active={showColorPicker} 
-          onClick={() => { setShowColorPicker(!showColorPicker); setShowBgColorPicker(false); }} 
+          onClick={() => toggleMenu(setShowColorPicker, showColorPicker)} 
           title="글자색"
         />
         {showColorPicker && (
@@ -144,7 +178,7 @@ export default function FloatingToolbar() {
         <ToolbarButton 
           icon={<Highlighter size={16} />} 
           active={showBgColorPicker} 
-          onClick={() => { setShowBgColorPicker(!showBgColorPicker); setShowColorPicker(false); }} 
+          onClick={() => toggleMenu(setShowBgColorPicker, showBgColorPicker)} 
           title="배경색"
         />
         {showBgColorPicker && (
@@ -190,34 +224,54 @@ export default function FloatingToolbar() {
 
       <div className="w-[1px] h-5 bg-gray-300 mx-1"></div>
 
-      <select 
-        className="text-[13px] bg-transparent outline-none cursor-pointer text-gray-700 hover:bg-gray-100 px-1 py-1 rounded max-w-[90px] truncate"
-        onChange={(e) => execCommand('fontName', e.target.value)}
-        title="글꼴"
-        defaultValue=""
-      >
-        <option value="" disabled hidden>글꼴</option>
-        <option value="Inter, sans-serif">기본 폰트</option>
-        <option value="Nanum Myeongjo, serif">나눔명조</option>
-        <option value="Noto Serif KR, serif">본고딕 바탕</option>
-        <option value="Gowun Dodum, sans-serif">고운돋움</option>
-        <option value="system-ui, sans-serif">시스템 폰트</option>
-      </select>
+      {/* Font Family Custom Dropdown */}
+      <div className="relative flex items-center">
+        <button 
+          onClick={() => toggleMenu(setShowFontFamily, showFontFamily)}
+          className={`flex items-center gap-1 text-[12px] px-2 py-1.5 rounded transition-colors ${showFontFamily ? 'bg-gray-200 text-gray-900' : 'text-gray-700 hover:bg-gray-100'}`}
+          title="글꼴"
+        >
+          글꼴 <ChevronDown size={14} className="text-gray-400" />
+        </button>
+        {showFontFamily && (
+          <div className="absolute top-full left-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 flex flex-col">
+            {fonts.map(font => (
+              <button 
+                key={font.value}
+                className="text-left px-3 py-1.5 text-[12px] text-gray-700 hover:bg-gray-100"
+                style={{ fontFamily: font.value }}
+                onClick={() => { execCommand('fontName', font.value); setShowFontFamily(false); }}
+              >
+                {font.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <select 
-        className="text-[13px] bg-transparent outline-none cursor-pointer text-gray-700 hover:bg-gray-100 px-1 py-1 rounded"
-        onChange={(e) => execCommand('fontSize', e.target.value)}
-        title="글자 크기"
-        defaultValue="3"
-      >
-        <option value="1">가장 작게</option>
-        <option value="2">작게</option>
-        <option value="3">보통</option>
-        <option value="4">조금 크게</option>
-        <option value="5">크게</option>
-        <option value="6">매우 크게</option>
-        <option value="7">가장 크게</option>
-      </select>
+      {/* Font Size Custom Dropdown */}
+      <div className="relative flex items-center">
+        <button 
+          onClick={() => toggleMenu(setShowFontSize, showFontSize)}
+          className={`flex items-center gap-1 text-[12px] px-2 py-1.5 rounded transition-colors ${showFontSize ? 'bg-gray-200 text-gray-900' : 'text-gray-700 hover:bg-gray-100'}`}
+          title="크기"
+        >
+          크기 <ChevronDown size={14} className="text-gray-400" />
+        </button>
+        {showFontSize && (
+          <div className="absolute top-full left-0 mt-2 w-28 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 flex flex-col">
+            {sizes.map(size => (
+              <button 
+                key={size.value}
+                className="text-left px-3 py-1.5 text-[12px] text-gray-700 hover:bg-gray-100"
+                onClick={() => { execCommand('fontSize', size.value); setShowFontSize(false); }}
+              >
+                {size.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="w-[1px] h-5 bg-gray-300 mx-1"></div>
       
