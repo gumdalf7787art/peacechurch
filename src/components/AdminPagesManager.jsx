@@ -8,6 +8,7 @@ import {
 import BlockEditor from './BlockEditor';
 import { BlockRenderer } from './PageBlocks';
 import BlockLibrary from './BlockLibrary';
+import FloatingToolbar from './FloatingToolbar';
 import { PAGE_TEMPLATES } from '../data/pageTemplates';
 
 // Helper to generate IDs
@@ -510,7 +511,7 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
           </>
         )}
       </div>
-
+      <FloatingToolbar />
     </div>
   );
 }

@@ -19,12 +19,13 @@ export const IconMap = {
 // -------------------------------------------------------------
 export const EditableText = ({ tag: Tag = 'div', value, onChange, className, isEditMode, placeholder, multiline, ...props }) => {
   if (!isEditMode) {
-    return <Tag className={className} {...props}>{value}</Tag>;
+    // Render as HTML to support rich text (bold, color, etc.)
+    return <Tag className={className} dangerouslySetInnerHTML={{ __html: value }} {...props} />;
   }
 
   const handleBlur = (e) => {
-    if (onChange && e.target.innerText !== value) {
-      onChange(e.target.innerText);
+    if (onChange && e.target.innerHTML !== value) {
+      onChange(e.target.innerHTML);
     }
   };
 
@@ -43,10 +44,9 @@ export const EditableText = ({ tag: Tag = 'div', value, onChange, className, isE
       onKeyDown={handleKeyDown}
       className={`${className} outline-none ring-2 ring-transparent focus:ring-[#8DC63F]/50 hover:bg-black/5 rounded transition-colors empty:before:content-[attr(placeholder)] empty:before:text-gray-400 cursor-text min-h-[1em]`}
       placeholder={placeholder}
+      dangerouslySetInnerHTML={{ __html: value }}
       {...props}
-    >
-      {value}
-    </Tag>
+    />
   );
 };
 
