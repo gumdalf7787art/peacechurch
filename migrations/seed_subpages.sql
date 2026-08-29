@@ -1,5 +1,5 @@
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('vision', 2, '교회비전과 목표', '우리가 세워가는 교회', '', '
+VALUES ('about/vision', 2, '교회비전과 목표', '우리가 세워가는 교회', '', '
       <div style="text-align: center; margin-bottom: 40px;">
         <span style="color: #8DC63F; font-weight: bold; font-size: 14px; display: block; margin-bottom: 16px;">OUR VISION</span>
         <h2 style="font-size: 36px; font-weight: 800; color: #111; margin-bottom: 40px;">우리의 비전</h2>
@@ -20,7 +20,7 @@ VALUES ('vision', 2, '교회비전과 목표', '우리가 세워가는 교회', 
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('pastor', 3, '담임목사 인사말', '그리스도의 평화가 머무는 교회', '', '
+VALUES ('about/pastor', 3, '담임목사 인사말', '그리스도의 평화가 머무는 교회', '', '
       <div style="display: flex; gap: 40px; flex-wrap: wrap;">
         <div style="flex: 0 0 300px;">
           <img src="/pastor-profile.jpg" alt="담임목사" style="width: 100%; border-radius: 12px; margin-bottom: 20px;" />
@@ -47,7 +47,7 @@ VALUES ('pastor', 3, '담임목사 인사말', '그리스도의 평화가 머무
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('staff', 4, '섬기는 사람들', '교회를 위해 헌신하는 동역자들', '', '
+VALUES ('about/staff', 4, '섬기는 사람들', '교회를 위해 헌신하는 동역자들', '', '
       <h3 style="font-size: 22px; font-weight: bold; border-left: 4px solid #cc0000; padding-left: 12px; margin-bottom: 24px;">목회자</h3>
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px;">
         <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">부목사</div><div style="font-weight: bold; font-size: 18px;">김목사</div></div>
@@ -64,7 +64,7 @@ VALUES ('staff', 4, '섬기는 사람들', '교회를 위해 헌신하는 동역
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('worship-info', 5, '예배시간 안내', '예배와 모임 시간', '', '
+VALUES ('about/worship', 5, '예배시간 안내', '예배와 모임 시간', '', '
       <h3 style="font-size: 22px; font-weight: bold; color: #cc0000; margin-bottom: 16px;">주일예배안내</h3>
       <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 40px;">
         <thead><tr style="background: #f9f9f9; border-top: 2px solid #cc0000; border-bottom: 1px solid #ddd;">
@@ -90,7 +90,7 @@ VALUES ('worship-info', 5, '예배시간 안내', '예배와 모임 시간', '',
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('facility', 6, '층별 시설안내', '교회 공간 안내', '', '
+VALUES ('about/facility', 6, '층별 시설안내', '교회 공간 안내', '', '
       <div style="border-top: 2px solid #333;">
         <div style="display: flex; padding: 24px 0; border-bottom: 1px solid #eee; align-items: center;">
           <div style="width: 120px; text-align: center; color: #cc0000; font-size: 32px; font-weight: bold; border-right: 2px dashed #ddd; margin-right: 24px;">4F</div>
@@ -116,7 +116,7 @@ VALUES ('facility', 6, '층별 시설안내', '교회 공간 안내', '', '
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('kids', 14, '유초등부', '말씀 안에서 쑥쑥 자라나는 다음 세대', '', '
+VALUES ('education/kids', 14, '유초등부', '말씀 안에서 쑥쑥 자라나는 다음 세대', '', '
       <div style="display: flex; background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div style="width: 40%; background: url(''https://images.unsplash.com/photo-1519340333755-56e9c1d04079?w=800&q=80'') center/cover;"></div>
         <div style="padding: 40px; flex: 1;">
@@ -127,7 +127,7 @@ VALUES ('kids', 14, '유초등부', '말씀 안에서 쑥쑥 자라나는 다음
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('youth', 15, '중고등부', '세상의 빛과 소금으로 세워지는 청소년', '', '
+VALUES ('education/youth', 15, '중고등부', '세상의 빛과 소금으로 세워지는 청소년', '', '
       <div style="display: flex; background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div style="width: 40%; background: url(''https://images.unsplash.com/photo-1529390079861-591de354faf5?w=800&q=80'') center/cover;"></div>
         <div style="padding: 40px; flex: 1;">
@@ -138,7 +138,7 @@ VALUES ('youth', 15, '중고등부', '세상의 빛과 소금으로 세워지는
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('young-adult', 16, '청년부', '진리와 사랑으로 하나 되는 청년 공동체', '', '
+VALUES ('education/young-adult', 16, '청년부', '진리와 사랑으로 하나 되는 청년 공동체', '', '
       <div style="display: flex; background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div style="width: 40%; background: url(''https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80'') center/cover;"></div>
         <div style="padding: 40px; flex: 1;">
@@ -149,7 +149,7 @@ VALUES ('young-adult', 16, '청년부', '진리와 사랑으로 하나 되는 �
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('womens', 17, '여선교회', '기도와 섬김으로 교회를 세우는 어머니들의 모임', '', '
+VALUES ('education/womens', 17, '여선교회', '기도와 섬김으로 교회를 세우는 어머니들의 모임', '', '
       <div style="display: flex; background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div style="width: 40%; background: url(''https://images.unsplash.com/photo-1573165231977-3f0e27806045?w=800&q=80'') center/cover;"></div>
         <div style="padding: 40px; flex: 1;">
@@ -160,7 +160,7 @@ VALUES ('womens', 17, '여선교회', '기도와 섬김으로 교회를 세우�
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('mens', 18, '남선교회', '말씀 위에 굳게 서서 헌신하는 아버지들의 공동체', '', '
+VALUES ('education/mens', 18, '남선교회', '말씀 위에 굳게 서서 헌신하는 아버지들의 공동체', '', '
       <div style="display: flex; background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div style="width: 40%; background: url(''https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80'') center/cover;"></div>
         <div style="padding: 40px; flex: 1;">

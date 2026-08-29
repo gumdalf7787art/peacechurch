@@ -89,9 +89,12 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
     setSelectedMenu(menu);
     setIsAddingBlock(false);
     
-    // Find if there's an existing page for this menu
-    const page = pages.find(p => p.menu_id === menu.id || (p.slug && p.slug === (menu.path || '').replace('/', '')));
-    const defaultSlug = menu.path ? menu.path.replace('/', '') : `page-${menu.id}`;
+    // Derive the expected slug from the menu path (e.g., '/about/vision' → 'about/vision')
+    const expectedSlug = menu.path ? menu.path.replace(/^\//, '') : `page-${menu.id}`;
+    
+    // Find existing page: prefer slug match first, then menu_id
+    const page = pages.find(p => p.slug === expectedSlug) || pages.find(p => p.menu_id === menu.id);
+    const defaultSlug = expectedSlug;
     
     if (page) {
       let content = page.content || '[]';
@@ -309,7 +312,8 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
                   </div>
                   <div className="space-y-0.5 mt-1">
                     {children.map(child => {
-                      const hasPage = pages.some(p => p.menu_id === child.id || (p.slug && p.slug === (child.path || '').replace('/','')));
+                      const childSlug = child.path ? child.path.replace(/^\//, '') : '';
+                      const hasPage = pages.some(p => p.slug === childSlug || p.menu_id === child.id);
                       return (
                         <button
                           key={child.id}

@@ -11,13 +11,16 @@ export default function DynamicSubPage({ defaultSlug }) {
   const [blocks, setBlocks] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  const pathSlug = location.pathname.replace(/^\/+|\/+$/g, ''); // Removes leading/trailing slashes, e.g., 'about/sample2'
+  const pathSlug = location.pathname.replace(/^\/+|\/+$/g, '');
   const currentSlug = slug || defaultSlug || pathSlug;
 
   useEffect(() => {
     if (!currentSlug) return;
     
     setLoading(true);
+    setContent(null);
+    setBlocks(null);
+
     fetch(`/api/pages/${currentSlug}`)
       .then(res => {
         if (!res.ok) throw new Error('Page not found');
@@ -25,59 +28,64 @@ export default function DynamicSubPage({ defaultSlug }) {
       })
       .then(data => {
         if (data.success && data.page && data.page.is_published === 1) {
+          const rawContent = data.page.content;
+          
+          // Try parsing content as JSON block array
           try {
-            // Try parsing content as JSON (Block Builder format)
-            const parsedBlocks = JSON.parse(data.page.content);
-            if (Array.isArray(parsedBlocks)) {
-              // Check if it's practically empty or just a default placeholder
-              const isDummy = parsedBlocks.length === 0 || 
-                             (parsedBlocks.length === 1 && parsedBlocks[0].type === 'HeadingText' && parsedBlocks[0].data?.text === '큰 제목을 입력하세요');
-              
-              if (isDummy && PAGE_TEMPLATES[currentSlug]) {
-                setBlocks(PAGE_TEMPLATES[currentSlug]);
-              } else {
-                setBlocks(parsedBlocks);
-              }
-            } else {
-              setContent(data.page.content); // Fallback if parsed but not array
+            const parsed = JSON.parse(rawContent);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              // Valid block data exists in DB → use it directly
+              setBlocks(parsed);
+              return;
             }
           } catch (e) {
-            // Not JSON, treat as raw HTML
-            setContent(data.page.content);
+            // Not JSON - could be old HTML
           }
-        } else {
-          // If no content in DB but we have a template, show the template
+
+          // DB has data but it's empty array, old HTML, or invalid
+          // → Prefer template if available, otherwise show raw HTML
           if (PAGE_TEMPLATES[currentSlug]) {
             setBlocks(PAGE_TEMPLATES[currentSlug]);
+          } else if (rawContent && rawContent.trim() && rawContent !== '[]') {
+            setContent(rawContent); // Legacy HTML fallback
           } else {
-            setContent(`
-              <div style="text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd;">
-                <div style="font-size: 48px; margin-bottom: 20px;">🚧</div>
-                <h3 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 12px;">현재 페이지는 내용이 비어있거나 비공개 상태입니다.</h3>
-                <p style="color: #666; font-size: 15px; line-height: 1.6;">
-                  이 페이지는 관리자 메뉴에서 새롭게 생성된 페이지입니다.<br/>
-                  향후 <strong>[서브 페이지 편집]</strong> 기능을 통해 내용을 작성하실 수 있습니다.
-                </p>
-              </div>
-            `);
+            showEmptyState();
           }
+        } else {
+          // Page found but not published, or no success
+          useTemplate();
         }
       })
       .catch(err => {
-        console.error(err);
-        setContent(`
-          <div style="text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd;">
-            <div style="font-size: 48px; margin-bottom: 20px;">❓</div>
-            <h3 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 12px;">요청하신 페이지를 찾을 수 없습니다.</h3>
-            <p style="color: #666; font-size: 15px; line-height: 1.6;">
-              주소가 잘못되었거나 삭제된 페이지일 수 있습니다.
-            </p>
-          </div>
-        `);
+        console.error('DynamicSubPage fetch error:', err);
+        // API returned 404 or network error
+        // → Always try template before showing error
+        useTemplate();
       })
       .finally(() => {
         setLoading(false);
       });
+
+    function useTemplate() {
+      if (PAGE_TEMPLATES[currentSlug]) {
+        setBlocks(PAGE_TEMPLATES[currentSlug]);
+      } else {
+        showEmptyState();
+      }
+    }
+
+    function showEmptyState() {
+      setContent(`
+        <div style="text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd;">
+          <div style="font-size: 48px; margin-bottom: 20px;">🚧</div>
+          <h3 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 12px;">현재 페이지는 준비 중입니다.</h3>
+          <p style="color: #666; font-size: 15px; line-height: 1.6;">
+            이 페이지는 곧 업데이트될 예정입니다.<br/>
+            조금만 기다려 주세요.
+          </p>
+        </div>
+      `);
+    }
   }, [currentSlug, location.pathname]);
 
   if (loading) {
