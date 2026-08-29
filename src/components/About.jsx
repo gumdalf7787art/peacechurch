@@ -447,94 +447,7 @@ function WorshipInfo() {
   );
 }
 
-function BulletinCard({ date }) {
-  return (
-    <div 
-      style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        backgroundColor: '#fff',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease-in-out'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
-      }}
-    >
-      <div style={{
-        width: '100%',
-        height: '240px',
-        backgroundColor: '#f8fafc',
-        backgroundImage: 'linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9), linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9)',
-        backgroundSize: '20px 20px',
-        backgroundPosition: '0 0, 10px 10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#94a3b8',
-        fontSize: '14px',
-        borderBottom: '1px solid #e2e8f0'
-      }}>
-        주보 썸네일 이미지
-      </div>
-      <div style={{ padding: '16px', textAlign: 'center' }}>
-        <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#1f2937' }}>{date} 주보</div>
-      </div>
-    </div>
-  );
-}
 
-function Bulletin() {
-  const dummyBulletins = [
-    '8월 23일', '8월 16일', '8월 9일', '8월 2일',
-    '7월 26일', '7월 19일', '7월 12일', '7월 5일'
-  ];
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#222', borderLeft: '4px solid #cc0000', paddingLeft: '12px' }}>교회주보</h3>
-        <span style={{ fontSize: '14px', color: '#666' }}>주보 썸네일을 클릭하면 원본 이미지를 볼 수 있습니다.</span>
-      </div>
-      
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-        {dummyBulletins.map((date, idx) => (
-          <BulletinCard key={idx} date={date} />
-        ))}
-      </div>
-
-      {/* ── Pagination ── */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '48px' }}>
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', color: '#666', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-          {'<'}
-        </button>
-        
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #cc0000', backgroundColor: '#cc0000', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>
-          1
-        </button>
-        
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', color: '#666', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-          2
-        </button>
-        
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', color: '#666', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-          3
-        </button>
-
-        <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', color: '#666', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-          {'>'}
-        </button>
-      </div>
-    </div>
-  );
-}
 function Offering() {
   return (
     <div>
@@ -905,7 +818,7 @@ export default function About() {
                 <Route path="pastor" element={<DynamicSubPage defaultSlug="about/pastor" />} />
                 <Route path="staff" element={<DynamicSubPage defaultSlug="about/staff" />} />
                 <Route path="worship" element={<DynamicSubPage defaultSlug="about/worship" />} />
-                <Route path="bulletin" element={<Bulletin />} />
+                <Route path="bulletin" element={<DynamicSubPage defaultSlug="about/bulletin" />} />
                 <Route path="offering" element={<Offering />} />
                 <Route path="facility" element={<DynamicSubPage defaultSlug="about/facility" />} />
                 <Route path="location" element={<LocationPage />} />
