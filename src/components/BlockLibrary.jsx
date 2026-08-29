@@ -2,11 +2,11 @@ import React from 'react';
 import { BLOCK_DEFINITIONS, BlockRenderer } from './PageBlocks';
 
 const BLOCK_CATEGORIES = [
-  { id: 'title', label: '타이틀', blocks: ['HeadingText'] },
+  { id: 'title', label: '타이틀', blocks: ['HeadingText', 'VisionHero'] },
   { id: 'divider', label: '라인 구분', blocks: [] },
   { id: 'textbox', label: '글상자', blocks: ['RichText'] },
-  { id: 'cardbox', label: '카드상자', blocks: ['CoreValues'] },
-  { id: 'quote', label: '인용구', blocks: ['VisionHighlight'] },
+  { id: 'cardbox', label: '카드상자', blocks: ['CoreValues', 'VisionGoals'] },
+  { id: 'quote', label: '인용구', blocks: ['VisionHighlight', 'VisionOutro'] },
   { id: 'pastor', label: '담임목사 소개', blocks: ['PastorGreeting'] },
   { id: 'people', label: '섬기는분', blocks: ['StaffGrid'] },
   { id: 'worship', label: '예배안내', blocks: ['WorshipSchedule'] },
