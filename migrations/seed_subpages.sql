@@ -20,31 +20,7 @@ VALUES ('about/vision', 2, '교회비전과 목표', '우리가 세워가는 교
     ', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('about/pastor', 3, '담임목사 인사말', '그리스도의 평화가 머무는 교회', '', '
-      <div style="display: flex; gap: 40px; flex-wrap: wrap;">
-        <div style="flex: 0 0 300px;">
-          <img src="/pastor-profile.jpg" alt="담임목사" style="width: 100%; border-radius: 12px; margin-bottom: 20px;" />
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 12px;">
-            <h4 style="font-weight: bold; border-bottom: 2px solid #cc0000; padding-bottom: 10px; margin-bottom: 10px;">장성진 담임목사</h4>
-            <ul style="font-size: 14px; color: #555; padding-left: 20px;">
-              <li>감리교신학교 신학과 졸업</li>
-              <li>감리교신학교 대학원 졸업</li>
-              <li>평화감리교회 담임 (2016-현재)</li>
-            </ul>
-          </div>
-        </div>
-        <div style="flex: 1; font-size: 16px; line-height: 1.8;">
-          <p>평화교회 홈페이지를 찾아주신 여러분을 주님의 이름으로 환영합니다.<br/>평화교회를 섬기고 있는 담임목사 <strong>장성진</strong>입니다.</p>
-          <br/>
-          <p>교회는 단순히 사람들이 모여 예배드리는 장소가 아니라, 하나님의 사랑을 배우고 그 사랑을 삶으로 살아내는 공동체라고 믿습니다.</p>
-          <div style="padding: 20px; background: #fff; border-left: 4px solid #cc0000; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin: 24px 0; font-weight: bold;">
-            복음은 말에만 머무는 것이 아니라 한 사람의 삶 곁으로 다가가 함께 울고, 함께 기뻐하며, 함께 걸어가는 사랑이어야 한다는 것입니다.
-          </div>
-          <p>우리 교회가 예배의 기쁨이 살아 있는 교회, 말씀을 통해 삶의 방향을 발견하는 교회, 다음 세대가 믿음 안에서 꿈을 키우는 교회가 되기를 소망합니다.</p>
-          <p>누구든 편안한 마음으로 찾아오십시오. 함께 예배하고, 함께 말씀을 배우며, 서로의 삶을 나누면서 믿음의 길을 함께 걸어가고 싶습니다.</p>
-        </div>
-      </div>
-    ', 1)
+VALUES ('about/pastor', 3, '담임목사 인사말', '그리스도의 평화가 머무는 교회', '', '[{"id":"blk_pastor_hero","type":"PastorGreeting","data":{"image":"/pastor-profile.jpg","name":"장성진","title":"담임목사","history":["감리교신학교 신학과 졸업<br>감리교신학교 대학원 졸업<br>평화감리교회 담임 (2016-현재)"],"greetingPart1":"평화교회 홈페이지를 찾아주신 여러분을 주님의 이름으로 환영합니다.<br><br>평화교회를 섬기고 있는 담임목사 장성진입니다.<br>교회는 단순히 사람들이 모여 예배드리는 장소가 아니라, 하나님의 사랑을 배우고 그 사랑을 삶으로 살아내는 공동체라고 믿습니다.","quoteText":"복음은 말에만 머무는 것이 아니라 한 사람의 삶 곁으로 다가가 함께 울고, 함께 기뻐하며, 함께 걸어가는 사랑이어야 한다는 것입니다.","greetingPart2":"우리 교회가 예배의 기쁨이 살아 있는 교회, 말씀을 통해 삶의 방향을 발견하는 교회, 다음 세대가 믿음 안에서 꿈을 키우는 교회가 되기를 소망합니다.<br><br>누구든 편안한 마음으로 찾아오십시오. 함께 예배하고, 함께 말씀을 배우며, 서로의 삶을 나누면서 믿음의 길을 함께 걸어가고 싶습니다."}}]', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
 VALUES ('about/staff', 4, '섬기는 사람들', '교회를 위해 헌신하는 동역자들', '', '

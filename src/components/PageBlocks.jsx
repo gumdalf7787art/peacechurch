@@ -545,95 +545,93 @@ export function RichTextBlock({ data, isEditMode }) {
 // -------------------------------------------------------------
 export function PastorGreetingBlock({ data, isEditMode, onChange }) {
   return (
-    <section className="py-8">
-      <div className="flex flex-col md:flex-row gap-10 items-start">
-        {/* Left Profile Section */}
-        <div className="w-full md:w-[32%] lg:w-[35%] shrink-0">
-          <div className="rounded-2xl overflow-hidden mb-6 bg-gray-100 shadow-sm border border-gray-100">
-            <EditableImage
-              src={data.image}
-              onChange={(url) => onChange({ image: url })}
-              isEditMode={isEditMode}
-              className="w-full aspect-[3/4]"
-              imageClassName="w-full h-full object-cover"
-              placeholder={
-                <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-200">
-                  <ImageIcon size={48} className="opacity-50" />
-                </div>
-              }
-            />
-          </div>
-          
-          <div className="bg-[#f9f9f9] rounded-2xl p-6 md:p-8 shadow-sm">
-            <h3 className="text-[20px] font-bold text-gray-900 mb-4 inline-block relative pb-3 flex items-center gap-1">
-              <EditableText tag="span" value={data.name || ''} onChange={(val) => onChange({ name: val })} isEditMode={isEditMode} placeholder="이름" />
-              <EditableText tag="span" className="font-medium text-[16px]" value={data.title || ''} onChange={(val) => onChange({ title: val })} isEditMode={isEditMode} placeholder="직책" />
-              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#cc0000]"></div>
-            </h3>
-            <div className="space-y-3">
-              {isEditMode ? (
+    <section className="py-16 md:py-24 bg-white relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-gray-50 to-transparent rounded-full -translate-y-1/2 translate-x-1/3 opacity-70 pointer-events-none"></div>
+      
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+          {/* Left Profile Section */}
+          <div className="w-full lg:w-[400px] shrink-0">
+            <div className="relative mb-10">
+              <div className="absolute inset-0 bg-[#cc0000] rounded-tl-[40px] rounded-br-[40px] translate-x-3 translate-y-3 opacity-10"></div>
+              <div className="rounded-tl-[40px] rounded-br-[40px] overflow-hidden shadow-2xl relative bg-white border border-gray-100">
+                <EditableImage
+                  src={data.image}
+                  onChange={(url) => onChange({ image: url })}
+                  isEditMode={isEditMode}
+                  className="w-full aspect-[3/4]"
+                  imageClassName="w-full h-full object-cover"
+                  placeholder={
+                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                      <ImageIcon size={48} className="mb-2 opacity-50" />
+                      <span className="text-sm font-medium">사진을 등록하세요</span>
+                    </div>
+                  }
+                />
+              </div>
+            </div>
+            
+            <div className="px-2">
+              <div className="flex items-baseline gap-2 mb-4 border-b border-gray-100 pb-4">
+                <EditableText tag="h3" value={data.name || ''} onChange={(val) => onChange({ name: val })} isEditMode={isEditMode} placeholder="이름" className="text-3xl font-bold text-gray-900" />
+                <EditableText tag="span" value={data.title || ''} onChange={(val) => onChange({ title: val })} isEditMode={isEditMode} placeholder="직책" className="text-lg font-medium text-[#cc0000]" />
+              </div>
+              <div className="space-y-3">
                 <EditableText
                   tag="div"
                   multiline={true}
-                  value={(data.history || []).join('\n')}
-                  onChange={(val) => onChange({ history: val.split('\n') })}
-                  isEditMode={true}
-                  placeholder="약력을 엔터로 구분하여 입력"
-                  className="text-[14px] text-gray-600 leading-relaxed whitespace-pre-wrap"
+                  value={Array.isArray(data.history) ? data.history.join('<br>') : (data.history || '')}
+                  onChange={(val) => onChange({ history: [val] })}
+                  isEditMode={isEditMode}
+                  placeholder="약력을 입력하세요 (엔터로 줄바꿈)"
+                  className="text-[15px] text-gray-600 leading-[1.9]"
                 />
-              ) : (
-                <ul className="space-y-3">
-                  {data.history?.map((item, idx) => (
-                    <li key={idx} className="flex items-start text-[14px] text-gray-600">
-                      <span className="text-gray-300 mr-2 mt-0.5 text-[10px]">●</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Content Section */}
-        <div className="flex-1 space-y-6 md:space-y-10 mt-4 md:mt-0">
-          {(data.greetingPart1 || isEditMode) && (
-            <EditableText
-              tag="div"
-              multiline={true}
-              value={data.greetingPart1 || ''}
-              onChange={(val) => onChange({ greetingPart1: val })}
-              isEditMode={isEditMode}
-              placeholder="인사말 1부를 입력하세요"
-              className="text-[16px] md:text-[17px] leading-[1.8] text-gray-700 whitespace-pre-wrap break-keep"
-            />
-          )}
-          
-          {(data.quoteText || isEditMode) && (
-            <div className="border-l-[4px] border-[#cc0000] pl-6 py-2 bg-white rounded-r-xl shadow-sm my-8 relative">
+          {/* Right Content Section */}
+          <div className="flex-1 lg:pt-8 w-full">
+            {(data.greetingPart1 || isEditMode) && (
               <EditableText
-                tag="p"
+                tag="div"
                 multiline={true}
-                value={data.quoteText || ''}
-                onChange={(val) => onChange({ quoteText: val })}
+                value={data.greetingPart1 || ''}
+                onChange={(val) => onChange({ greetingPart1: val })}
                 isEditMode={isEditMode}
-                placeholder="인용구를 입력하세요"
-                className="font-bold text-[18px] md:text-[20px] text-gray-800 leading-[1.6] break-keep"
+                placeholder="인사말 1부를 입력하세요"
+                className="text-[17px] md:text-[18px] leading-[2.2] text-gray-700 break-keep font-light"
               />
-            </div>
-          )}
+            )}
+            
+            {(data.quoteText || isEditMode) && (
+              <div className="relative my-12 py-8 px-8 md:px-10 bg-[#f8f9fa] rounded-2xl border border-gray-100">
+                <div className="absolute top-1/2 left-0 w-[4px] h-12 bg-[#cc0000] -translate-y-1/2 rounded-r-full"></div>
+                <EditableText
+                  tag="div"
+                  multiline={true}
+                  value={data.quoteText || ''}
+                  onChange={(val) => onChange({ quoteText: val })}
+                  isEditMode={isEditMode}
+                  placeholder="인용구를 입력하세요"
+                  className="font-bold text-[19px] md:text-[22px] text-gray-900 leading-[1.7] break-keep text-center"
+                />
+              </div>
+            )}
 
-          {(data.greetingPart2 || isEditMode) && (
-            <EditableText
-              tag="div"
-              multiline={true}
-              value={data.greetingPart2 || ''}
-              onChange={(val) => onChange({ greetingPart2: val })}
-              isEditMode={isEditMode}
-              placeholder="인사말 2부를 입력하세요"
-              className="text-[16px] md:text-[17px] leading-[1.8] text-gray-700 whitespace-pre-wrap break-keep"
-            />
-          )}
+            {(data.greetingPart2 || isEditMode) && (
+              <EditableText
+                tag="div"
+                multiline={true}
+                value={data.greetingPart2 || ''}
+                onChange={(val) => onChange({ greetingPart2: val })}
+                isEditMode={isEditMode}
+                placeholder="인사말 2부를 입력하세요"
+                className="text-[17px] md:text-[18px] leading-[2.2] text-gray-700 break-keep font-light mt-4"
+              />
+            )}
+          </div>
         </div>
       </div>
     </section>
