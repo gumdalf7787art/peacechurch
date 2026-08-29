@@ -677,29 +677,18 @@ export function VisionHeroBlock({ data, isEditMode, onChange }) {
         {/* Modern Box Design (Matching user image) */}
         <div className="bg-[#f8f9fa] border-l-[4px] border-[#cc0000] rounded-r-2xl p-8 md:p-12 shadow-sm max-w-4xl mx-auto">
           <div className="text-[16px] md:text-[18px] text-gray-700 leading-[2.2] space-y-6 md:space-y-8 break-keep text-center font-medium">
-            {isEditMode ? (
-              <EditableText
-                tag="div"
-                multiline={true}
-                value={(data.paragraphs || []).join('\n\n')}
-                onChange={(val) => onChange({ paragraphs: val.split('\n\n') })}
-                isEditMode={true}
-                placeholder="단락을 두 번 엔터로 구분하여 입력하세요"
-              />
-            ) : (
-              data.paragraphs?.map((p, idx) => {
-                const isLast = idx === data.paragraphs.length - 1;
-                return (
-                  <p 
-                    key={idx} 
-                    className={isLast ? "font-bold text-gray-900" : ""}
-                    dangerouslySetInnerHTML={{ 
-                      __html: p.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#cc0000] font-bold">$1</strong>') 
-                    }} 
-                  />
-                );
-              })
-            )}
+            <EditableText
+              tag="div"
+              multiline={true}
+              value={
+                Array.isArray(data.paragraphs) 
+                  ? data.paragraphs.join('<br><br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#cc0000] font-bold">$1</strong>')
+                  : (data.paragraphs || '')
+              }
+              onChange={(val) => onChange({ paragraphs: [val] })}
+              isEditMode={isEditMode}
+              placeholder="단락을 두 번 엔터로 구분하여 입력하세요"
+            />
           </div>
         </div>
       </motion.div>
