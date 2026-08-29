@@ -900,14 +900,14 @@ export default function About() {
               transition={{ duration: 0.2 }}
             >
               <Routes>
-                <Route path="/" element={<DynamicSubPage defaultSlug="vision" />} />
-                <Route path="vision" element={<DynamicSubPage defaultSlug="vision" />} />
-                <Route path="pastor" element={<DynamicSubPage defaultSlug="pastor" />} />
-                <Route path="staff" element={<DynamicSubPage defaultSlug="staff" />} />
-                <Route path="worship" element={<DynamicSubPage defaultSlug="worship" />} />
+                <Route path="/" element={<DynamicSubPage defaultSlug="about/vision" />} />
+                <Route path="vision" element={<DynamicSubPage defaultSlug="about/vision" />} />
+                <Route path="pastor" element={<DynamicSubPage defaultSlug="about/pastor" />} />
+                <Route path="staff" element={<DynamicSubPage defaultSlug="about/staff" />} />
+                <Route path="worship" element={<DynamicSubPage defaultSlug="about/worship" />} />
                 <Route path="bulletin" element={<Bulletin />} />
                 <Route path="offering" element={<Offering />} />
-                <Route path="facility" element={<DynamicSubPage defaultSlug="facility" />} />
+                <Route path="facility" element={<DynamicSubPage defaultSlug="about/facility" />} />
                 <Route path="location" element={<LocationPage />} />
                 <Route path="*" element={<DynamicSubPage />} />
               </Routes>

@@ -222,12 +222,12 @@ export default function Education() {
               transition={{ duration: 0.2 }}
             >
               <Routes>
-                <Route path="/" element={<DynamicSubPage defaultSlug="kids" />} />
-                <Route path="kids" element={<DynamicSubPage defaultSlug="kids" />} />
-                <Route path="youth" element={<DynamicSubPage defaultSlug="youth" />} />
-                <Route path="young-adult" element={<DynamicSubPage defaultSlug="young-adult" />} />
-                <Route path="womens" element={<DynamicSubPage defaultSlug="womens" />} />
-                <Route path="mens" element={<DynamicSubPage defaultSlug="mens" />} />
+                <Route path="/" element={<DynamicSubPage defaultSlug="education/kids" />} />
+                <Route path="kids" element={<DynamicSubPage defaultSlug="education/kids" />} />
+                <Route path="youth" element={<DynamicSubPage defaultSlug="education/youth" />} />
+                <Route path="young-adult" element={<DynamicSubPage defaultSlug="education/young-adult" />} />
+                <Route path="womens" element={<DynamicSubPage defaultSlug="education/womens" />} />
+                <Route path="mens" element={<DynamicSubPage defaultSlug="education/mens" />} />
                 <Route path="*" element={<DynamicSubPage />} />
               </Routes>
             </motion.div>
