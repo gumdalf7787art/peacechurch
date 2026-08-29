@@ -103,5 +103,52 @@ export const PAGE_TEMPLATES = {
         ]
       }
     }
+  ],
+  'about/worship': [
+    {
+      "id": "blk_worship_1",
+      "type": "HeadingText",
+      "data": {
+        "badge": "WORSHIP SCHEDULE",
+        "title": "예배 및 모임 안내",
+        "description": "평화교회의 예배와 모임에 여러분을 초대합니다."
+      }
+    },
+    {
+      "id": "blk_worship_2",
+      "type": "WorshipSchedule",
+      "data": {
+        "title": "주일 예배",
+        "schedules": [
+          { "name": "1부 예배", "time": "오전 9:00", "location": "본당 (3층)", "description": "전통 예배 양식으로 드립니다." },
+          { "name": "2부 예배", "time": "오전 11:00", "location": "본당 (3층)", "description": "현대적인 찬양과 함께하는 열린 예배입니다." },
+          { "name": "오후 찬양예배", "time": "오후 2:00", "location": "본당 (3층)", "description": "다양한 주제의 특강과 찬양으로 채워집니다." }
+        ]
+      }
+    },
+    {
+      "id": "blk_worship_3",
+      "type": "WorshipSchedule",
+      "data": {
+        "title": "교회학교 예배",
+        "schedules": [
+          { "name": "아동부", "time": "오전 11:00", "location": "믿음홀 (2층)", "description": "유치부, 유년부, 초등부 통합 예배" },
+          { "name": "중고등부", "time": "오전 11:00", "location": "소망홀 (2층)", "description": "청소년을 위한 맞춤형 예배와 분반 공부" },
+          { "name": "청년부", "time": "오후 2:00", "location": "사랑홀 (지하 1층)", "description": "예배 후 소그룹 모임과 교제" }
+        ]
+      }
+    },
+    {
+      "id": "blk_worship_4",
+      "type": "WorshipSchedule",
+      "data": {
+        "title": "주중 모임",
+        "schedules": [
+          { "name": "새벽기도회", "time": "매일 오전 5:00", "location": "본당 (3층)", "description": "월~토요일 진행 (주일 제외)" },
+          { "name": "수요예배", "time": "수요일 오후 7:30", "location": "본당 (3층)", "description": "말씀 강해와 뜨거운 기도의 시간" },
+          { "name": "금요성령집회", "time": "금요일 오후 8:30", "location": "본당 (3층)", "description": "찬양과 치유, 성령의 임재를 구하는 집회" }
+        ]
+      }
+    }
   ]
 };
