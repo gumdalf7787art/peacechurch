@@ -10,6 +10,7 @@ export default function DynamicSubPage({ defaultSlug }) {
   const [content, setContent] = useState(null);
   const [blocks, setBlocks] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pageData, setPageData] = useState(null);
   
   const pathSlug = location.pathname.replace(/^\/+|\/+$/g, '');
   const currentSlug = slug || defaultSlug || pathSlug;
@@ -28,6 +29,7 @@ export default function DynamicSubPage({ defaultSlug }) {
       })
       .then(data => {
         if (data.success && data.page && data.page.is_published === 1) {
+          setPageData(data.page);
           const rawContent = data.page.content;
           
           // Try parsing content as JSON block array
@@ -96,10 +98,25 @@ export default function DynamicSubPage({ defaultSlug }) {
     );
   }
 
+  const handleBlockChange = async (newBlocks) => {
+    setBlocks(newBlocks);
+    if (pageData) {
+      try {
+        await fetch(`/api/pages/${currentSlug}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...pageData, content: JSON.stringify(newBlocks) })
+        });
+      } catch (err) {
+        console.error('Failed to save block data', err);
+      }
+    }
+  };
+
   return (
     <div className="w-full">
       {blocks ? (
-        <BlockRenderer blocks={blocks} />
+        <BlockRenderer blocks={blocks} onChange={handleBlockChange} />
       ) : (
         <div 
           className="prose max-w-none prose-lg prose-headings:font-bold prose-a:text-[#8DC63F]"

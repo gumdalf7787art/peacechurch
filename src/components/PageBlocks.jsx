@@ -1041,6 +1041,10 @@ export const BLOCK_DEFINITIONS = [
 // 10. BulletinBoard Block
 // -------------------------------------------------------------
 export function BulletinBoardBlock({ data, isEditMode, onChange }) {
+  const userProfileStr = typeof window !== 'undefined' ? localStorage.getItem('userProfile') : null;
+  const userProfile = userProfileStr ? JSON.parse(userProfileStr) : null;
+  const canEdit = isEditMode || userProfile;
+
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
   const [newDate, setNewDate] = React.useState('');
@@ -1123,20 +1127,23 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                />
              )}
           </div>
-          {isEditMode && (
+          {canEdit && (
              <button 
                onClick={() => setIsModalOpen(true)}
-               className="bg-[#cc0000] text-white px-5 py-2.5 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg flex items-center gap-2 transform hover:-translate-y-0.5"
+               style={!isEditMode ? { padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', transition: 'background-color 0.2s' } : {}}
+               className={isEditMode ? "bg-[#cc0000] text-white px-5 py-2.5 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg flex items-center gap-2 transform hover:-translate-y-0.5" : ""}
+               onMouseEnter={(e) => { if (!isEditMode) e.currentTarget.style.backgroundColor = '#1d2f3d'; }}
+               onMouseLeave={(e) => { if (!isEditMode) e.currentTarget.style.backgroundColor = '#2a4358'; }}
              >
-               <Plus size={18} /> 새 주보 등록
+               {isEditMode ? <><Plus size={18} /> 새 주보 등록</> : '글쓰기'}
              </button>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
            {bulletins.map((b) => (
-              <div key={b.id} className="group relative border border-gray-100 bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                 {isEditMode && (
+            <div key={b.id} className="group relative border border-gray-100 bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                 {canEdit && (
                    <button onClick={() => removeBulletin(b.id)} className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg text-red-500 shadow-md z-10 hover:bg-red-50 hover:scale-110 transition-all"><Trash2 size={16}/></button>
                  )}
                  <div className="w-full aspect-[1/1.414] bg-gray-200 overflow-hidden relative">
