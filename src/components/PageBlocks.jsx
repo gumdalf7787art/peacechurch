@@ -312,8 +312,8 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10">
           {data.staff?.map((person, idx) => (
-            <div key={idx} className="group flex flex-col items-center text-center">
-              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden mb-4 bg-gray-50 shadow-sm group-hover:shadow-lg transition-all duration-300 relative group-hover:-translate-y-1">
+            <div key={idx} className="group flex flex-col items-center text-center rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden relative hover:-translate-y-1">
+              <div className="w-full aspect-[4/5] bg-gray-50 relative overflow-hidden border-b border-gray-100">
                 <EditableImage
                   src={person.image}
                   onChange={(url) => {
@@ -323,7 +323,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                   }}
                   isEditMode={isEditMode}
                   className="w-full h-full"
-                  imageClassName="w-full h-full object-cover"
+                  imageClassName="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   placeholder={
                     <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
                       <ImageIcon size={40} className="opacity-30" />
@@ -332,7 +332,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                 />
               </div>
               
-              <div className="px-2 py-2 w-full">
+              <div className="px-4 py-6 w-full">
                 <EditableText
                   tag="div"
                   value={person.role || ''}
@@ -343,7 +343,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                   }}
                   isEditMode={isEditMode}
                   placeholder="직책 (예: 부목사)"
-                  className="text-[13px] text-[#cc0000] font-bold tracking-wider uppercase mb-1"
+                  className="text-[13px] text-[#cc0000] font-bold tracking-wider uppercase mb-1.5"
                 />
                 <EditableText
                   tag="div"
@@ -368,7 +368,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                     }}
                     isEditMode={isEditMode}
                     placeholder="사역 부서 (선택)"
-                    className="text-[14px] text-gray-500 font-medium"
+                    className="text-[14px] text-gray-500 font-medium mt-1"
                   />
                 )}
               </div>
