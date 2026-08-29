@@ -1049,40 +1049,55 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
   const [newTitle, setNewTitle] = React.useState('');
   const [newDate, setNewDate] = React.useState('');
   const [newImage, setNewImage] = React.useState('');
-  const [newPdf, setNewPdf] = React.useState('');
+  const [newAttachments, setNewAttachments] = React.useState([]);
   const [uploading, setUploading] = React.useState(false);
 
   const bulletins = data.bulletins || [];
 
-  const handleUploadFile = (e, type) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleUploadFile = async (e, type) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
     setUploading(true);
     
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const base64Data = event.target.result;
-      const extension = file.name.split('.').pop() || (type === 'image' ? 'webp' : 'pdf');
-      
-      try {
-        const res = await fetch('/api/cms/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ base64Data, extension })
-        });
-        const uploadData = await res.json();
-        if (uploadData.success) {
-          if (type === 'image') setNewImage(uploadData.url);
-          if (type === 'pdf') setNewPdf(uploadData.url);
-        } else {
-          alert('업로드 실패: ' + uploadData.error);
-        }
-      } catch (err) {
-        alert('업로드 중 오류가 발생했습니다.');
+    const uploadPromises = files.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          const base64Data = event.target.result;
+          const extension = file.name.split('.').pop() || (type === 'image' ? 'webp' : 'pdf');
+          try {
+            const res = await fetch('/api/cms/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ base64Data, extension })
+            });
+            const uploadData = await res.json();
+            resolve(uploadData.success ? uploadData.url : null);
+          } catch (err) {
+            resolve(null);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const urls = await Promise.all(uploadPromises);
+    const validUrls = urls.filter(Boolean);
+
+    if (validUrls.length > 0) {
+      if (type === 'image') {
+        setNewImage(validUrls[0]);
+      } else {
+        setNewAttachments(prev => [...prev, ...validUrls]);
       }
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    } else {
+      alert('업로드 중 오류가 발생했습니다.');
+    }
+    setUploading(false);
+  };
+
+  const removeAttachment = (urlToRemove) => {
+    setNewAttachments(prev => prev.filter(url => url !== urlToRemove));
   };
 
   const addBulletin = () => {
@@ -1092,8 +1107,9 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
     }
     
     let finalImage = newImage;
-    if (!finalImage && newPdf && newPdf.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i)) {
-      finalImage = newPdf;
+    if (!finalImage && newAttachments.length > 0) {
+      const firstImage = newAttachments.find(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
+      if (firstImage) finalImage = firstImage;
     }
 
     const newBulletin = {
@@ -1101,14 +1117,14 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
       title: newTitle,
       date: newDate,
       image: finalImage,
-      pdf: newPdf
+      pdf: newAttachments
     };
     onChange({ bulletins: [newBulletin, ...bulletins] });
     setIsWritePageOpen(false);
     setNewTitle('');
     setNewDate('');
     setNewImage('');
-    setNewPdf('');
+    setNewAttachments([]);
   };
 
   const removeBulletin = (id) => {
@@ -1147,11 +1163,13 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                <div>
                  <label className="block text-[14px] font-bold text-gray-700 mb-2">표지 이미지 (선택)</label>
                  <p className="text-[12px] text-gray-500 mb-3">등록하지 않으면 첨부파일이 이미지일 경우 표지로 자동 사용됩니다.</p>
-                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative h-[160px] flex flex-col justify-center">
+                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative h-[180px] flex flex-col justify-center overflow-hidden">
                    {newImage ? (
-                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
-                       <span className="text-[13px] text-green-600 truncate w-full px-4 font-bold mb-3">{newImage.split('/').pop()}</span>
-                       <button onClick={()=>setNewImage('')} className="bg-red-50 text-red-500 text-[13px] font-bold px-4 py-2 hover:bg-red-100 transition-colors rounded-lg">삭제하기</button>
+                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 rounded-xl overflow-hidden group/cover">
+                       <img src={newImage} alt="표지 미리보기" className="w-full h-full object-cover" />
+                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/cover:opacity-100 transition-opacity">
+                         <button onClick={()=>setNewImage('')} className="bg-red-500 text-white text-[13px] font-bold px-4 py-2 hover:bg-red-600 transition-colors rounded-lg shadow-lg">삭제하기</button>
+                       </div>
                      </div>
                    ) : (
                      <label className="cursor-pointer text-gray-600 font-bold text-[14px] flex flex-col items-center justify-center gap-3 w-full h-full">
@@ -1163,19 +1181,41 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                  </div>
                </div>
                <div>
-                 <label className="block text-[14px] font-bold text-gray-700 mb-2">주보 첨부파일 (PDF, JPG, PNG)</label>
-                 <p className="text-[12px] text-gray-500 mb-3">PDF 문서나 주보 원본 이미지를 업로드할 수 있습니다.</p>
-                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative h-[160px] flex flex-col justify-center">
-                   {newPdf ? (
-                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
-                       <span className="text-[13px] text-blue-600 truncate w-full px-4 font-bold mb-3">{newPdf.split('/').pop()}</span>
-                       <button onClick={()=>setNewPdf('')} className="bg-red-50 text-red-500 text-[13px] font-bold px-4 py-2 hover:bg-red-100 transition-colors rounded-lg">삭제하기</button>
+                 <label className="block text-[14px] font-bold text-gray-700 mb-2">주보 첨부파일 (PDF, JPG, PNG 등 다중선택)</label>
+                 <p className="text-[12px] text-gray-500 mb-3">여러 장의 주보 이미지나 PDF를 올릴 수 있습니다.</p>
+                 <div className={`border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-3 text-center hover:border-gray-400 transition-colors group relative h-[180px] flex flex-col justify-center ${newAttachments.length > 0 ? 'overflow-y-auto custom-scrollbar' : ''}`}>
+                   {newAttachments.length > 0 ? (
+                     <div className="w-full grid grid-cols-3 gap-2 h-full content-start">
+                       {newAttachments.map((url, idx) => (
+                         <div key={idx} className="relative group/attach rounded-lg overflow-hidden border border-gray-200 aspect-[1/1.4] bg-white flex items-center justify-center shadow-sm">
+                           {url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
+                              <img src={url} alt={`첨부 ${idx+1}`} className="w-full h-full object-cover" />
+                           ) : (
+                              <div className="flex flex-col items-center justify-center text-red-500"><BookOpen size={20} /><span className="text-[9px] mt-1 font-bold">PDF</span></div>
+                           )}
+                           
+                           {/* 대표이미지 뱃지 */}
+                           {!newImage && idx === 0 && url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) && (
+                             <div className="absolute top-1 left-1 bg-[#8DC63F] text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow whitespace-nowrap">대표이미지</div>
+                           )}
+
+                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/attach:opacity-100 transition-opacity">
+                             <button onClick={()=>removeAttachment(url)} className="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors shadow-lg"><Trash2 size={12}/></button>
+                           </div>
+                         </div>
+                       ))}
+                       {/* 추가 썸네일 박스 */}
+                       <label className="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-white rounded-lg aspect-[1/1.4] hover:bg-gray-100 transition-colors shadow-sm">
+                          <Plus size={16} className="text-gray-400 mb-1" />
+                          <span className="text-[10px] font-bold text-gray-400">추가</span>
+                          <input type="file" multiple accept=".pdf,image/*" className="hidden" onChange={(e) => handleUploadFile(e, 'pdf')} />
+                       </label>
                      </div>
                    ) : (
                      <label className="cursor-pointer text-gray-600 font-bold text-[14px] flex flex-col items-center justify-center gap-3 w-full h-full">
                        <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform"><BookOpen size={20} /></div>
-                       첨부파일 선택
-                       <input type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => handleUploadFile(e, 'pdf')} />
+                       첨부파일 다중 선택
+                       <input type="file" multiple accept=".pdf,image/*" className="hidden" onChange={(e) => handleUploadFile(e, 'pdf')} />
                      </label>
                    )}
                  </div>
@@ -1184,7 +1224,7 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
              
              <div className="pt-8 border-t border-gray-100 flex justify-end gap-3">
                 <button onClick={() => setIsWritePageOpen(false)} className="px-6 py-3.5 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">취소</button>
-                <button onClick={addBulletin} className="px-8 py-3.5 rounded-xl font-bold text-white bg-[#2a4358] hover:bg-[#1d2f3d] transition-colors shadow-lg">등록 완료</button>
+                <button onClick={addBulletin} className="px-8 py-3.5 rounded-xl font-bold text-white bg-[#2a4358] hover:bg-[#1d2f3d] transition-colors shadow-lg">주보등록</button>
              </div>
           </div>
         </div>
@@ -1237,12 +1277,16 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                  <div className="p-6 bg-white border-t border-gray-100 relative z-10 -mt-2 rounded-t-2xl">
                    <div className="text-[13px] text-[#cc0000] font-bold mb-2 tracking-wide">{b.date}</div>
                    <h4 className="font-bold text-[18px] text-gray-900 mb-5 leading-snug">{b.title}</h4>
-                   <div className="flex gap-2">
-                     {b.pdf && b.pdf.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
-                       <a href={b.pdf} target="_blank" rel="noreferrer" className="flex-1 text-center py-2.5 bg-[#cc0000] text-white rounded-xl text-[14px] font-bold hover:bg-red-700 transition-colors shadow-sm">주보 이미지 열기</a>
-                     ) : b.pdf ? (
-                       <a href={b.pdf} target="_blank" rel="noreferrer" className="flex-1 text-center py-2.5 bg-[#cc0000] text-white rounded-xl text-[14px] font-bold hover:bg-red-700 transition-colors shadow-sm">PDF 다운로드</a>
-                     ) : null}
+                   <div className="flex flex-col gap-2">
+                     {b.pdf && (Array.isArray(b.pdf) ? b.pdf : [b.pdf]).map((pdfUrl, idx) => {
+                       if (!pdfUrl) return null;
+                       const isImg = pdfUrl.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i);
+                       return (
+                         <a key={idx} href={pdfUrl} target="_blank" rel="noreferrer" className="flex-1 text-center py-2.5 bg-[#cc0000] text-white rounded-xl text-[14px] font-bold hover:bg-red-700 transition-colors shadow-sm">
+                           {isImg ? (Array.isArray(b.pdf) && b.pdf.length > 1 ? `주보 이미지 열기 (${idx+1})` : '주보 이미지 열기') : 'PDF 다운로드'}
+                         </a>
+                       )
+                     })}
                    </div>
                  </div>
               </div>
