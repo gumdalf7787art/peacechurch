@@ -884,7 +884,7 @@ export function BlockRenderer({ blocks, isEditMode = false, onChange }) {
             key={block.id} 
             data={block.data} 
             isEditMode={isEditMode}
-            onChange={isEditMode && onChange ? (newData) => onChange(block.id, newData) : undefined}
+            onChange={onChange ? (newData) => onChange(block.id, newData) : undefined}
           />
         );
       })}
@@ -1163,7 +1163,7 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                <div>
                  <label className="block text-[14px] font-bold text-gray-700 mb-2">표지 이미지 (선택)</label>
                  <p className="text-[12px] text-gray-500 mb-3">등록하지 않으면 첨부파일이 이미지일 경우 표지로 자동 사용됩니다.</p>
-                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative h-[180px] flex flex-col justify-center overflow-hidden">
+                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative min-h-[180px] flex flex-col justify-center overflow-hidden">
                    {newImage ? (
                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 rounded-xl overflow-hidden group/cover">
                        <img src={newImage} alt="표지 미리보기" className="w-full h-full object-cover" />
@@ -1183,7 +1183,7 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                <div>
                  <label className="block text-[14px] font-bold text-gray-700 mb-2">주보 첨부파일 (PDF, JPG, PNG 등 다중선택)</label>
                  <p className="text-[12px] text-gray-500 mb-3">여러 장의 주보 이미지나 PDF를 올릴 수 있습니다.</p>
-                 <div className={`border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-3 text-center hover:border-gray-400 transition-colors group relative h-[180px] flex flex-col justify-center ${newAttachments.length > 0 ? 'overflow-y-auto custom-scrollbar' : ''}`}>
+                 <div className={`border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-3 text-center hover:border-gray-400 transition-colors group relative min-h-[180px] flex flex-col justify-center`}>
                    {newAttachments.length > 0 ? (
                      <div className="w-full grid grid-cols-3 gap-2 h-full content-start">
                        {newAttachments.map((url, idx) => (
