@@ -674,13 +674,9 @@ export function VisionHeroBlock({ data, isEditMode, onChange }) {
           className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-16 leading-[1.3] tracking-tight break-keep"
         />
         
-        {/* Modern Blockquote Design */}
-        <div className="relative max-w-3xl mx-auto">
-          {/* Decorative Large Quote Marks */}
-          <div className="absolute -top-12 -left-8 text-8xl text-gray-100 font-serif leading-none select-none pointer-events-none">"</div>
-          <div className="absolute -bottom-16 -right-8 text-8xl text-gray-100 font-serif leading-none select-none pointer-events-none rotate-180">"</div>
-          
-          <div className="relative z-10 text-[17px] md:text-[20px] text-gray-600 leading-[2] md:leading-[2.2] space-y-6 md:space-y-8 break-keep text-left md:text-center font-medium italic border-l-4 md:border-l-0 border-[#8DC63F] pl-6 md:pl-0">
+        {/* Modern Box Design (Matching user image) */}
+        <div className="bg-[#f8f9fa] border-l-[4px] border-[#cc0000] rounded-r-2xl p-8 md:p-12 shadow-sm max-w-4xl mx-auto">
+          <div className="text-[16px] md:text-[18px] text-gray-700 leading-[2.2] space-y-6 md:space-y-8 break-keep text-center font-medium">
             {isEditMode ? (
               <EditableText
                 tag="div"
@@ -691,9 +687,18 @@ export function VisionHeroBlock({ data, isEditMode, onChange }) {
                 placeholder="단락을 두 번 엔터로 구분하여 입력하세요"
               />
             ) : (
-              data.paragraphs?.map((p, idx) => (
-                <p key={idx} dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold not-italic">$1</strong>') }} />
-              ))
+              data.paragraphs?.map((p, idx) => {
+                const isLast = idx === data.paragraphs.length - 1;
+                return (
+                  <p 
+                    key={idx} 
+                    className={isLast ? "font-bold text-gray-900" : ""}
+                    dangerouslySetInnerHTML={{ 
+                      __html: p.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#cc0000] font-bold">$1</strong>') 
+                    }} 
+                  />
+                );
+              })
             )}
           </div>
         </div>
