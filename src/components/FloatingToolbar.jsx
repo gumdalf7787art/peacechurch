@@ -13,9 +13,17 @@ export default function FloatingToolbar() {
   useEffect(() => {
     const handleSelectionChange = () => {
       const selection = window.getSelection();
+      
       if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-        if (!showColorPicker && !showBgColorPicker && !showFontFamily && !showFontSize) {
+        const activeElement = document.activeElement;
+        const isFocusInsideToolbar = toolbarRef.current && toolbarRef.current.contains(activeElement);
+        
+        if (!isFocusInsideToolbar) {
           setPosition(prev => ({ ...prev, visible: false }));
+          setShowColorPicker(false);
+          setShowBgColorPicker(false);
+          setShowFontFamily(false);
+          setShowFontSize(false);
         }
         return;
       }
@@ -28,6 +36,10 @@ export default function FloatingToolbar() {
       const isEditable = container.closest('[contenteditable="true"]');
       if (!isEditable) {
         setPosition(prev => ({ ...prev, visible: false }));
+        setShowColorPicker(false);
+        setShowBgColorPicker(false);
+        setShowFontFamily(false);
+        setShowFontSize(false);
         return;
       }
 
@@ -55,14 +67,20 @@ export default function FloatingToolbar() {
     };
 
     document.addEventListener('selectionchange', handleSelectionChange);
+    
     // Hide when clicking outside
     const handleMouseDown = (e) => {
-      if (toolbarRef.current && !toolbarRef.current.contains(e.target) && !e.target.closest('[contenteditable="true"]')) {
-        setPosition(prev => ({ ...prev, visible: false }));
+      if (toolbarRef.current && !toolbarRef.current.contains(e.target)) {
+        // Always close dropdowns when clicking outside the toolbar
         setShowColorPicker(false);
         setShowBgColorPicker(false);
         setShowFontFamily(false);
         setShowFontSize(false);
+        
+        // Hide entire toolbar if clicking outside an editable area
+        if (!e.target.closest('[contenteditable="true"]')) {
+          setPosition(prev => ({ ...prev, visible: false }));
+        }
       }
     };
     document.addEventListener('mousedown', handleMouseDown);
