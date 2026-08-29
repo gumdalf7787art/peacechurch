@@ -21,3 +21,26 @@
 ## 4. UI 상태 가시화 및 상태 동기화 (Single Source of Truth)
 * **저장 상태 피드백:** 비동기 서버 저장 로직(`saveToServer`)은 반드시 성공/실패 여부를 프론트엔드로 반환하여, 실패 시 사용자(관리자)가 즉각 인지할 수 있도록 붉은색 에러 UI 등을 제공해야 합니다.
 * **데이터 원천 단일화:** 중요한 CMS 데이터는 `localStorage`에 의존하여 상태를 초기화하지 말고, 서버(DB)를 단일 진실의 원천(Single Source of Truth)으로 삼아 데이터를 불러오고 캐시를 철저히 관리(필요시 강제 무효화)해야 합니다.
+
+## 5. 서브 페이지 신규 생성 및 디자인 고도화 자동화 워크플로우 (Subpage Creation Workflow)
+사용자가 "새로운 페이지를 만들어줘" 또는 "특정 페이지 디자인을 고도화해줘"라고 요청할 경우, AI는 **반드시 아래 5단계 워크플로우를 한 번에 진행**하여 즉시 실서버 및 관리자 페이지에 연동되도록 해야 합니다.
+
+**[Step 1] 블록 컴포넌트 개발 및 디자인 (Design & Block Development)**
+* `src/components/PageBlocks.jsx`에 요구사항에 맞는 최고 수준의 모던 UI 컴포넌트를 설계합니다 (예: `VisionHeroBlock`).
+* 관리자 편집을 위해 `EditableText`, `EditableImage` 등을 사용하고 `isEditMode`에 따른 분기 처리를 확실히 적용합니다.
+
+**[Step 2] 블록 라이브러리 등록 (Register to Library)**
+* 생성된 새 블록을 `src/components/BlockLibrary.jsx`의 `AVAILABLE_BLOCKS` 배열에 등록합니다.
+* 이를 통해 관리자(마이페이지 > 서브페이지 편집)가 '우측 블록 추가 메뉴'에서 클릭만으로 해당 디자인을 자유롭게 조립할 수 있게 됩니다.
+
+**[Step 3] 초기 템플릿(Fallback) 및 JSON 스키마 정의 (Define Template)**
+* `src/data/pageTemplates.js` (또는 템플릿 관리 파일)에 새 페이지에 들어갈 기본 블록 조합(JSON)을 정의합니다.
+* 사용자가 관리자 페이지에서 빈 화면을 볼 때, "✨ 템플릿 불러오기" 버튼 하나로 새 디자인 블록 세트를 즉시 로드할 수 있도록 돕습니다.
+
+**[Step 4] D1 DB 마이그레이션 적용 (Database Seed)**
+* `migrations/seed_subpages.sql`에 신규 서브페이지의 초기 JSON 데이터를 `INSERT` (혹은 `UPDATE`) 합니다. 
+* 페이지 접속 라우팅(예: `about/vision`)과 일치하는 `slug`를 사용하여, DB 마이그레이션 즉시 라이브 웹사이트에 새로운 디자인이 렌더링되도록 자동화합니다.
+
+**[Step 5] 커밋, 푸시 및 배포 검증 (Commit & Deploy)**
+* 위 작업들을 완료한 후 깃허브에 커밋 & 푸시하여 Cloudflare CI/CD가 구동되게 합니다.
+* 실제 온라인 페이지에 렌더링 되는지, 관리자 페이지에서 서식 편집(메뉴바)과 저장이 원활하게 되는지 확인해야 프로젝트가 완성된 것입니다.
