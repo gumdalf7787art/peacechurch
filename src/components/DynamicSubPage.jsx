@@ -54,12 +54,13 @@ export default function DynamicSubPage({ defaultSlug }) {
               <div style="text-align: center; padding: 60px 20px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd;">
                 <div style="font-size: 48px; margin-bottom: 20px;">🚧</div>
                 <h3 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 12px;">현재 페이지는 내용이 비어있거나 비공개 상태입니다.</h3>
-              <p style="color: #666; font-size: 15px; line-height: 1.6;">
-                이 페이지는 관리자 메뉴에서 새롭게 생성된 페이지입니다.<br/>
-                향후 <strong>[서브 페이지 편집]</strong> 기능을 통해 내용을 작성하실 수 있습니다.
-              </p>
-            </div>
-          `);
+                <p style="color: #666; font-size: 15px; line-height: 1.6;">
+                  이 페이지는 관리자 메뉴에서 새롭게 생성된 페이지입니다.<br/>
+                  향후 <strong>[서브 페이지 편집]</strong> 기능을 통해 내용을 작성하실 수 있습니다.
+                </p>
+              </div>
+            `);
+          }
         }
       })
       .catch(err => {
