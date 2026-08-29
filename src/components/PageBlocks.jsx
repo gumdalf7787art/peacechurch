@@ -1043,7 +1043,7 @@ export const BLOCK_DEFINITIONS = [
 export function BulletinBoardBlock({ data, isEditMode, onChange }) {
   const userProfileStr = typeof window !== 'undefined' ? localStorage.getItem('userProfile') : null;
   const userProfile = userProfileStr ? JSON.parse(userProfileStr) : null;
-  const canEdit = isEditMode || userProfile;
+  const canEdit = isEditMode || (userProfile && userProfile.role === 'admin');
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
