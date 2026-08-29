@@ -191,6 +191,20 @@ export default function FloatingToolbar() {
       <div className="w-[1px] h-5 bg-gray-300 mx-1"></div>
 
       <select 
+        className="text-[13px] bg-transparent outline-none cursor-pointer text-gray-700 hover:bg-gray-100 px-1 py-1 rounded max-w-[90px] truncate"
+        onChange={(e) => execCommand('fontName', e.target.value)}
+        title="글꼴"
+        defaultValue=""
+      >
+        <option value="" disabled hidden>글꼴</option>
+        <option value="Inter, sans-serif">기본 폰트</option>
+        <option value="Nanum Myeongjo, serif">나눔명조</option>
+        <option value="Noto Serif KR, serif">본고딕 바탕</option>
+        <option value="Gowun Dodum, sans-serif">고운돋움</option>
+        <option value="system-ui, sans-serif">시스템 폰트</option>
+      </select>
+
+      <select 
         className="text-[13px] bg-transparent outline-none cursor-pointer text-gray-700 hover:bg-gray-100 px-1 py-1 rounded"
         onChange={(e) => execCommand('fontSize', e.target.value)}
         title="글자 크기"
