@@ -8,6 +8,7 @@ import {
 import BlockEditor from './BlockEditor';
 import { BlockRenderer } from './PageBlocks';
 import BlockLibrary from './BlockLibrary';
+import { PAGE_TEMPLATES } from '../data/pageTemplates';
 
 // Helper to generate IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -449,19 +450,33 @@ export default function AdminPagesManager({ setHasUnsavedChanges }) {
                     <LayoutGrid size={12} className="mr-1.5 text-indigo-500" />
                     블록 내용 수정
                   </h4>
-                  {!isBlockMode && (
-                    <button 
-                      onClick={() => {
-                        if (window.confirm('블록 에디터로 전환하면 기존 HTML 코드가 모두 삭제됩니다. 계속하시겠습니까?')) {
-                          setFormData(prev => ({ ...prev, content: '[]' }));
-                          setIsBlockMode(true);
-                        }
-                      }}
-                      className="text-[10px] font-bold text-indigo-600 hover:underline"
-                    >
-                      블록 전환
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {isBlockMode && PAGE_TEMPLATES[formData.slug] && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('AI가 생성한 아름다운 기본 템플릿을 불러오시겠습니까? 기존 작업 내역은 덮어씌워집니다.')) {
+                            setFormData(prev => ({ ...prev, content: JSON.stringify(PAGE_TEMPLATES[formData.slug]) }));
+                          }
+                        }}
+                        className="text-[10px] font-bold px-2 py-1 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-colors"
+                      >
+                        ✨ 템플릿 불러오기
+                      </button>
+                    )}
+                    {!isBlockMode && (
+                      <button 
+                        onClick={() => {
+                          if (window.confirm('블록 에디터로 전환하면 기존 HTML 코드가 모두 삭제됩니다. 계속하시겠습니까?')) {
+                            setFormData(prev => ({ ...prev, content: '[]' }));
+                            setIsBlockMode(true);
+                          }
+                        }}
+                        className="text-[10px] font-bold text-indigo-600 hover:underline"
+                      >
+                        블록 전환
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="p-3 bg-[#f8fafc]">

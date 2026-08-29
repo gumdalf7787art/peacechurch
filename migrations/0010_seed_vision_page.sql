@@ -1,6 +1,6 @@
 -- 0010_seed_vision_page.sql
 INSERT OR REPLACE INTO subpages (slug, menu_id, title, content, is_published, created_at, updated_at) 
-VALUES ('aboutvision', 2, '평화교회 비전과 목표', '[
+VALUES ('about/vision', 2, '평화교회 비전과 목표', '[
   {
     "id": "blk1",
     "type": "VisionHero",
