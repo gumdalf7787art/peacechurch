@@ -287,10 +287,14 @@ export function CoreValuesBlock({ data, isEditMode, onChange }) {
 // 4. StaffGrid Block
 // -------------------------------------------------------------
 export function StaffGridBlock({ data, isEditMode, onChange }) {
+  const align = data.align || 'center';
+  const alignClass = align === 'left' ? 'text-left' : align === 'right' ? 'text-right' : 'text-center';
+  const lineClass = align === 'left' ? 'ml-0' : align === 'right' ? 'ml-auto mr-0' : 'mx-auto';
+
   return (
     <section className="py-16 md:py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <div className={`mb-12 ${alignClass} relative group`}>
           {(data.title || isEditMode) && (
             <>
               <EditableText
@@ -301,7 +305,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                 placeholder="직분 타이틀 (예: 목회자, 장로)"
                 className="text-3xl font-bold text-gray-900 inline-block relative pb-4"
               />
-              <div className="w-12 h-1 bg-[#cc0000] mx-auto mt-4 rounded-full"></div>
+              <div className={`w-12 h-1 bg-[#cc0000] mt-4 rounded-full ${lineClass}`}></div>
             </>
           )}
         </div>
@@ -309,7 +313,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10">
           {data.staff?.map((person, idx) => (
             <div key={idx} className="group flex flex-col items-center text-center">
-              <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-6 bg-gray-50 border-4 border-white shadow-xl group-hover:shadow-2xl transition-all duration-300 relative group-hover:-translate-y-2">
+              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden mb-4 bg-gray-50 shadow-sm group-hover:shadow-lg transition-all duration-300 relative group-hover:-translate-y-1">
                 <EditableImage
                   src={person.image}
                   onChange={(url) => {
@@ -328,7 +332,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
                 />
               </div>
               
-              <div className="bg-white px-6 py-4 rounded-2xl w-full -mt-12 relative z-10 border border-gray-100 shadow-sm group-hover:shadow-md transition-shadow">
+              <div className="px-2 py-2 w-full">
                 <EditableText
                   tag="div"
                   value={person.role || ''}

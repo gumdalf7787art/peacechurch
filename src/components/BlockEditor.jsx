@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, ArrowUp, ArrowDown, Settings, Type, AlignLeft, Image as ImageIcon, LayoutGrid, LayoutTemplate, Layers } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown, Settings, Type, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon, LayoutGrid, LayoutTemplate, Layers } from 'lucide-react';
 import { BLOCK_DEFINITIONS } from './PageBlocks';
 
 // Helpers to generate unique IDs
@@ -209,7 +209,19 @@ function BlockEditorItem({ block, index, total, onUpdate, onRemove, onMoveUp, on
       case 'StaffGrid':
         return (
           <div className="space-y-4">
-            <Input label="섹션 제목 (예: 담임 목회자)" value={data.title} onChange={(v) => handleChange('title', v)} />
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <Input label="섹션 제목 (예: 담임 목회자)" value={data.title} onChange={(v) => handleChange('title', v)} />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5">제목 정렬</label>
+                <div className="flex gap-1 border border-gray-200 p-1 rounded-xl bg-white">
+                  <button onClick={() => handleChange('align', 'left')} className={`p-1.5 rounded-lg ${data.align === 'left' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:bg-gray-50'}`}><AlignLeft size={16} /></button>
+                  <button onClick={() => handleChange('align', 'center')} className={`p-1.5 rounded-lg ${!data.align || data.align === 'center' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:bg-gray-50'}`}><AlignCenter size={16} /></button>
+                  <button onClick={() => handleChange('align', 'right')} className={`p-1.5 rounded-lg ${data.align === 'right' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:bg-gray-50'}`}><AlignRight size={16} /></button>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.staff.map((person, idx) => (
                 <div key={idx} className="bg-gray-50 border border-gray-200 p-4 rounded-xl relative group">
