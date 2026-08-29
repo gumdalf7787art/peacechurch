@@ -256,6 +256,7 @@ function BlockEditorItem({ block, index, total, onUpdate, onRemove, onMoveUp, on
               ))}
               <button onClick={() => addArrayItem('schedules', { name:'', time:'', location:'', description:'' })} className="w-full py-2 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-[13px] font-bold text-gray-600 hover:bg-gray-100">+ 일정 추가</button>
             </div>
+          </div>
         );
       case 'BulletinBoard':
         return (
