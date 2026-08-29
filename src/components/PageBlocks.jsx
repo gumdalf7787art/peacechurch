@@ -288,76 +288,89 @@ export function CoreValuesBlock({ data, isEditMode, onChange }) {
 // -------------------------------------------------------------
 export function StaffGridBlock({ data, isEditMode, onChange }) {
   return (
-    <section className="py-8">
-      {(data.title || isEditMode) && (
-        <EditableText
-          tag="h3"
-          value={data.title || ''}
-          onChange={(val) => onChange({ title: val })}
-          isEditMode={isEditMode}
-          placeholder="스태프 섹션 제목"
-          className="text-[22px] font-bold text-[#222] border-l-[4px] border-[#cc0000] pl-3 mb-6 block"
-        />
-      )}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-        {data.staff?.map((person, idx) => (
-          <div key={idx} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex flex-col">
-            <div className="w-full h-[190px] bg-gray-100 flex items-center justify-center text-gray-400 text-sm overflow-hidden relative group">
-              <EditableImage
-                src={person.image}
-                onChange={(url) => {
-                  const newStaff = [...data.staff];
-                  newStaff[idx] = { ...person, image: url };
-                  onChange({ staff: newStaff });
-                }}
-                isEditMode={isEditMode}
-                className="w-full h-full"
-                imageClassName="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                placeholder={<ImageIcon size={32} className="opacity-50" />}
-              />
-            </div>
-            <div className="p-5 text-center">
+    <section className="py-16 md:py-20 bg-white">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-16">
+          {(data.title || isEditMode) && (
+            <>
               <EditableText
-                tag="div"
-                value={person.role || ''}
-                onChange={(val) => {
-                  const newStaff = [...data.staff];
-                  newStaff[idx] = { ...person, role: val };
-                  onChange({ staff: newStaff });
-                }}
+                tag="h3"
+                value={data.title || ''}
+                onChange={(val) => onChange({ title: val })}
                 isEditMode={isEditMode}
-                placeholder="직책"
-                className="text-[13px] text-[#cc0000] font-semibold mb-1.5"
+                placeholder="직분 타이틀 (예: 목회자, 장로)"
+                className="text-3xl font-bold text-gray-900 inline-block relative pb-4"
               />
-              <EditableText
-                tag="div"
-                value={person.name || ''}
-                onChange={(val) => {
-                  const newStaff = [...data.staff];
-                  newStaff[idx] = { ...person, name: val };
-                  onChange({ staff: newStaff });
-                }}
-                isEditMode={isEditMode}
-                placeholder="이름"
-                className="text-[18px] font-bold text-[#111] mb-1"
-              />
-              {(person.department || isEditMode) && (
-                <EditableText
-                  tag="div"
-                  value={person.department || ''}
-                  onChange={(val) => {
+              <div className="w-12 h-1 bg-[#cc0000] mx-auto mt-4 rounded-full"></div>
+            </>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10">
+          {data.staff?.map((person, idx) => (
+            <div key={idx} className="group flex flex-col items-center text-center">
+              <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-6 bg-gray-50 border-4 border-white shadow-xl group-hover:shadow-2xl transition-all duration-300 relative group-hover:-translate-y-2">
+                <EditableImage
+                  src={person.image}
+                  onChange={(url) => {
                     const newStaff = [...data.staff];
-                    newStaff[idx] = { ...person, department: val };
+                    newStaff[idx] = { ...person, image: url };
                     onChange({ staff: newStaff });
                   }}
                   isEditMode={isEditMode}
-                  placeholder="부서 (선택)"
-                  className="text-[13px] text-gray-500"
+                  className="w-full h-full"
+                  imageClassName="w-full h-full object-cover"
+                  placeholder={
+                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
+                      <ImageIcon size={40} className="opacity-30" />
+                    </div>
+                  }
                 />
-              )}
+              </div>
+              
+              <div className="bg-white px-6 py-4 rounded-2xl w-full -mt-12 relative z-10 border border-gray-100 shadow-sm group-hover:shadow-md transition-shadow">
+                <EditableText
+                  tag="div"
+                  value={person.role || ''}
+                  onChange={(val) => {
+                    const newStaff = [...data.staff];
+                    newStaff[idx] = { ...person, role: val };
+                    onChange({ staff: newStaff });
+                  }}
+                  isEditMode={isEditMode}
+                  placeholder="직책 (예: 부목사)"
+                  className="text-[13px] text-[#cc0000] font-bold tracking-wider uppercase mb-1"
+                />
+                <EditableText
+                  tag="div"
+                  value={person.name || ''}
+                  onChange={(val) => {
+                    const newStaff = [...data.staff];
+                    newStaff[idx] = { ...person, name: val };
+                    onChange({ staff: newStaff });
+                  }}
+                  isEditMode={isEditMode}
+                  placeholder="이름"
+                  className="text-[20px] font-bold text-gray-900 mb-1"
+                />
+                {(person.department || isEditMode) && (
+                  <EditableText
+                    tag="div"
+                    value={person.department || ''}
+                    onChange={(val) => {
+                      const newStaff = [...data.staff];
+                      newStaff[idx] = { ...person, department: val };
+                      onChange({ staff: newStaff });
+                    }}
+                    isEditMode={isEditMode}
+                    placeholder="사역 부서 (선택)"
+                    className="text-[14px] text-gray-500 font-medium"
+                  />
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

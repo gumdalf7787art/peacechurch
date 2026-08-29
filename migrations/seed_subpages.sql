@@ -23,21 +23,7 @@ INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_
 VALUES ('about/pastor', 3, '담임목사 인사말', '그리스도의 평화가 머무는 교회', '', '[{"id":"blk_pastor_hero","type":"PastorGreeting","data":{"image":"/pastor-profile.jpg","name":"장성진","title":"담임목사","history":["감리교신학교 신학과 졸업<br>감리교신학교 대학원 졸업<br>평화감리교회 담임 (2016-현재)"],"greetingPart1":"평화교회 홈페이지를 찾아주신 여러분을 주님의 이름으로 환영합니다.<br><br>평화교회를 섬기고 있는 담임목사 장성진입니다.<br>교회는 단순히 사람들이 모여 예배드리는 장소가 아니라, 하나님의 사랑을 배우고 그 사랑을 삶으로 살아내는 공동체라고 믿습니다.","quoteText":"복음은 말에만 머무는 것이 아니라 한 사람의 삶 곁으로 다가가 함께 울고, 함께 기뻐하며, 함께 걸어가는 사랑이어야 한다는 것입니다.","greetingPart2":"우리 교회가 예배의 기쁨이 살아 있는 교회, 말씀을 통해 삶의 방향을 발견하는 교회, 다음 세대가 믿음 안에서 꿈을 키우는 교회가 되기를 소망합니다.<br><br>누구든 편안한 마음으로 찾아오십시오. 함께 예배하고, 함께 말씀을 배우며, 서로의 삶을 나누면서 믿음의 길을 함께 걸어가고 싶습니다."}}]', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
-VALUES ('about/staff', 4, '섬기는 사람들', '교회를 위해 헌신하는 동역자들', '', '
-      <h3 style="font-size: 22px; font-weight: bold; border-left: 4px solid #cc0000; padding-left: 12px; margin-bottom: 24px;">목회자</h3>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px;">
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">부목사</div><div style="font-weight: bold; font-size: 18px;">김목사</div></div>
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">전도사</div><div style="font-weight: bold; font-size: 18px;">이전도사</div></div>
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">전도사</div><div style="font-weight: bold; font-size: 18px;">박전도사</div></div>
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">전도사</div><div style="font-weight: bold; font-size: 18px;">최전도사</div></div>
-      </div>
-      <h3 style="font-size: 22px; font-weight: bold; border-left: 4px solid #cc0000; padding-left: 12px; margin-bottom: 24px;">장로</h3>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px;">
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">시무장로</div><div style="font-weight: bold; font-size: 18px;">최장로</div></div>
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">시무장로</div><div style="font-weight: bold; font-size: 18px;">정장로</div></div>
-        <div style="border: 1px solid #eee; border-radius: 8px; text-align: center; padding: 20px;"><div style="color: #cc0000; font-size: 13px;">시무장로</div><div style="font-weight: bold; font-size: 18px;">강장로</div></div>
-      </div>
-    ', 1)
+VALUES ('about/staff', 4, '섬기는 사람들', '교회를 위해 헌신하는 동역자들', '', '[{"id":"blk_staff_1","type":"StaffGrid","data":{"title":"목회자","staff":[{"role":"부목사","name":"김목사","department":"교구/행정","image":""},{"role":"전도사","name":"이전도사","department":"청년부/찬양","image":""},{"role":"전도사","name":"박전도사","department":"중고등부","image":""},{"role":"전도사","name":"최전도사","department":"아동부","image":""}]}},{"id":"blk_staff_2","type":"StaffGrid","data":{"title":"시무장로","staff":[{"role":"시무장로","name":"최장로","image":""},{"role":"시무장로","name":"정장로","image":""},{"role":"시무장로","name":"강장로","image":""}]}}]', 1)
 ON CONFLICT(slug) DO UPDATE SET content = excluded.content, title = excluded.title, subtitle = excluded.subtitle;
 INSERT INTO subpages (slug, menu_id, title, subtitle, banner_image, content, is_published)
 VALUES ('about/worship', 5, '예배시간 안내', '예배와 모임 시간', '', '

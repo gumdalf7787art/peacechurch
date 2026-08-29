@@ -76,5 +76,32 @@ export const PAGE_TEMPLATES = {
         "greetingPart2": "우리 교회가 예배의 기쁨이 살아 있는 교회, 말씀을 통해 삶의 방향을 발견하는 교회, 다음 세대가 믿음 안에서 꿈을 키우는 교회가 되기를 소망합니다.<br><br>누구든 편안한 마음으로 찾아오십시오. 함께 예배하고, 함께 말씀을 배우며, 서로의 삶을 나누면서 믿음의 길을 함께 걸어가고 싶습니다."
       }
     }
+  ],
+  'about/staff': [
+    {
+      "id": "blk_staff_1",
+      "type": "StaffGrid",
+      "data": {
+        "title": "목회자",
+        "staff": [
+          { "role": "부목사", "name": "김목사", "department": "교구/행정", "image": "" },
+          { "role": "전도사", "name": "이전도사", "department": "청년부/찬양", "image": "" },
+          { "role": "전도사", "name": "박전도사", "department": "중고등부", "image": "" },
+          { "role": "전도사", "name": "최전도사", "department": "아동부", "image": "" }
+        ]
+      }
+    },
+    {
+      "id": "blk_staff_2",
+      "type": "StaffGrid",
+      "data": {
+        "title": "시무장로",
+        "staff": [
+          { "role": "시무장로", "name": "최장로", "image": "" },
+          { "role": "시무장로", "name": "정장로", "image": "" },
+          { "role": "시무장로", "name": "강장로", "image": "" }
+        ]
+      }
+    }
   ]
 };
