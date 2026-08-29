@@ -43,6 +43,8 @@ export default function FloatingToolbar() {
         justifyLeft: document.queryCommandState('justifyLeft'),
         justifyCenter: document.queryCommandState('justifyCenter'),
         justifyRight: document.queryCommandState('justifyRight'),
+        foreColor: document.queryCommandValue('foreColor'),
+        hiliteColor: document.queryCommandValue('hiliteColor'),
       });
 
       setPosition({
@@ -74,7 +76,8 @@ export default function FloatingToolbar() {
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value);
     // Force re-check formats
-    setActiveFormats({
+    setActiveFormats(prev => ({
+      ...prev,
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
@@ -82,7 +85,9 @@ export default function FloatingToolbar() {
       justifyLeft: document.queryCommandState('justifyLeft'),
       justifyCenter: document.queryCommandState('justifyCenter'),
       justifyRight: document.queryCommandState('justifyRight'),
-    });
+      foreColor: document.queryCommandValue('foreColor'),
+      hiliteColor: document.queryCommandValue('hiliteColor'),
+    }));
   };
 
   const closeAllMenus = () => {
@@ -118,6 +123,12 @@ export default function FloatingToolbar() {
     { label: '매우 크게', value: '6' },
     { label: '가장 크게', value: '7' },
   ];
+
+  // Utility to determine indicator color
+  const getDisplayColor = (colorString, fallback) => {
+    if (!colorString || colorString === 'transparent' || colorString === 'rgba(0, 0, 0, 0)') return fallback;
+    return colorString;
+  };
 
   return (
     <div 
@@ -155,48 +166,83 @@ export default function FloatingToolbar() {
       
       <div className="relative">
         <ToolbarButton 
-          icon={<Type size={16} />} 
+          icon={
+            <div className="flex flex-col items-center">
+              <Type size={16} />
+              <div className="w-3 h-[3px] mt-[1px] rounded-sm" style={{ backgroundColor: getDisplayColor(activeFormats.foreColor, '#000') }}></div>
+            </div>
+          }
           active={showColorPicker} 
           onClick={() => toggleMenu(setShowColorPicker, showColorPicker)} 
           title="글자색"
         />
         {showColorPicker && (
-          <div className="absolute top-full left-0 mt-2 p-2 bg-white rounded-lg shadow-lg border border-gray-200 grid grid-cols-4 gap-2 z-50">
-            {colors.map(c => (
-              <button 
-                key={c}
-                className="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform"
-                style={{ backgroundColor: c }}
-                onClick={() => { execCommand('foreColor', c); setShowColorPicker(false); }}
-              />
-            ))}
+          <div className="absolute top-full left-0 mt-2 p-3 w-[140px] bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+            <div className="text-[11px] text-gray-500 mb-1.5 font-bold">기본 색상</div>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {colors.map(c => (
+                <button 
+                  key={c}
+                  className="w-6 h-6 rounded-full border border-gray-200 hover:scale-110 transition-transform shadow-sm"
+                  style={{ backgroundColor: c }}
+                  onClick={() => { execCommand('foreColor', c); setShowColorPicker(false); }}
+                />
+              ))}
+            </div>
+            <div className="w-full h-[1px] bg-gray-100 my-2"></div>
+            <div className="text-[11px] text-gray-500 mb-1.5 font-bold">직접 지정 (RGB)</div>
+            <input 
+              type="color" 
+              className="w-full h-8 cursor-pointer rounded border border-gray-200"
+              onChange={(e) => execCommand('foreColor', e.target.value)}
+              onBlur={() => setShowColorPicker(false)}
+            />
           </div>
         )}
       </div>
 
       <div className="relative">
         <ToolbarButton 
-          icon={<Highlighter size={16} />} 
+          icon={
+            <div className="flex flex-col items-center">
+              <Highlighter size={16} />
+              <div className="w-3 h-[3px] mt-[1px] rounded-sm border" style={{ 
+                backgroundColor: getDisplayColor(activeFormats.hiliteColor, 'transparent'),
+                borderColor: (!activeFormats.hiliteColor || activeFormats.hiliteColor === 'rgba(0, 0, 0, 0)' || activeFormats.hiliteColor === 'transparent') ? '#ccc' : 'transparent'
+              }}></div>
+            </div>
+          }
           active={showBgColorPicker} 
           onClick={() => toggleMenu(setShowBgColorPicker, showBgColorPicker)} 
           title="배경색"
         />
         {showBgColorPicker && (
-          <div className="absolute top-full left-0 mt-2 p-2 bg-white rounded-lg shadow-lg border border-gray-200 grid grid-cols-4 gap-2 z-50">
-            {colors.map(c => (
-              <button 
-                key={c}
-                className="w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform"
-                style={{ backgroundColor: c }}
-                onClick={() => { execCommand('hiliteColor', c); setShowBgColorPicker(false); }}
-              />
-            ))}
+          <div className="absolute top-full left-0 mt-2 p-3 w-[140px] bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+            <div className="text-[11px] text-gray-500 mb-1.5 font-bold">기본 색상</div>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {colors.map(c => (
+                <button 
+                  key={c}
+                  className="w-6 h-6 rounded-full border border-gray-200 hover:scale-110 transition-transform shadow-sm"
+                  style={{ backgroundColor: c }}
+                  onClick={() => { execCommand('hiliteColor', c); setShowBgColorPicker(false); }}
+                />
+              ))}
+            </div>
             <button 
-              className="col-span-4 py-1 text-[11px] bg-gray-100 rounded text-gray-600 hover:bg-gray-200"
+              className="w-full py-1.5 mb-2 text-[11px] bg-gray-100 rounded text-gray-600 hover:bg-gray-200 font-medium"
               onClick={() => { execCommand('hiliteColor', 'transparent'); setShowBgColorPicker(false); }}
             >
               배경색 없음
             </button>
+            <div className="w-full h-[1px] bg-gray-100 my-2"></div>
+            <div className="text-[11px] text-gray-500 mb-1.5 font-bold">직접 지정 (RGB)</div>
+            <input 
+              type="color" 
+              className="w-full h-8 cursor-pointer rounded border border-gray-200"
+              onChange={(e) => execCommand('hiliteColor', e.target.value)}
+              onBlur={() => setShowBgColorPicker(false)}
+            />
           </div>
         )}
       </div>
