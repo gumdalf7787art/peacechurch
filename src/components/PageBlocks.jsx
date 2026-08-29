@@ -1045,7 +1045,7 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
   const userProfile = userProfileStr ? JSON.parse(userProfileStr) : null;
   const canEdit = isEditMode || (userProfile && userProfile.role === 'admin');
 
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isWritePageOpen, setIsWritePageOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
   const [newDate, setNewDate] = React.useState('');
   const [newImage, setNewImage] = React.useState('');
@@ -1086,19 +1086,25 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
   };
 
   const addBulletin = () => {
-    if (!newTitle || !newDate || !newImage) {
-      alert("제목, 날짜, 표지 이미지는 필수입니다.");
+    if (!newTitle || !newDate) {
+      alert("제목과 날짜는 필수입니다.");
       return;
     }
+    
+    let finalImage = newImage;
+    if (!finalImage && newPdf && newPdf.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i)) {
+      finalImage = newPdf;
+    }
+
     const newBulletin = {
       id: Math.random().toString(36).substr(2, 9),
       title: newTitle,
       date: newDate,
-      image: newImage,
+      image: finalImage,
       pdf: newPdf
     };
     onChange({ bulletins: [newBulletin, ...bulletins] });
-    setIsModalOpen(false);
+    setIsWritePageOpen(false);
     setNewTitle('');
     setNewDate('');
     setNewImage('');
@@ -1110,6 +1116,81 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
       onChange({ bulletins: bulletins.filter(b => b.id !== id) });
     }
   };
+
+  if (isWritePageOpen) {
+    return (
+      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20">
+        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100 relative">
+          {uploading && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-3xl">
+              <div className="w-8 h-8 border-4 border-[#cc0000] border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="font-bold text-gray-700">파일 업로드 중...</div>
+            </div>
+          )}
+          
+          <div className="flex justify-between items-center mb-10 border-b border-gray-100 pb-6">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-900">새 주보 등록</h3>
+            <button onClick={() => setIsWritePageOpen(false)} className="text-gray-400 hover:text-gray-700 transition-colors px-4 py-2 bg-gray-50 rounded-xl font-bold">취소</button>
+          </div>
+          
+          <div className="space-y-8">
+             <div>
+               <label className="block text-[14px] font-bold text-gray-700 mb-2">주보 제목 <span className="text-red-500">*</span></label>
+               <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 focus:bg-white focus:border-[#cc0000] focus:ring-2 focus:ring-red-100 outline-none transition-all text-[15px]" placeholder="예: 2026년 8월 4주차 주보" />
+             </div>
+             <div>
+               <label className="block text-[14px] font-bold text-gray-700 mb-2">주보 날짜 <span className="text-red-500">*</span></label>
+               <input type="date" value={newDate} onChange={e=>setNewDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 focus:bg-white focus:border-[#cc0000] focus:ring-2 focus:ring-red-100 outline-none transition-all text-gray-700 text-[15px]" />
+             </div>
+             
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div>
+                 <label className="block text-[14px] font-bold text-gray-700 mb-2">표지 이미지 (선택)</label>
+                 <p className="text-[12px] text-gray-500 mb-3">등록하지 않으면 첨부파일이 이미지일 경우 표지로 자동 사용됩니다.</p>
+                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative h-[160px] flex flex-col justify-center">
+                   {newImage ? (
+                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+                       <span className="text-[13px] text-green-600 truncate w-full px-4 font-bold mb-3">{newImage.split('/').pop()}</span>
+                       <button onClick={()=>setNewImage('')} className="bg-red-50 text-red-500 text-[13px] font-bold px-4 py-2 hover:bg-red-100 transition-colors rounded-lg">삭제하기</button>
+                     </div>
+                   ) : (
+                     <label className="cursor-pointer text-gray-600 font-bold text-[14px] flex flex-col items-center justify-center gap-3 w-full h-full">
+                       <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform"><ImageIcon size={20} /></div>
+                       표지 이미지 선택
+                       <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUploadFile(e, 'image')} />
+                     </label>
+                   )}
+                 </div>
+               </div>
+               <div>
+                 <label className="block text-[14px] font-bold text-gray-700 mb-2">주보 첨부파일 (PDF, JPG, PNG)</label>
+                 <p className="text-[12px] text-gray-500 mb-3">PDF 문서나 주보 원본 이미지를 업로드할 수 있습니다.</p>
+                 <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-6 text-center hover:border-gray-400 transition-colors group relative h-[160px] flex flex-col justify-center">
+                   {newPdf ? (
+                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+                       <span className="text-[13px] text-blue-600 truncate w-full px-4 font-bold mb-3">{newPdf.split('/').pop()}</span>
+                       <button onClick={()=>setNewPdf('')} className="bg-red-50 text-red-500 text-[13px] font-bold px-4 py-2 hover:bg-red-100 transition-colors rounded-lg">삭제하기</button>
+                     </div>
+                   ) : (
+                     <label className="cursor-pointer text-gray-600 font-bold text-[14px] flex flex-col items-center justify-center gap-3 w-full h-full">
+                       <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform"><BookOpen size={20} /></div>
+                       첨부파일 선택
+                       <input type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => handleUploadFile(e, 'pdf')} />
+                     </label>
+                   )}
+                 </div>
+               </div>
+             </div>
+             
+             <div className="pt-8 border-t border-gray-100 flex justify-end gap-3">
+                <button onClick={() => setIsWritePageOpen(false)} className="px-6 py-3.5 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">취소</button>
+                <button onClick={addBulletin} className="px-8 py-3.5 rounded-xl font-bold text-white bg-[#2a4358] hover:bg-[#1d2f3d] transition-colors shadow-lg">등록 완료</button>
+             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="py-16 md:py-20 bg-white relative">
@@ -1129,13 +1210,13 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
           </div>
           {canEdit && (
              <button 
-               onClick={() => setIsModalOpen(true)}
+               onClick={() => setIsWritePageOpen(true)}
                style={!isEditMode ? { padding: '10px 20px', backgroundColor: '#2a4358', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', transition: 'background-color 0.2s' } : {}}
                className={isEditMode ? "bg-[#cc0000] text-white px-5 py-2.5 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg flex items-center gap-2 transform hover:-translate-y-0.5" : ""}
                onMouseEnter={(e) => { if (!isEditMode) e.currentTarget.style.backgroundColor = '#1d2f3d'; }}
                onMouseLeave={(e) => { if (!isEditMode) e.currentTarget.style.backgroundColor = '#2a4358'; }}
              >
-               {isEditMode ? <><Plus size={18} /> 새 주보 등록</> : '글쓰기'}
+               {isEditMode ? <><Plus size={18} /> 새 주보 등록</> : '주보등록'}
              </button>
           )}
         </div>
@@ -1157,12 +1238,11 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
                    <div className="text-[13px] text-[#cc0000] font-bold mb-2 tracking-wide">{b.date}</div>
                    <h4 className="font-bold text-[18px] text-gray-900 mb-5 leading-snug">{b.title}</h4>
                    <div className="flex gap-2">
-                     {b.image && (
-                       <a href={b.image} target="_blank" rel="noreferrer" className="flex-1 text-center py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-[14px] font-bold text-gray-700 hover:bg-gray-100 transition-colors">이미지 열기</a>
-                     )}
-                     {b.pdf && (
+                     {b.pdf && b.pdf.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
+                       <a href={b.pdf} target="_blank" rel="noreferrer" className="flex-1 text-center py-2.5 bg-[#cc0000] text-white rounded-xl text-[14px] font-bold hover:bg-red-700 transition-colors shadow-sm">주보 이미지 열기</a>
+                     ) : b.pdf ? (
                        <a href={b.pdf} target="_blank" rel="noreferrer" className="flex-1 text-center py-2.5 bg-[#cc0000] text-white rounded-xl text-[14px] font-bold hover:bg-red-700 transition-colors shadow-sm">PDF 다운로드</a>
-                     )}
+                     ) : null}
                    </div>
                  </div>
               </div>
@@ -1174,69 +1254,6 @@ export function BulletinBoardBlock({ data, isEditMode, onChange }) {
         )}
       </div>
 
-      {/* Upload Modal (Only visible in edit mode when opened) */}
-      {isModalOpen && isEditMode && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-           <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative overflow-hidden">
-              {uploading && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                  <div className="w-8 h-8 border-4 border-[#cc0000] border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <div className="font-bold text-gray-700">파일 업로드 중...</div>
-                </div>
-              )}
-              
-              <h3 className="text-2xl font-bold mb-6 text-gray-900">새 주보 등록</h3>
-              <div className="space-y-5">
-                 <div>
-                   <label className="block text-[13px] font-bold text-gray-500 mb-1.5">주보 제목</label>
-                   <input type="text" value={newTitle} onChange={e=>setNewTitle(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:bg-white focus:border-[#cc0000] outline-none transition-colors" placeholder="예: 2026년 8월 4주차 주보" />
-                 </div>
-                 <div>
-                   <label className="block text-[13px] font-bold text-gray-500 mb-1.5">주보 날짜</label>
-                   <input type="date" value={newDate} onChange={e=>setNewDate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:bg-white focus:border-[#cc0000] outline-none transition-colors text-gray-700" />
-                 </div>
-                 <div>
-                   <label className="block text-[13px] font-bold text-gray-500 mb-1.5">표지 이미지 (필수)</label>
-                   <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-4 text-center hover:border-gray-400 transition-colors">
-                     {newImage ? (
-                       <div className="flex items-center justify-between bg-white border border-gray-200 p-2 rounded-lg shadow-sm">
-                         <span className="text-[12px] text-green-600 truncate max-w-[200px] font-medium">{newImage.split('/').pop()}</span>
-                         <button onClick={()=>setNewImage('')} className="text-red-500 text-[12px] font-bold px-2 py-1 hover:bg-red-50 rounded">삭제</button>
-                       </div>
-                     ) : (
-                       <label className="cursor-pointer text-gray-600 font-bold text-[14px] flex flex-col items-center justify-center gap-2">
-                         <div className="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400"><ImageIcon size={18} /></div>
-                         이미지 파일 업로드
-                         <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUploadFile(e, 'image')} />
-                       </label>
-                     )}
-                   </div>
-                 </div>
-                 <div>
-                   <label className="block text-[13px] font-bold text-gray-500 mb-1.5">PDF 파일 (선택)</label>
-                   <div className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-xl p-4 text-center hover:border-gray-400 transition-colors">
-                     {newPdf ? (
-                       <div className="flex items-center justify-between bg-white border border-gray-200 p-2 rounded-lg shadow-sm">
-                         <span className="text-[12px] text-green-600 truncate max-w-[200px] font-medium">{newPdf.split('/').pop()}</span>
-                         <button onClick={()=>setNewPdf('')} className="text-red-500 text-[12px] font-bold px-2 py-1 hover:bg-red-50 rounded">삭제</button>
-                       </div>
-                     ) : (
-                       <label className="cursor-pointer text-gray-600 font-bold text-[14px] flex flex-col items-center justify-center gap-2">
-                         <div className="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400"><BookOpen size={18} /></div>
-                         PDF 파일 업로드
-                         <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleUploadFile(e, 'pdf')} />
-                       </label>
-                     )}
-                   </div>
-                 </div>
-              </div>
-              <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
-                 <button onClick={()=>setIsModalOpen(false)} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">취소</button>
-                 <button onClick={addBulletin} className="px-6 py-3 bg-[#cc0000] text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-md">완료 및 등록</button>
-              </div>
-           </div>
-        </div>
-      )}
     </section>
   );
 }
