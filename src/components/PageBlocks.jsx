@@ -313,7 +313,7 @@ export function StaffGridBlock({ data, isEditMode, onChange }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10">
           {data.staff?.map((person, idx) => (
             <div key={idx} className="group flex flex-col items-center text-center rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden relative hover:-translate-y-1">
-              <div className="w-full aspect-[4/5] bg-gray-50 relative overflow-hidden border-b border-gray-100">
+              <div className="w-full aspect-[3/4] bg-gray-50 relative overflow-hidden border-b border-gray-100">
                 <EditableImage
                   src={person.image}
                   onChange={(url) => {
